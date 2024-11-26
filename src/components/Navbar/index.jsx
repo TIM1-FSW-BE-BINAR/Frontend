@@ -35,7 +35,7 @@ const NavigationBar = () => {
 
   return (
     <>
-      {["xxl"].map((expand) => (
+      {["xl"].map((expand) => (
         <Navbar
           style={{
             background: "#FFFFFF",
@@ -55,37 +55,6 @@ const NavigationBar = () => {
               TiketKU
             </Navbar.Brand>
 
-            <div
-              style={{
-                padding: "5px",
-                paddingInline: "15px",
-                margin: "5px",
-                borderRadius: "10px",
-                width: "350px",
-                display: "flex",
-                justifyContent: "center",
-                gap: "0em",
-                alignItems: "center",
-                backgroundColor: "#EEEEEE",
-              }}
-            >
-              <input
-                type="text"
-                // value={query}
-                // onChange={(e) => setQuery(e.target.value)}
-                style={{
-                  width: "100%",
-                  border: "none",
-                  zIndex: "1",
-                  backgroundColor: "#EEEEEE",
-                  outline: "1px grey",
-                }}
-                placeholder="Cari di sini ..."
-              />
-
-              <LuSearch />
-            </div>
-
             <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} />
             <Navbar.Offcanvas
               id={`offcanvasNavbar-expand-${expand}`}
@@ -103,10 +72,12 @@ const NavigationBar = () => {
                     <>
                       <Nav.Link as={Link} to="/#faq">
                         <IoIosList />
-                      </Nav.Link> History
+                      </Nav.Link>{" "}
+                      History
                       <Nav.Link as={Link} to="/#faq">
                         <IoIosNotificationsOutline />
-                      </Nav.Link> Notification
+                      </Nav.Link>{" "}
+                      Notification
                       <Nav.Link as={Link} to="/#faq">
                         <RxPerson /> Account
                       </Nav.Link>

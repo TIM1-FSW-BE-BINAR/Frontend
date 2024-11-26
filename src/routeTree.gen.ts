@@ -16,17 +16,31 @@ import { Route as rootRoute } from './routes/__root'
 
 // Create Virtual Routes
 
+const ResetPasswordLazyImport = createFileRoute('/resetPassword')()
 const RegisterLazyImport = createFileRoute('/register')()
+const OtpLazyImport = createFileRoute('/otp')()
 const LoginLazyImport = createFileRoute('/login')()
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
+
+const ResetPasswordLazyRoute = ResetPasswordLazyImport.update({
+  id: '/resetPassword',
+  path: '/resetPassword',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/resetPassword.lazy').then((d) => d.Route))
 
 const RegisterLazyRoute = RegisterLazyImport.update({
   id: '/register',
   path: '/register',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/register.lazy').then((d) => d.Route))
+
+const OtpLazyRoute = OtpLazyImport.update({
+  id: '/otp',
+  path: '/otp',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/otp.lazy').then((d) => d.Route))
 
 const LoginLazyRoute = LoginLazyImport.update({
   id: '/login',
@@ -58,11 +72,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginLazyImport
       parentRoute: typeof rootRoute
     }
+    '/otp': {
+      id: '/otp'
+      path: '/otp'
+      fullPath: '/otp'
+      preLoaderRoute: typeof OtpLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/register': {
       id: '/register'
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/resetPassword': {
+      id: '/resetPassword'
+      path: '/resetPassword'
+      fullPath: '/resetPassword'
+      preLoaderRoute: typeof ResetPasswordLazyImport
       parentRoute: typeof rootRoute
     }
   }
@@ -73,41 +101,51 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/login': typeof LoginLazyRoute
+  '/otp': typeof OtpLazyRoute
   '/register': typeof RegisterLazyRoute
+  '/resetPassword': typeof ResetPasswordLazyRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '/login': typeof LoginLazyRoute
+  '/otp': typeof OtpLazyRoute
   '/register': typeof RegisterLazyRoute
+  '/resetPassword': typeof ResetPasswordLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
   '/login': typeof LoginLazyRoute
+  '/otp': typeof OtpLazyRoute
   '/register': typeof RegisterLazyRoute
+  '/resetPassword': typeof ResetPasswordLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register'
+  fullPaths: '/' | '/login' | '/otp' | '/register' | '/resetPassword'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register'
-  id: '__root__' | '/' | '/login' | '/register'
+  to: '/' | '/login' | '/otp' | '/register' | '/resetPassword'
+  id: '__root__' | '/' | '/login' | '/otp' | '/register' | '/resetPassword'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   LoginLazyRoute: typeof LoginLazyRoute
+  OtpLazyRoute: typeof OtpLazyRoute
   RegisterLazyRoute: typeof RegisterLazyRoute
+  ResetPasswordLazyRoute: typeof ResetPasswordLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   LoginLazyRoute: LoginLazyRoute,
+  OtpLazyRoute: OtpLazyRoute,
   RegisterLazyRoute: RegisterLazyRoute,
+  ResetPasswordLazyRoute: ResetPasswordLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -122,7 +160,9 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/login",
-        "/register"
+        "/otp",
+        "/register",
+        "/resetPassword"
       ]
     },
     "/": {
@@ -131,8 +171,14 @@ export const routeTree = rootRoute
     "/login": {
       "filePath": "login.lazy.jsx"
     },
+    "/otp": {
+      "filePath": "otp.lazy.jsx"
+    },
     "/register": {
       "filePath": "register.lazy.jsx"
+    },
+    "/resetPassword": {
+      "filePath": "resetPassword.lazy.jsx"
     }
   }
 }

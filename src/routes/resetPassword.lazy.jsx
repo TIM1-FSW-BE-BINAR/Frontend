@@ -1,21 +1,20 @@
 import React from "react";
 import "../styles/variables.scss";
-import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
+import { createLazyFileRoute } from "@tanstack/react-router";
 import { useSelector } from "react-redux";
 import Background from "/img/Frame 1.svg";
-import RegisterForm from "../components/Register/Form";
+import ResetPasswordForm from "../components/Login/Form/resetPasswordForm";
 
-export const Route = createLazyFileRoute("/register")({
-  component: Register,
+export const Route = createLazyFileRoute("/resetPassword")({
+  component: ResetPassword,
 });
 
-function Register() {
+function ResetPassword() {
   const { token } = useSelector((state) => state.auth);
-  const navigate = useNavigate();
 
-  if (token) {
-    navigate({ to: "/" });
-  }
+  // if (token) {
+  //   navigate({ to: "/" });
+  // }
 
   return (
     <section
@@ -45,7 +44,7 @@ function Register() {
           height: "100%",
         }}
       >
-        <RegisterForm />
+        <ResetPasswordForm />
       </div>
     </section>
   );
