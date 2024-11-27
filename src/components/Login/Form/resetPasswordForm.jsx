@@ -28,10 +28,7 @@ const ResetPasswordForm = () => {
     if (password !== confirmPassword) {
       setError("Password tidak sama. Silakan coba lagi.");
     } else {
-      setError(""); // Clear error if passwords match
-      // Form submission logic
-      console.log("Password reset berhasil!");
-      // Reset form or redirect logic here
+      setError("");
     }
   };
   return (
