@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useRef, useState } from "react";
 import "../../../styles/variables.scss";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -7,21 +6,8 @@ import { Container, Row, Col, Button, Form, Image } from "react-bootstrap";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { useMutation } from "@tanstack/react-query";
 import { register } from "../../../service/auth";
-<<<<<<< HEAD
 import { setToken } from "../../../redux/slices/auth";
 import toast, { Toaster } from "react-hot-toast";
-=======
->>>>>>> e680011bd640e47652230a69286d127236c70cc5
-=======
-import React from "react";
-import "../../../styles/variables.scss";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
-import { Container, Row, Col, Button, Form, Image } from "react-bootstrap";
-import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
-import { register } from "../../../service/auth";
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
 
 const RegisterForm = () => {
   const dispatch = useDispatch();
@@ -36,7 +22,6 @@ const RegisterForm = () => {
 
   const [type, setType] = useState("password");
   const [icon, setIcon] = useState(<IoEyeOffOutline />);
-<<<<<<< HEAD
 
   const [errors, setErrors] = useState({
     firstName: "",
@@ -177,9 +162,6 @@ const RegisterForm = () => {
     };
     registerUser(request);
   };
-=======
-  const [validated, setValidated] = useState(false);
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
 
   const handleEyeToggle = () => {
     if (type === "password") {
@@ -191,46 +173,6 @@ const RegisterForm = () => {
     }
   };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
-  const handleRegister = async (e) => {
-    e.preventDefault();
-
-    const form = e.currentTarget;
-    if (form.checkValidity() === false) {
-      e.preventDefault();
-      e.stopPropagation();
-      setValidated(true);
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      alert("Password tidak cocok");
-      return;
-    }
-
-    const request = {
-      firstName,
-      lastName,
-      phone,
-      email,
-      password,
-    };
-
-    const result = await register(request);
-
-    if (result.meta.statusCode === 201) {
-      alert("Registrasi berhasil!");
-      navigate({ to: "/otp" });
-    }
-  };
-<<<<<<< HEAD
->>>>>>> e680011bd640e47652230a69286d127236c70cc5
-=======
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
   return (
     <div
       style={{
@@ -238,11 +180,7 @@ const RegisterForm = () => {
         width: "100%",
       }}
     >
-<<<<<<< HEAD
-<<<<<<< HEAD
       {" "}
-=======
->>>>>>> e680011bd640e47652230a69286d127236c70cc5
       <h2 className="fw-bold text-start mb-4">Daftar</h2>
       <Form noValidate onSubmit={handleRegister}>
         {/* Nama */}
@@ -262,33 +200,10 @@ const RegisterForm = () => {
           />
           <Form.Control.Feedback type="invalid">
             {errors.firstName}
-=======
-      <h2 className="fw-bold text-start mb-4">Daftar</h2>
-      <Form noValidate validated={validated} onSubmit={handleRegister}>
-        {/* Nama */}
-        <Form.Group className="mb-3" controlId="validationCustom01">
-          <Form.Label>Nama Depan</Form.Label>
-          <div style={{ position: "relative" }}>
-            <Form.Control
-              type="text"
-              placeholder="Nama Depan"
-              required
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              style={{
-                borderRadius: "15px",
-                padding: "1em",
-              }}
-            />
-          </div>
-          <Form.Control.Feedback type="invalid">
-            Please provide a valid city.
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
           </Form.Control.Feedback>
         </Form.Group>
         <Form.Group className="mb-3" controlId="validationCustom02">
           <Form.Label>Nama Belakang</Form.Label>
-<<<<<<< HEAD
           <Form.Control
             ref={lastNameRef}
             isInvalid={!!errors.lastName}
@@ -303,30 +218,12 @@ const RegisterForm = () => {
           />
           <Form.Control.Feedback type="invalid">
             {errors.lastName}
-=======
-          <div style={{ position: "relative" }}>
-            <Form.Control
-              type="text"
-              placeholder="Nama Belakang"
-              required
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              style={{
-                borderRadius: "15px",
-                padding: "1em",
-              }}
-            />
-          </div>
-          <Form.Control.Feedback type="invalid">
-            Please provide a valid city.
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
           </Form.Control.Feedback>
         </Form.Group>
 
         {/* Email */}
         <Form.Group className="mb-3" controlId="validationCustom03">
           <Form.Label>Email</Form.Label>
-<<<<<<< HEAD
           <Form.Control
             type="email"
             ref={emailRef}
@@ -342,31 +239,12 @@ const RegisterForm = () => {
           />
           <Form.Control.Feedback type="invalid">
             {errors.email}
-=======
-          <div style={{ position: "relative" }}>
-            <Form.Control
-              type="email"
-              placeholder="Contoh: johndoe@gmail.com"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{
-                borderRadius: "15px",
-                padding: "1em",
-                paddingRight: "2.5em",
-              }}
-            />
-          </div>
-          <Form.Control.Feedback type="invalid">
-            Please provide a valid email.
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
           </Form.Control.Feedback>
         </Form.Group>
 
         {/* Nomor Telepon */}
         <Form.Group className="mb-3" controlId="validationCustom04">
           <Form.Label>Nomor Telepon</Form.Label>
-<<<<<<< HEAD
           <Form.Control
             ref={phoneRef}
             isInvalid={!!errors.phone}
@@ -381,23 +259,6 @@ const RegisterForm = () => {
           />
           <Form.Control.Feedback type="invalid">
             {errors.phone}
-=======
-          <div style={{ position: "relative" }}>
-            <Form.Control
-              type="number"
-              placeholder="+62 "
-              required
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              style={{
-                borderRadius: "15px",
-                padding: "1em",
-              }}
-            />
-          </div>
-          <Form.Control.Feedback type="invalid">
-            Please provide a valid phone number.
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
           </Form.Control.Feedback>
         </Form.Group>
 
@@ -407,10 +268,7 @@ const RegisterForm = () => {
           <div style={{ position: "relative" }}>
             <Form.Control
               type={type}
-<<<<<<< HEAD
               ref={passwordRef}
-=======
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
               placeholder="Masukkan password"
               required
               style={{
@@ -420,43 +278,25 @@ const RegisterForm = () => {
               }}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-<<<<<<< HEAD
               isInvalid={!!errors.password}
-=======
-              autoComplete="off"
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
             />
             <span
               onClick={handleEyeToggle}
               style={{
                 position: "absolute",
-<<<<<<< HEAD
                 top: errors.password ? "35%" : "50%",
                 right: errors.password ? "40px" : "10px",
                 transform: "translateY(-50%)",
                 cursor: "pointer",
                 zIndex: 2,
-=======
-                top: "50%",
-                right: validated ? "40px" : "10px",
-                transform: "translateY(-50%)",
-                cursor: "pointer",
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
               }}
             >
               {icon}
             </span>
-<<<<<<< HEAD
             <Form.Control.Feedback type="invalid">
               {errors.password}
             </Form.Control.Feedback>
           </div>
-=======
-          </div>
-          <Form.Control.Feedback type="invalid">
-            Please choose a password.
-          </Form.Control.Feedback>
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
         </Form.Group>
 
         {/* Konfirmasi Password */}
@@ -464,15 +304,9 @@ const RegisterForm = () => {
           <Form.Label>Konfirmasi Password</Form.Label>
           <div style={{ position: "relative" }}>
             <Form.Control
-<<<<<<< HEAD
               ref={confirmPasswordRef}
               type={type}
               placeholder="Konfirmasi password"
-=======
-              type={type}
-              placeholder="Konfirmasi password"
-              required
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
               style={{
                 borderRadius: "15px",
                 paddingRight: "40px",
@@ -480,43 +314,25 @@ const RegisterForm = () => {
               }}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-<<<<<<< HEAD
               isInvalid={!!errors.confirmPassword}
-=======
-              autoComplete="off"
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
             />
             <span
               onClick={handleEyeToggle}
               style={{
                 position: "absolute",
-<<<<<<< HEAD
                 top: errors.confirmPassword ? "35%" : "50%",
                 right: errors.confirmPassword ? "40px" : "10px",
                 transform: "translateY(-50%)",
                 cursor: "pointer",
                 zIndex: 2,
-=======
-                top: "50%",
-                right: validated ? "40px" : "10px",
-                transform: "translateY(-50%)",
-                cursor: "pointer",
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
               }}
             >
               {icon}
             </span>
-<<<<<<< HEAD
             <Form.Control.Feedback type="invalid">
               {errors.confirmPassword}
             </Form.Control.Feedback>
           </div>
-=======
-          </div>
-          <Form.Control.Feedback type="invalid">
-            Please confirm your password.
-          </Form.Control.Feedback>
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
         </Form.Group>
 
         <Button
@@ -534,7 +350,6 @@ const RegisterForm = () => {
           Daftar
         </Button>
       </Form>
-
       <div
         className="text-center"
         style={{
@@ -556,7 +371,6 @@ const RegisterForm = () => {
           </Button>
         </p>
       </div>
-<<<<<<< HEAD
       <div>
         <Toaster
           position="bottom-center"
@@ -570,8 +384,6 @@ const RegisterForm = () => {
           reverseOrder={false}
         />
       </div>
-=======
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
     </div>
   );
 };
