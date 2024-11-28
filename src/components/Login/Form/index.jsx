@@ -1,18 +1,17 @@
-import React from "react";
-import { createLazyFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import React, { useRef, useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { useState, useEffect } from "react";
 import { Container, Row, Col, Button, Form, Image } from "react-bootstrap";
-import Background from "/img/Frame 1.svg";
 import { IoEyeOutline, IoEyeOffOutline, IoArrowBack } from "react-icons/io5";
 import ForgetPasswordForm from "./forgetPasswordForm";
 import { login } from "../../../service/auth";
 import { setToken } from "../../../redux/slices/auth";
+import { useMutation } from "@tanstack/react-query";
+import toast, { Toaster } from "react-hot-toast";
 
 const loginForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { token } = useSelector((state) => state.auth);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,14 +19,76 @@ const loginForm = () => {
   const [type, setType] = useState("password");
   const [icon, setIcon] = useState(<IoEyeOffOutline />);
   const [forgotPassword, setForgotPassword] = useState(false);
+  const [errors, setErrors] = useState({ email: "", password: "" });
   const disabled = !email || !password;
 
-  useEffect(() => {
-    if (token) {
-      navigate({ to: "/" });
-    }
-  }, [token, navigate]);
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
 
+  const { mutate: loginUser } = useMutation({
+    mutationFn: (request) => {
+      return login(request);
+    },
+    onSuccess: (result) => {
+      if (result) {
+        dispatch(setToken(result.data?.token));
+        navigate({ to: "/" });
+      } else {
+        handleApiError(result.message);
+      }
+    },
+    onError: (err) => {
+      handleApiError(err.message);
+      toast.error(err?.message, {
+        style: {
+          padding: "16px",
+          background: "#FF0000",
+          color: "#FFFFFF",
+        },
+        iconTheme: {
+          primary: "#000",
+          secondary: "#fff",
+        },
+      });
+    },
+  });
+
+  const handleApiError = (errorMessage) => {
+    const message = errorMessage?.toLowerCase() || "";
+
+    setErrors({ email: "", password: "" });
+
+    if (message.includes("password") || message.includes("credential")) {
+      setErrors((prev) => ({ ...prev, password: errorMessage }));
+      passwordRef.current?.focus();
+    } else {
+      setErrors((prev) => ({ ...prev, email: errorMessage }));
+      emailRef.current?.focus();
+    }
+  };
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setErrors({ email: "", password: "" });
+
+    if (!email.trim()) {
+      setErrors((prev) => ({ ...prev, email: "Email harus diisi" }));
+      emailRef.current?.focus();
+      return;
+    }
+
+    if (!password) {
+      setErrors((prev) => ({ ...prev, password: "Password harus diisi" }));
+      passwordRef.current?.focus();
+      return;
+    }
+
+    loginUser({ email: email.trim(), password });
+  };
+  const handleForgotPassword = () => {
+    setForgotPassword(true);
+  };
+  
   const handleEyeToggle = () => {
     if (type === "password") {
       setType("text");
@@ -38,23 +99,6 @@ const loginForm = () => {
     }
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    const request = {
-      email,
-      password,
-    };
-    const result = await login(request);
-    console.log(result);
-    if (result) {
-      dispatch(setToken(result.data.token));
-      navigate({ to: "/" });
-      return;
-    }
-  };
-  const handleForgotPassword = () => {
-    setForgotPassword(true);
-  };
   return (
     <div
       style={{
@@ -67,54 +111,58 @@ const loginForm = () => {
         <>
           <h2 className="fw-bold text-start mb-4">Masuk</h2>
 
-          <Form onSubmit={handleLogin}>
+          <Form onSubmit={handleLogin} noValidate>
             <Form.Group className="mb-3">
-              <Form.Label>Email/No Telepon</Form.Label>
+              <Form.Label>Email</Form.Label>
               <Form.Control
+                ref={emailRef}
                 type="email"
-                placeholder="Contoh: johndoe@gmail.com"
-                required
+                placeholder="Contoh: johndee@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                isInvalid={!!errors.email}
                 style={{
                   borderRadius: "15px",
                   padding: "1em",
                 }}
               />
+              <Form.Control.Feedback type="invalid">
+                {errors.email}
+              </Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Password</Form.Label>
-              <div
-                style={{
-                  position: "relative",
-                }}
-              >
+              <div style={{ position: "relative" }}>
                 <Form.Control
+                  ref={passwordRef}
                   type={type}
                   placeholder="Masukkan password"
-                  required
-                  style={{
-                    borderRadius: "15px",
-                    paddingRight: "40px",
-                    padding: "1em",
-                  }}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="off"
+                  isInvalid={!!errors.password}
+                  style={{
+                    borderRadius: "15px",
+                    padding: "1em",
+                    paddingRight: "40px",
+                  }}
                 />
                 <span
                   onClick={handleEyeToggle}
                   style={{
                     position: "absolute",
-                    top: "50%",
-                    right: "10px",
+                    top: errors.password ? "35%" : "50%",
+                    right: errors.password ? "40px" : "10px",
                     transform: "translateY(-50%)",
                     cursor: "pointer",
+                    zIndex: 2,
                   }}
                 >
                   {icon}
                 </span>
+                <Form.Control.Feedback type="invalid">
+                  {errors.password}
+                </Form.Control.Feedback>
               </div>
               <div
                 className="text-end mt-1"
@@ -186,8 +234,20 @@ const loginForm = () => {
         // Form Lupa Password
         <ForgetPasswordForm onBack={() => setForgotPassword(false)} />
       )}
+      <div>
+        <Toaster
+          position="bottom-center"
+          containerStyle={{
+            position: "fixed",
+            bottom: "20px",
+            left: "75%",
+            transform: "translateX(-50%)",
+            zIndex: "9999",
+          }}
+          reverseOrder={false}
+        />
+      </div>
     </div>
   );
 };
-
 export default loginForm;
