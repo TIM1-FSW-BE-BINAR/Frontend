@@ -71,7 +71,6 @@ const RegisterForm = () => {
       }}
     >
       <h2 className="fw-bold text-start mb-4">Daftar</h2>
-
       <Form noValidate validated={validated} onSubmit={handleRegister}>
         {/* Nama */}
         <Form.Group className="mb-3" controlId="validationCustom01">

@@ -121,3 +121,34 @@ export const profile = async () => {
   const result = await response.json();
   return result?.data;
 };
+
+export const sendEmail = async (request) => {
+  
+  console.log(request);
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/v1/auth/reset-otp`,
+      {
+        body: JSON.stringify(request),
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    // if (!response.ok) {
+    //   const errorBody = await response.text();
+    //   throw new Error(
+    //     `HTTP error! status: ${response.status}, message: ${errorBody}`
+    //   );
+    // }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error; 
+  }
+
+};
