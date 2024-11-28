@@ -24,6 +24,8 @@ const LoginLazyImport = createFileRoute("/login")();
 const HistoryLazyImport = createFileRoute("/history")();
 const AccountLazyImport = createFileRoute("/account")();
 const IndexLazyImport = createFileRoute("/")();
+const PemesananIndexLazyImport = createFileRoute("/Pemesanan/")();
+const BayarIndexLazyImport = createFileRoute("/Bayar/")();
 
 // Create/Update Routes
 
@@ -65,6 +67,20 @@ const IndexLazyRoute = IndexLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import("./routes/index.lazy").then((d) => d.Route));
 
+const PemesananIndexLazyRoute = PemesananIndexLazyImport.update({
+  id: "/Pemesanan/",
+  path: "/Pemesanan/",
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import("./routes/Pemesanan/index.lazy").then((d) => d.Route)
+);
+
+const BayarIndexLazyRoute = BayarIndexLazyImport.update({
+  id: "/Bayar/",
+  path: "/Bayar/",
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import("./routes/Bayar/index.lazy").then((d) => d.Route));
+
 // Populate the FileRoutesByPath interface
 
 declare module "@tanstack/react-router" {
@@ -97,6 +113,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof LoginLazyImport;
       parentRoute: typeof rootRoute;
     };
+    "/otp": {
+      id: "/otp";
+      path: "/otp";
+      fullPath: "/otp";
+      preLoaderRoute: typeof OtpLazyImport;
+      parentRoute: typeof rootRoute;
+    };
     "/register": {
       id: "/register";
       path: "/register";
@@ -111,6 +134,20 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof ResetPasswordLazyImport;
       parentRoute: typeof rootRoute;
     };
+    "/Bayar/": {
+      id: "/Bayar/";
+      path: "/Bayar";
+      fullPath: "/Bayar";
+      preLoaderRoute: typeof BayarIndexLazyImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/Pemesanan/": {
+      id: "/Pemesanan/";
+      path: "/Pemesanan";
+      fullPath: "/Pemesanan";
+      preLoaderRoute: typeof PemesananIndexLazyImport;
+      parentRoute: typeof rootRoute;
+    };
   }
 }
 
@@ -121,8 +158,11 @@ export interface FileRoutesByFullPath {
   "/account": typeof AccountLazyRoute;
   "/history": typeof HistoryLazyRoute;
   "/login": typeof LoginLazyRoute;
+  "/otp": typeof OtpLazyRoute;
   "/register": typeof RegisterLazyRoute;
   "/resetPassword": typeof ResetPasswordLazyRoute;
+  "/Bayar": typeof BayarIndexLazyRoute;
+  "/Pemesanan": typeof PemesananIndexLazyRoute;
 }
 
 export interface FileRoutesByTo {
@@ -130,8 +170,11 @@ export interface FileRoutesByTo {
   "/account": typeof AccountLazyRoute;
   "/history": typeof HistoryLazyRoute;
   "/login": typeof LoginLazyRoute;
+  "/otp": typeof OtpLazyRoute;
   "/register": typeof RegisterLazyRoute;
   "/resetPassword": typeof ResetPasswordLazyRoute;
+  "/Bayar": typeof BayarIndexLazyRoute;
+  "/Pemesanan": typeof PemesananIndexLazyRoute;
 }
 
 export interface FileRoutesById {
@@ -140,16 +183,41 @@ export interface FileRoutesById {
   "/account": typeof AccountLazyRoute;
   "/history": typeof HistoryLazyRoute;
   "/login": typeof LoginLazyRoute;
+  "/otp": typeof OtpLazyRoute;
   "/register": typeof RegisterLazyRoute;
   "/resetPassword": typeof ResetPasswordLazyRoute;
+  "/Bayar/": typeof BayarIndexLazyRoute;
+  "/Pemesanan/": typeof PemesananIndexLazyRoute;
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/login" | "/register";
+  fullPaths:
+    | "/"
+    | "/login"
+    | "/otp"
+    | "/register"
+    | "/resetPassword"
+    | "/Bayar"
+    | "/Pemesanan";
   fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/login" | "/register";
-  id: "__root__" | "/" | "/login" | "/register";
+  to:
+    | "/"
+    | "/login"
+    | "/otp"
+    | "/register"
+    | "/resetPassword"
+    | "/Bayar"
+    | "/Pemesanan";
+  id:
+    | "__root__"
+    | "/"
+    | "/login"
+    | "/otp"
+    | "/register"
+    | "/resetPassword"
+    | "/Bayar/"
+    | "/Pemesanan/";
   fileRoutesById: FileRoutesById;
 }
 
@@ -158,8 +226,11 @@ export interface RootRouteChildren {
   AccountLazyRoute: typeof AccountLazyRoute;
   HistoryLazyRoute: typeof HistoryLazyRoute;
   LoginLazyRoute: typeof LoginLazyRoute;
+  OtpLazyRoute: typeof OtpLazyRoute;
   RegisterLazyRoute: typeof RegisterLazyRoute;
   ResetPasswordLazyRoute: typeof ResetPasswordLazyRoute;
+  BayarIndexLazyRoute: typeof BayarIndexLazyRoute;
+  PemesananIndexLazyRoute: typeof PemesananIndexLazyRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -169,6 +240,8 @@ const rootRouteChildren: RootRouteChildren = {
   LoginLazyRoute: LoginLazyRoute,
   RegisterLazyRoute: RegisterLazyRoute,
   ResetPasswordLazyRoute: ResetPasswordLazyRoute,
+  BayarIndexLazyRoute: BayarIndexLazyRoute,
+  PemesananIndexLazyRoute: PemesananIndexLazyRoute,
 };
 
 export const routeTree = rootRoute
@@ -185,7 +258,11 @@ export const routeTree = rootRoute
         "/account",
         "/history",
         "/login",
-        "/register"
+        "/otp",
+        "/register",
+        "/resetPassword",
+        "/Bayar/",
+        "/Pemesanan/"
       ]
     },
     "/": {
@@ -205,6 +282,12 @@ export const routeTree = rootRoute
     },
     "/resetPassword": {
       "filePath": "resetPassword.lazy.jsx"
+    },
+    "/Bayar/": {
+      "filePath": "Bayar/index.lazy.jsx"
+    },
+    "/Pemesanan/": {
+      "filePath": "Pemesanan/index.lazy.jsx"
     }
   }
 }

@@ -13,7 +13,6 @@ import { useQuery } from "@tanstack/react-query";
 import { IoIosNotificationsOutline, IoIosList } from "react-icons/io";
 import { LuLogIn } from "react-icons/lu";
 import { RxPerson } from "react-icons/rx";
-import { LuSearch } from "react-icons/lu";
 
 const NavigationBar = () => {
   const dispatch = useDispatch();
@@ -68,17 +67,17 @@ const NavigationBar = () => {
               </Offcanvas.Header>
               <Offcanvas.Body>
                 <Nav className="justify-content-end flex-grow-1 pe-3 text-black align-items-center">
-                  {token ? (
+                  {user ? (
                     <>
-                      <Nav.Link as={Link} to="/">
+                      <Nav.Link as={Link} to="/#faq">
                         <IoIosList />
                       </Nav.Link>{" "}
                       History
-                      <Nav.Link as={Link} to="/">
+                      <Nav.Link as={Link} to="/#faq">
                         <IoIosNotificationsOutline />
                       </Nav.Link>{" "}
                       Notification
-                      <Nav.Link as={Link} to="/">
+                      <Nav.Link as={Link} to="/#faq">
                         <RxPerson /> Account
                       </Nav.Link>
                     </>
