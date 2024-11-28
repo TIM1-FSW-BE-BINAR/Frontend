@@ -1,20 +1,69 @@
 import { Button, Form } from "react-bootstrap";
 import { useState } from "react";
 import { IoArrowBack } from "react-icons/io5";
+import { sendEmail } from "../../../service/auth";
+import toast, { Toaster } from "react-hot-toast";
+import { Link, useNavigate } from "@tanstack/react-router";
+
 const ForgetPasswordForm = ({ onBack }) => {
   const [forgotEmail, setForgotEmail] = useState("");
+  const navigate = useNavigate();
 
   const handleBack = () => {
     onBack();
   };
-  const handleSubmit = (event) => {
-    event.preventDefault(); 
-    // Form submission logic
-    loginUser({ email, password });
-    console.log("Form submitted!");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const request = { email: forgotEmail };
+      const result = await sendEmail(request);
+
+      if (result?.meta?.statusCode === 200) {
+        toast.success("Email berhasil dikirim", {
+          style: {
+            padding: "16px",
+            background: "#73CA5C",
+            color: "#FFFFFF",
+          },
+          iconTheme: {
+            primary: "#FFFFFF",
+            secondary: "#73CA5C",
+          },
+        });
+      } else {
+        toast.error(result?.error?.message, {
+          style: {
+            padding: "16px",
+            background: "#FF4D4F",
+            color: "#FFFFFF",
+          },
+          iconTheme: {
+            primary: "#FFFFFF",
+            secondary: "#FF4D4F",
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Terjadi kesalahan pada server", {
+        style: {
+          padding: "16px",
+          background: "#FF4D4F",
+          color: "#FFFFFF",
+        },
+        iconTheme: {
+          primary: "#FFFFFF",
+          secondary: "#FF4D4F",
+        },
+      });
+    }
   };
+
   return (
     <>
+      <div>
+        <Toaster position="bottom-center" reverseOrder={false} />
+      </div>
       <IoArrowBack
         onClick={handleBack}
         style={{

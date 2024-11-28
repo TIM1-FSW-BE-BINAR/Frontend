@@ -24,7 +24,6 @@ const loginForm = () => {
 
   useEffect(() => {
     if (token) {
-      // Redirect ke dashboard jika token ada
       navigate({ to: "/" });
     }
   }, [token, navigate]);
