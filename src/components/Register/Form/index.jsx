@@ -6,7 +6,6 @@ import { useState } from "react";
 import { Container, Row, Col, Button, Form, Image } from "react-bootstrap";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { register } from "../../../service/auth";
-import toast, { Toaster } from "react-hot-toast";
 
 const RegisterForm = () => {
   const dispatch = useDispatch();
@@ -45,7 +44,7 @@ const RegisterForm = () => {
     }
 
     if (password !== confirmPassword) {
-      toast.error("Password tidak sama!")
+      alert("Password tidak cocok");
       return;
     }
 
@@ -60,10 +59,8 @@ const RegisterForm = () => {
     const result = await register(request);
 
     if (result.meta.statusCode === 201) {
-      toast.success("Registrasi berhasil!");
+      alert("Registrasi berhasil!");
       navigate({ to: "/otp" });
-    } else {
-      toast.error(result.meta.message);
     }
   };
   return (
@@ -73,10 +70,6 @@ const RegisterForm = () => {
         width: "100%",
       }}
     >
-      {" "}
-      <div>
-        <Toaster position="bottom-center" reverseOrder={false} />
-      </div>
       <h2 className="fw-bold text-start mb-4">Daftar</h2>
       <Form noValidate validated={validated} onSubmit={handleRegister}>
         {/* Nama */}
@@ -247,6 +240,7 @@ const RegisterForm = () => {
           Daftar
         </Button>
       </Form>
+
       <div
         className="text-center"
         style={{

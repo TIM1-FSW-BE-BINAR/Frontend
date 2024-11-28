@@ -8,6 +8,7 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+
 import { createFileRoute } from "@tanstack/react-router";
 
 // Import Routes
@@ -84,6 +85,7 @@ const BayarIndexLazyRoute = BayarIndexLazyImport.update({
 // Populate the FileRoutesByPath interface
 
 declare module "@tanstack/react-router" {
+  
   interface FileRoutesByPath {
     '/': {
       id: '/'
@@ -246,7 +248,7 @@ const rootRouteChildren: RootRouteChildren = {
 
 export const routeTree = rootRoute
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
 
 /* ROUTE_MANIFEST_START
 {
@@ -276,6 +278,9 @@ export const routeTree = rootRoute
     },
     "/login": {
       "filePath": "login.lazy.jsx"
+    },
+    "/otp": {
+      "filePath": "otp.lazy.jsx"
     },
     "/register": {
       "filePath": "register.lazy.jsx"
