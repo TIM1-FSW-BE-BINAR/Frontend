@@ -1,11 +1,7 @@
 import React from "react";
 import "../styles/variables.scss";
-<<<<<<< HEAD
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-=======
-import { createLazyFileRoute } from "@tanstack/react-router";
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
 import { useSelector } from "react-redux";
 import Background from "/img/Frame 1.svg";
 import LoginForm from "../components/Login/Form/index";
@@ -15,7 +11,6 @@ export const Route = createLazyFileRoute("/login")({
 });
 
 function Login() {
-<<<<<<< HEAD
   const navigate = useNavigate();
   const { token } = useSelector((state) => state.auth);
 
@@ -24,13 +19,6 @@ function Login() {
       navigate({ to: "/" });
     }
   }, [token, navigate]);
-=======
-  const { token } = useSelector((state) => state.auth);
-
-  // if (token) {
-  //   navigate({ to: "/" });
-  // }
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
   return (
     <>
       <section
