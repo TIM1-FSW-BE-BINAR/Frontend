@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { useNavigate, useLocation } from "@tanstack/react-router";
@@ -94,38 +93,16 @@ const OTPForm = () => {
 
     verifyRegister(request);
   };
-=======
-import React, { useState } from "react";
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
-import { useNavigate } from "@tanstack/react-router";
-import OtpInput from "react-otp-input";
-import { IoArrowBack } from "react-icons/io5";
-
-const OTPForm = () => {
-  const navigate = useNavigate();
-
-  const [otp, setOtp] = useState("");
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
 
   const handleBack = () => {
     navigate({ to: "/register" });
   };
 
-<<<<<<< HEAD
   return (
     <Container className="d-flex flex-column align-items-center mt-5">
       <div>
         <Toaster position="bottom-center" reverseOrder={false} />
       </div>
-=======
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert(`OTP Anda: ${otp.join("")}`);
-  };
-
-  return (
-    <Container className="d-flex flex-column align-items-center mt-5">
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
       <div className="d-flex justify-content-start w-100 mb-4">
         <IoArrowBack
           onClick={handleBack}
@@ -137,19 +114,11 @@ const OTPForm = () => {
         />
         <h2 className="fw-bold text-end">Masukkan OTP</h2>
       </div>
-<<<<<<< HEAD
       <p className="text-muted m-4">
         Ketik 6 digit kode yang dikirimkan ke <b>{maskEmail(email)}</b>
       </p>
       <Form onSubmit={handleSubmit} className="w-100 justify-content-center">
         <Row className="justify-content-center m-4">
-=======
-      <p className="text-muted mt-4">
-        Ketik 6 digit kode yang dikirimkan ke <b>j*****@gmail.com</b>
-      </p>
-      <Form onSubmit={handleSubmit} className="w-100">
-        <Row className="justify-content-center mb-3">
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
           <OtpInput
             value={otp}
             onChange={setOtp}
@@ -162,7 +131,6 @@ const OTPForm = () => {
               fontWeight: "bold",
               marginLeft: "1em",
               borderRadius: "14px",
-<<<<<<< HEAD
               borderColor: "#D0D0D0",
             }}
             renderInput={(props) => <input {...props} />}
@@ -202,28 +170,6 @@ const OTPForm = () => {
           </Button>
         </Row>
       </Form>
-=======
-            }}
-            renderInput={(props) => <input {...props} />}
-          />{" "}
-        </Row>
-        <Button
-          variant="primary"
-          type="submit"
-          className="w-100 mb-3"
-          style={{
-            backgroundColor: "#7126B5",
-            border: "none",
-            transition: "opacity 0.3s ease",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.5")}
-          onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-        >
-          Simpan
-        </Button>
-      </Form>
-      <p className="text-muted mt-2">Kirim Ulang OTP dalam 60 detik</p>
->>>>>>> 7f7fa05f70d763199338adb18dbf44ecfe9e641a
     </Container>
   );
 };
