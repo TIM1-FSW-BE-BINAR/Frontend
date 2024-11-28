@@ -27,6 +27,7 @@ import cardImg from "../../assets/homepage/card-img.png";
 import { FaSearch } from "react-icons/fa";
 import HomepageModal from "./HomepageModal";
 import { useEffect, useState } from "react";
+import SearchFlight from "../Search/SearchFlight";
 const ScreenHomepage = () => {
   return <Homepage />;
 };
@@ -47,8 +48,8 @@ const Homepage = () => {
   const [tempClassInput, setTempClassInput] = useState("");
   const [classInput, setClassInput] = useState("Pilih Class");
   const [checkedSwitch, setCheckedSwitch] = useState(false);
-
   const [activeButton, setActiveButton] = useState(null);
+  const [searchPage, setSearchPage] = useState(false);
 
   const handleButtonCardClick = (index) => {
     setActiveButton(index); // Set the active button index
@@ -114,7 +115,11 @@ const Homepage = () => {
     setClassModalShow(false);
   };
 
-  return (
+  const handleSearchPage = () => {
+    setSearchPage(true);
+  };
+
+  return !searchPage ? (
     <>
       <section id="hero">
         <Container fluid className="p-0 mt-4 ">
@@ -372,7 +377,10 @@ const Homepage = () => {
           </Container>
 
           {/* button */}
-          <Button className="btn btn-block btn-primary w-100 mt-2 mx-0">
+          <Button
+            className="btn btn-block btn-primary w-100 mt-2 mx-0"
+            onClick={handleSearchPage}
+          >
             Cari Penerbangan
           </Button>
         </Container>
@@ -790,6 +798,8 @@ const Homepage = () => {
         </Container>
       </section>
     </>
+  ) : (
+    <SearchFlight />
   );
 };
 
