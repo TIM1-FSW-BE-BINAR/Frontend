@@ -6,8 +6,11 @@ import { Container, Row, Col, Button, Form, Image } from "react-bootstrap";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { useMutation } from "@tanstack/react-query";
 import { register } from "../../../service/auth";
+<<<<<<< HEAD
 import { setToken } from "../../../redux/slices/auth";
 import toast, { Toaster } from "react-hot-toast";
+=======
+>>>>>>> e680011bd640e47652230a69286d127236c70cc5
 
 const RegisterForm = () => {
   const dispatch = useDispatch();
@@ -173,6 +176,40 @@ const RegisterForm = () => {
     }
   };
 
+<<<<<<< HEAD
+=======
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
+    const form = e.currentTarget;
+    if (form.checkValidity() === false) {
+      e.preventDefault();
+      e.stopPropagation();
+      setValidated(true);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      alert("Password tidak cocok");
+      return;
+    }
+
+    const request = {
+      firstName,
+      lastName,
+      phone,
+      email,
+      password,
+    };
+
+    const result = await register(request);
+
+    if (result.meta.statusCode === 201) {
+      alert("Registrasi berhasil!");
+      navigate({ to: "/otp" });
+    }
+  };
+>>>>>>> e680011bd640e47652230a69286d127236c70cc5
   return (
     <div
       style={{
@@ -180,7 +217,10 @@ const RegisterForm = () => {
         width: "100%",
       }}
     >
+<<<<<<< HEAD
       {" "}
+=======
+>>>>>>> e680011bd640e47652230a69286d127236c70cc5
       <h2 className="fw-bold text-start mb-4">Daftar</h2>
       <Form noValidate onSubmit={handleRegister}>
         {/* Nama */}
@@ -350,6 +390,7 @@ const RegisterForm = () => {
           Daftar
         </Button>
       </Form>
+
       <div
         className="text-center"
         style={{

@@ -66,18 +66,22 @@ const NavigationBar = () => {
                 </Offcanvas.Title>
               </Offcanvas.Header>
               <Offcanvas.Body>
+<<<<<<< HEAD
                 <Nav className="justify-content-end flex-grow-1 pe-3 text-black align-items-center">
+=======
+                <Nav className="justify-content-end flex-grow-1 pe-3 text-black">
+>>>>>>> e680011bd640e47652230a69286d127236c70cc5
                   {user ? (
                     <>
-                      <Nav.Link as={Link} to="/">
+                      <Nav.Link as={Link} to="/#faq">
                         <IoIosList />
                       </Nav.Link>{" "}
                       History
-                      <Nav.Link as={Link} to="/">
+                      <Nav.Link as={Link} to="/#faq">
                         <IoIosNotificationsOutline />
                       </Nav.Link>{" "}
                       Notification
-                      <Nav.Link as={Link} to="/">
+                      <Nav.Link as={Link} to="/#faq">
                         <RxPerson /> Account
                       </Nav.Link>
                     </>
