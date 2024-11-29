@@ -10,7 +10,22 @@ import {
   Card,
   Form,
 } from "react-bootstrap";
+import { useSelector } from "react-redux";
+import { useQuery } from "@tanstack/react-query";
+import { profile } from "../../service/auth";
+import { useState } from "react";
+
 const ScreenUbahProfil = () => {
+  const { token } = useSelector((state) => state.auth);
+
+  const { data } = useQuery({
+    queryKey: ["profile"],
+    queryFn: profile,
+    enabled: !!token,
+  });
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   return (
     <Container className="d-flex flex-column py-2">
       <h1
@@ -19,6 +34,7 @@ const ScreenUbahProfil = () => {
           marginTop: "-1rem",
           right: "6.8rem",
           position: "relative",
+          color: "#000000",
         }}
       >
         Ubah Data Profil
@@ -32,17 +48,29 @@ const ScreenUbahProfil = () => {
           <Form>
             <Form.Group controlId="formNamaLengkap" className="mb-3">
               <Form.Label>Nama Lengkap</Form.Label>
-              <Form.Control type="text" placeholder="Nama" />
+              <Form.Control
+                type="text"
+                placeholder="Nama"
+                value={`${data?.firstName || ""} ${data?.lastName || ""}`}
+              />
             </Form.Group>
 
             <Form.Group controlId="formNomorTelepon" className="mb-3">
               <Form.Label>Nomor Telepon</Form.Label>
-              <Form.Control type="text" placeholder="+62 123456789" />
+              <Form.Control
+                type="text"
+                placeholder="+62 123456789"
+                value={`${data?.phone || ""} `}
+              />
             </Form.Group>
 
             <Form.Group controlId="formEmail" className="mb-3">
               <Form.Label>Email</Form.Label>
-              <Form.Control type="email" placeholder="johndoe@gmail.com" />
+              <Form.Control
+                type="email"
+                placeholder="johndoe@gmail.com"
+                value={`${data?.email || ""}`}
+              />
             </Form.Group>
 
             <Button
