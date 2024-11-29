@@ -69,15 +69,13 @@ const NavigationBar = () => {
                 <Nav className="justify-content-end flex-grow-1 pe-3 text-black align-items-center">
                   {user ? (
                     <>
-                      <Nav.Link as={Link} to="/#faq">
-                        <IoIosList />
-                      </Nav.Link>{" "}
-                      History
-                      <Nav.Link as={Link} to="/#faq">
-                        <IoIosNotificationsOutline />
-                      </Nav.Link>{" "}
-                      Notification
-                      <Nav.Link as={Link} to="/#faq">
+                      <Nav.Link as={Link} to="/history">
+                        <IoIosList /> History
+                      </Nav.Link>
+                      <Nav.Link as={Link} to="/notification">
+                        <IoIosNotificationsOutline /> Notification
+                      </Nav.Link>
+                      <Nav.Link as={Link} to="/account">
                         <RxPerson /> Account
                       </Nav.Link>
                     </>

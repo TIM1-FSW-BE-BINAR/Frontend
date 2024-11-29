@@ -17,12 +17,6 @@ const ScreenPengaturanAkun = () => {
   const [error, setError] = useState("");
   const [validated, setValidated] = useState(false);
 
-  useEffect(() => {
-    if (token) {
-      navigate({ to: "/" });
-    }
-  }, [token, navigate]);
-
   const handleEyeToggle = () => {
     if (type === "password") {
       setType("text");

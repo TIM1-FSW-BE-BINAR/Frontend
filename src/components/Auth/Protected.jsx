@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 const Protected = ({ children, roles }) => {
   const navigate = useNavigate();
 
-  const { token, user } = useSelector((state) => state.auth);
+  const { token, users } = useSelector((state) => state.auth);
 
   // if token not found It will redirect it to login
   if (!token) {
@@ -12,8 +12,8 @@ const Protected = ({ children, roles }) => {
     return;
   }
 
-  if (token && user && roles.length > 0) {
-    const isCanAccess = roles.includes(user?.role_id);
+  if (token && users && roles.length > 0) {
+    const isCanAccess = roles.includes(users?.role);
     if (!isCanAccess) {
       navigate({ to: "/" });
       return;
