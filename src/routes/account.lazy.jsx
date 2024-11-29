@@ -3,8 +3,14 @@ import AkunLayout from "../layouts/AkunLayout";
 import { useState } from "react";
 import ScreenUbahProfil from "../components/Akun/ScreenUbahProfil";
 import ScreenPengaturanAkun from "../components/Akun/ScreenPengaturanAkun";
+import Protected from "../components/Auth/Protected";
+
 export const Route = createLazyFileRoute("/account")({
-  component: Account,
+  component: () => (
+    <Protected roles={[1]}>
+      <Account />
+    </Protected>
+  ),
 });
 
 function Account() {

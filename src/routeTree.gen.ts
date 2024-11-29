@@ -19,7 +19,9 @@ import { Route as rootRoute } from './routes/__root'
 const ResetPasswordLazyImport = createFileRoute('/resetPassword')()
 const RegisterLazyImport = createFileRoute('/register')()
 const OtpLazyImport = createFileRoute('/otp')()
+const NotificationLazyImport = createFileRoute('/notification')()
 const LoginLazyImport = createFileRoute('/login')()
+const HistoryLazyImport = createFileRoute('/history')()
 const AccountLazyImport = createFileRoute('/account')()
 const IndexLazyImport = createFileRoute('/')()
 const PemesananIndexLazyImport = createFileRoute('/Pemesanan/')()
@@ -45,11 +47,23 @@ const OtpLazyRoute = OtpLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/otp.lazy').then((d) => d.Route))
 
+const NotificationLazyRoute = NotificationLazyImport.update({
+  id: '/notification',
+  path: '/notification',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/notification.lazy').then((d) => d.Route))
+
 const LoginLazyRoute = LoginLazyImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/login.lazy').then((d) => d.Route))
+
+const HistoryLazyRoute = HistoryLazyImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/history.lazy').then((d) => d.Route))
 
 const AccountLazyRoute = AccountLazyImport.update({
   id: '/account',
@@ -95,11 +109,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountLazyImport
       parentRoute: typeof rootRoute
     }
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/notification': {
+      id: '/notification'
+      path: '/notification'
+      fullPath: '/notification'
+      preLoaderRoute: typeof NotificationLazyImport
       parentRoute: typeof rootRoute
     }
     '/otp': {
@@ -145,7 +173,9 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/account': typeof AccountLazyRoute
+  '/history': typeof HistoryLazyRoute
   '/login': typeof LoginLazyRoute
+  '/notification': typeof NotificationLazyRoute
   '/otp': typeof OtpLazyRoute
   '/register': typeof RegisterLazyRoute
   '/resetPassword': typeof ResetPasswordLazyRoute
@@ -156,7 +186,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '/account': typeof AccountLazyRoute
+  '/history': typeof HistoryLazyRoute
   '/login': typeof LoginLazyRoute
+  '/notification': typeof NotificationLazyRoute
   '/otp': typeof OtpLazyRoute
   '/register': typeof RegisterLazyRoute
   '/resetPassword': typeof ResetPasswordLazyRoute
@@ -168,7 +200,9 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
   '/account': typeof AccountLazyRoute
+  '/history': typeof HistoryLazyRoute
   '/login': typeof LoginLazyRoute
+  '/notification': typeof NotificationLazyRoute
   '/otp': typeof OtpLazyRoute
   '/register': typeof RegisterLazyRoute
   '/resetPassword': typeof ResetPasswordLazyRoute
@@ -181,7 +215,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/account'
+    | '/history'
     | '/login'
+    | '/notification'
     | '/otp'
     | '/register'
     | '/resetPassword'
@@ -191,7 +227,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/account'
+    | '/history'
     | '/login'
+    | '/notification'
     | '/otp'
     | '/register'
     | '/resetPassword'
@@ -201,7 +239,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/account'
+    | '/history'
     | '/login'
+    | '/notification'
     | '/otp'
     | '/register'
     | '/resetPassword'
@@ -213,7 +253,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   AccountLazyRoute: typeof AccountLazyRoute
+  HistoryLazyRoute: typeof HistoryLazyRoute
   LoginLazyRoute: typeof LoginLazyRoute
+  NotificationLazyRoute: typeof NotificationLazyRoute
   OtpLazyRoute: typeof OtpLazyRoute
   RegisterLazyRoute: typeof RegisterLazyRoute
   ResetPasswordLazyRoute: typeof ResetPasswordLazyRoute
@@ -224,7 +266,9 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   AccountLazyRoute: AccountLazyRoute,
+  HistoryLazyRoute: HistoryLazyRoute,
   LoginLazyRoute: LoginLazyRoute,
+  NotificationLazyRoute: NotificationLazyRoute,
   OtpLazyRoute: OtpLazyRoute,
   RegisterLazyRoute: RegisterLazyRoute,
   ResetPasswordLazyRoute: ResetPasswordLazyRoute,
@@ -244,7 +288,9 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/account",
+        "/history",
         "/login",
+        "/notification",
         "/otp",
         "/register",
         "/resetPassword",
@@ -258,8 +304,14 @@ export const routeTree = rootRoute
     "/account": {
       "filePath": "account.lazy.jsx"
     },
+    "/history": {
+      "filePath": "history.lazy.jsx"
+    },
     "/login": {
       "filePath": "login.lazy.jsx"
+    },
+    "/notification": {
+      "filePath": "notification.lazy.jsx"
     },
     "/otp": {
       "filePath": "otp.lazy.jsx"
