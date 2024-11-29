@@ -35,6 +35,8 @@ const Homepage = () => {
   const [modalShow, setModalShow] = useState(false);
   const [fromInput, setFromInput] = useState("");
   const [toInput, setToInput] = useState("");
+  const [departureDate, setDepartureDate] = useState(""); // Untuk Departure
+  const [returnDate, setReturnDate] = useState("");
   const [activeModal, setActiveModal] = useState("");
   const [modalInputValue, setModalInputValue] = useState("");
   const [PassengerModalShow, setPassengerModalShow] = useState(false);
@@ -43,10 +45,10 @@ const Homepage = () => {
   const [childInput, setChildInput] = useState(0);
   const [babyInput, setBabyInput] = useState(0);
   const [totalPassengers, setTotalPassengers] = useState("");
-  const [selectedClass, setSelectedClass] = useState(""); // Menyimpan nilai class
-  const [selectedElement, setSelectedElement] = useState(null); // Menyimpan elemen yang dipilih
+  const [selectedClass, setSelectedClass] = useState(""); 
+  const [selectedElement, setSelectedElement] = useState(null);
   const [tempClassInput, setTempClassInput] = useState("");
-  const [classInput, setClassInput] = useState("Pilih Class");
+  const [classInput, setClassInput] = useState("");
   const [checkedSwitch, setCheckedSwitch] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
   const [searchPage, setSearchPage] = useState(false);
@@ -56,19 +58,18 @@ const Homepage = () => {
   };
 
   const handleSelectClass = (className, elementId, label) => {
-    setSelectedClass(className); // Simpan nama class yang dipilih
-    setSelectedElement(elementId); // Simpan elemen yang dipilih
-    setTempClassInput(label); // Simpan nilai sementara dari pilihan
+    setSelectedClass(className);
+    setSelectedElement(elementId);
+    setTempClassInput(label);
   };
 
   const handleModalSubmit = (value) => {
-    console.log(value); // Mengambil nilai input dari modal
     if (activeModal === "from") {
-      setFromInput(value); // Set nilai input "From"
+      setFromInput(value);
     } else if (activeModal === "to") {
-      setToInput(value); // Set nilai input "To"
+      setToInput(value);
     }
-    setModalShow(false); // Tutup modal setelah submit
+    setModalShow(false);
   };
 
   const handleSwitch = () => {
@@ -115,7 +116,8 @@ const Homepage = () => {
     setClassModalShow(false);
   };
 
-  const handleSearchPage = () => {
+  const handleSearchPage = (e) => {
+    e.preventDefault();
     setSearchPage(true);
   };
 
@@ -199,7 +201,7 @@ const Homepage = () => {
               </Col>
             </Row>
             <Row>
-              <Form>
+              <Form onSubmit={handleSearchPage}>
                 {/* Baris pertama */}
                 <Row className="">
                   <Col sm={12} md={5}>
@@ -229,7 +231,7 @@ const Homepage = () => {
                             setActiveModal("from");
                             setModalShow(true);
                           }}
-                          readOnly
+                          required
                         />
                       </Col>
                     </Form.Group>
@@ -263,7 +265,7 @@ const Homepage = () => {
                             setActiveModal("to");
                             setModalShow(true);
                           }}
-                          readOnly
+                          required
                         />
                       </Col>
                     </Form.Group>
@@ -294,6 +296,9 @@ const Homepage = () => {
                           type="date"
                           placeholder="1 Maret 2023"
                           className="custom-placeholder form-input"
+                          value={departureDate}
+                          onChange={(e) => setDepartureDate(e.target.value)} 
+                          required
                         />
                       </Col>
                       <Col className="mt-2">
@@ -302,6 +307,8 @@ const Homepage = () => {
                           type="date"
                           placeholder="Pilih Tanggal"
                           className="custom-placeholder form-input"
+                          value={returnDate}
+                          onChange={(e) => setReturnDate(e.target.value)}
                           disabled={checkedSwitch ? false : true}
                         />
                       </Col>
@@ -339,7 +346,7 @@ const Homepage = () => {
                         <FormLabel>Passengers</FormLabel>
                         <Form.Control
                           type="text"
-                          placeholder=""
+                          placeholder="Tambah Penumpang"
                           className="custom-placeholder form-input"
                           value={
                             totalPassengers
@@ -352,37 +359,36 @@ const Homepage = () => {
                                     ? `${adultInput > 0 || childInput > 0 ? ", " : ""}${babyInput} Baby`
                                     : ""
                                 }`
-                              : "Tambah Penumpang"
+                              : ""
                           }
                           onClick={() => setPassengerModalShow(true)}
-                          readOnly
+                          required
                         />
                       </Col>
                       <Col className="mt-2">
                         <FormLabel>Seat Class</FormLabel>
                         <Form.Control
                           type="text"
-                          placeholder=""
+                          placeholder="Pilih Class"
                           className="custom-placeholder form-input"
                           onClick={() => setClassModalShow(true)}
                           value={classInput}
-                          readOnly
+                          required
                         />
                       </Col>
                     </Form.Group>
                   </Col>
                 </Row>
+                {/* button */}
+                <Button
+                  type="submit"
+                  className="btn btn-block btn-primary w-100 mt-2 mx-0"
+                >
+                  Cari Penerbangan
+                </Button>
               </Form>
             </Row>
           </Container>
-
-          {/* button */}
-          <Button
-            className="btn btn-block btn-primary w-100 mt-2 mx-0"
-            onClick={handleSearchPage}
-          >
-            Cari Penerbangan
-          </Button>
         </Container>
 
         {/* Memanggil from to modal */}
@@ -455,7 +461,6 @@ const Homepage = () => {
                       marginRight: "10px",
                     }}
                     value={adultInput}
-                    readOnly
                   />
 
                   {/* Tombol Plus */}
@@ -519,7 +524,6 @@ const Homepage = () => {
                       marginRight: "10px",
                     }}
                     value={childInput}
-                    readOnly
                   />
 
                   {/* Tombol Plus */}
@@ -583,7 +587,6 @@ const Homepage = () => {
                       marginRight: "10px",
                     }}
                     value={babyInput}
-                    readOnly
                   />
 
                   {/* Tombol Plus */}
@@ -771,7 +774,9 @@ const Homepage = () => {
                   </div>
                   <Card.Img variant="top" src={cardImg} />
                   <Card.Body>
-                    <Card.Title className="card-title">
+                    <Card.Title className="card-title" style={{ 
+                      fontSize: '16px'
+                     }}>
                       {index % 2 === 0
                         ? "Jakarta -> Bangkok"
                         : "Jakarta -> Sydney"}
@@ -799,7 +804,7 @@ const Homepage = () => {
       </section>
     </>
   ) : (
-    <SearchFlight />
+    <SearchFlight fromInput={fromInput} toInput={toInput} departureDate= {departureDate} returnDate={returnDate ? returnDate : null} passengers={totalPassengers} classInput={classInput} />
   );
 };
 
