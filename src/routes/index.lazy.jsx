@@ -8,7 +8,7 @@ export const Route = createLazyFileRoute("/")({
 });
 
 function Index() {
-  const [openHomepage, setOpenHomepage] = useState(false); // components yang akan dirender pertama kali nilainya true, sedangkan component yg lain nilai defaultnya false dulu
+  const [openHomepage, setOpenHomepage] = useState(true); // components yang akan dirender pertama kali nilainya true, sedangkan component yg lain nilai defaultnya false dulu
   return (
     <>
       <GuestLayout

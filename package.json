@@ -20,6 +20,7 @@
     "@tanstack/react-router": "^1.79.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "form": "^0.2.5",
     "input-otp": "^1.4.1",
