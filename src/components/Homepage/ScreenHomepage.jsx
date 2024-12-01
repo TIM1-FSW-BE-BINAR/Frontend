@@ -61,6 +61,10 @@ const Homepage = () => {
   const [activeButton, setActiveButton] = useState(null);
   const [searchPage, setSearchPage] = useState(false);
 
+  useEffect(() => {
+    setDepartureDate("");
+  }, [checkedSwitch]);
+
   const handleButtonCardClick = (index) => {
     setActiveButton(index); // Set the active button index
   };
