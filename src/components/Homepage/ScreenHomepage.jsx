@@ -27,10 +27,18 @@ import cardImg from "../../assets/homepage/card-img.png";
 import { FaSearch } from "react-icons/fa";
 import HomepageModal from "./HomepageModal";
 import { useEffect, useState } from "react";
+import dayjs from "dayjs";
 import SearchFlight from "../Search/SearchFlight";
+
+import { LocalizationProvider } from "@mui/x-date-pickers-pro/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
+import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
+import toast, { Toaster } from "react-hot-toast";
+
 const ScreenHomepage = () => {
   return <Homepage />;
 };
+
 const Homepage = () => {
   const [modalShow, setModalShow] = useState(false);
   const [fromInput, setFromInput] = useState("");
@@ -45,13 +53,17 @@ const Homepage = () => {
   const [childInput, setChildInput] = useState(0);
   const [babyInput, setBabyInput] = useState(0);
   const [totalPassengers, setTotalPassengers] = useState("");
-  const [selectedClass, setSelectedClass] = useState(""); 
+  const [selectedClass, setSelectedClass] = useState("");
   const [selectedElement, setSelectedElement] = useState(null);
   const [tempClassInput, setTempClassInput] = useState("");
   const [classInput, setClassInput] = useState("");
   const [checkedSwitch, setCheckedSwitch] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
   const [searchPage, setSearchPage] = useState(false);
+
+  useEffect(() => {
+    setDepartureDate("");
+  }, [checkedSwitch]);
 
   const handleButtonCardClick = (index) => {
     setActiveButton(index); // Set the active button index
@@ -118,7 +130,14 @@ const Homepage = () => {
 
   const handleSearchPage = (e) => {
     e.preventDefault();
-    setSearchPage(true);
+    console.log(departureDate);
+    console.log(returnDate);
+    if(fromInput == '' || toInput == '' || departureDate == '' || totalPassengers == '' || classInput == ''){
+      toast.error("Please fill out all fields in the form!");
+      setSearchPage(false);
+    }else{
+      setSearchPage(true);
+    }
   };
 
   return !searchPage ? (
@@ -231,7 +250,6 @@ const Homepage = () => {
                             setActiveModal("from");
                             setModalShow(true);
                           }}
-                          required
                         />
                       </Col>
                     </Form.Group>
@@ -265,7 +283,6 @@ const Homepage = () => {
                             setActiveModal("to");
                             setModalShow(true);
                           }}
-                          required
                         />
                       </Col>
                     </Form.Group>
@@ -290,28 +307,41 @@ const Homepage = () => {
                         />
                         <span className="mt-4">Date</span>
                       </Form.Label>
-                      <Col className="mt-2">
-                        <FormLabel>Departure</FormLabel>
-                        <Form.Control
-                          type="date"
-                          placeholder="1 Maret 2023"
-                          className="custom-placeholder form-input"
-                          value={departureDate}
-                          onChange={(e) => setDepartureDate(e.target.value)} 
-                          required
-                        />
-                      </Col>
-                      <Col className="mt-2">
-                        <FormLabel>Return</FormLabel>
-                        <Form.Control
-                          type="date"
-                          placeholder="Pilih Tanggal"
-                          className="custom-placeholder form-input"
-                          value={returnDate}
-                          onChange={(e) => setReturnDate(e.target.value)}
-                          disabled={checkedSwitch ? false : true}
-                        />
-                      </Col>
+                      {checkedSwitch ? (
+                        <>
+                          <Col className="mt-3">
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                              <DateRangePicker
+                                localeText={{
+                                  start: "Departure",
+                                  end: "Return",
+                                }}
+                                onChange={(e) => {
+                                  setDepartureDate(
+                                    dayjs(e[0]).format("YYYY-MM-DD")
+                                  );
+                                  setReturnDate(
+                                    dayjs(e[1]).format("YYYY-MM-DD")
+                                  );
+                                }}
+                              />
+                            </LocalizationProvider>
+                          </Col>
+                        </>
+                      ) : (
+                        <>
+                          <Col className="mt-2">
+                            <FormLabel>Departure</FormLabel>
+                            <Form.Control
+                              type="date"
+                              placeholder="1 Maret 2023"
+                              className="custom-placeholder form-input"
+                              value={departureDate}
+                              onChange={(e) => setDepartureDate(e.target.value)}
+                            />
+                          </Col>
+                        </>
+                      )}
                     </Form.Group>
                   </Col>
                   <Col
@@ -362,7 +392,6 @@ const Homepage = () => {
                               : ""
                           }
                           onClick={() => setPassengerModalShow(true)}
-                          required
                         />
                       </Col>
                       <Col className="mt-2">
@@ -373,7 +402,6 @@ const Homepage = () => {
                           className="custom-placeholder form-input"
                           onClick={() => setClassModalShow(true)}
                           value={classInput}
-                          required
                         />
                       </Col>
                     </Form.Group>
@@ -774,9 +802,12 @@ const Homepage = () => {
                   </div>
                   <Card.Img variant="top" src={cardImg} />
                   <Card.Body>
-                    <Card.Title className="card-title" style={{ 
-                      fontSize: '16px'
-                     }}>
+                    <Card.Title
+                      className="card-title"
+                      style={{
+                        fontSize: "16px",
+                      }}
+                    >
                       {index % 2 === 0
                         ? "Jakarta -> Bangkok"
                         : "Jakarta -> Sydney"}
@@ -802,9 +833,30 @@ const Homepage = () => {
           </Row>
         </Container>
       </section>
+
+      <div>
+        <Toaster
+          position="top-right"
+          containerStyle={{
+            position: "fixed",
+            bottom: "20px",
+            left: "75%",
+            transform: "translateX(-50%)",
+            zIndex: "9999",
+          }}
+          reverseOrder={false}
+        />
+      </div>
     </>
   ) : (
-    <SearchFlight fromInput={fromInput} toInput={toInput} departureDate= {departureDate} returnDate={returnDate ? returnDate : null} passengers={totalPassengers} classInput={classInput} />
+    <SearchFlight
+      fromInput={fromInput}
+      toInput={toInput}
+      departureDate={departureDate}
+      returnDate={returnDate ? returnDate : null}
+      passengers={totalPassengers}
+      classInput={classInput}
+    />
   );
 };
 
