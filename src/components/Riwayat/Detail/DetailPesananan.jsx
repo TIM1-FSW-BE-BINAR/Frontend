@@ -5,12 +5,11 @@ const DetailPesanan = () => {
   return (
     <Card
       style={{
-        width: "27rem",
+        width: "25rem",
         borderRadius: "10px",
         border: "1px solid #D0D0D0",
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-        right: "8rem",
-        bottom: "18rem",
+        right: "6.5rem",
       }}
     >
       <Card.Body>
@@ -54,7 +53,7 @@ const DetailPesanan = () => {
           {/* Logo Maskapai */}
           <img
             className="me-4"
-            src="/img/airlane_logo1.svg"
+            src="img/airlane_logo1.svg"
             alt="Airlane Logo"
             style={{ width: "40px", height: "40px" }}
           />
