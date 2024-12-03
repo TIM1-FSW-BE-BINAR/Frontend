@@ -28,15 +28,15 @@ import { FaSearch } from "react-icons/fa";
 import HomepageModal from "./HomepageModal";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
-import SearchFlight from "../Search/SearchFlight";
 
 import { LocalizationProvider } from "@mui/x-date-pickers-pro/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import toast, { Toaster } from "react-hot-toast";
 
-import {useQuery} from "@tanstack/react-query";
-import {getFlights} from "../../service/flight/flightService"
+import { useQuery } from "@tanstack/react-query";
+import { getFlights } from "../../service/flight/flightService";
+import { useNavigate } from "@tanstack/react-router";
 
 const ScreenHomepage = () => {
   return <Homepage />;
@@ -62,7 +62,6 @@ const Homepage = () => {
   const [classInput, setClassInput] = useState("");
   const [checkedSwitch, setCheckedSwitch] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
-  const [searchPage, setSearchPage] = useState(false);
 
   useEffect(() => {
     setDepartureDate("");
@@ -131,15 +130,33 @@ const Homepage = () => {
     setClassModalShow(false);
   };
 
+  const navigate = useNavigate();
+
   const handleSearchPage = (e) => {
     e.preventDefault();
-    console.log(departureDate);
-    console.log(returnDate);
-    if(fromInput == '' || toInput == '' || departureDate == '' || totalPassengers == '' || classInput == ''){
+    console.log("button dipencet");
+    if (
+      fromInput == "" ||
+      toInput == "" ||
+      departureDate == "" ||
+      totalPassengers == "" ||
+      classInput == ""
+    ) {
       toast.error("Please fill out all fields in the form!");
-      setSearchPage(false);
-    }else{
-      setSearchPage(true);
+    } else {
+      const queryParams = new URLSearchParams({
+        fromInput,
+        toInput,
+        departureDate,
+        returnDate: returnDate || "", // Kirim kosong jika null
+        totalPassengers,
+        classInput,
+      }).toString();
+
+      navigate({
+        to: `/search?${queryParams}`,
+      });
+
     }
   };
 
@@ -159,7 +176,7 @@ const Homepage = () => {
     }
   }, [data, isSuccess, flights]);
 
-  return !searchPage ? (
+  return (
     <>
       <section id="hero">
         <Container fluid className="p-0 mt-4 ">
@@ -831,24 +848,38 @@ const Homepage = () => {
                         ? "Jakarta -> Bangkok"
                         : "Jakarta -> Sydney"}
                     </Card.Title>
-                    <p className="text-primary mb-1" style={{ 
-                      fontSize: "12px",
-                     }}>AirAsia</p>
+                    <p
+                      className="text-primary mb-1"
+                      style={{
+                        fontSize: "12px",
+                      }}
+                    >
+                      AirAsia
+                    </p>
                     <Card.Text>
-                      <p className="mb-1" style={{ 
-                        fontSize: "10px"
-                       }}>
+                      <p
+                        className="mb-1"
+                        style={{
+                          fontSize: "10px",
+                        }}
+                      >
                         {index % 2 === 0
                           ? "20 - 30 Maret 2023"
                           : "5 - 25 Maret 2023"}
                       </p>
-                      <p className="" style={{ 
-                        fontSize: "14px"
-                       }}>
+                      <p
+                        className=""
+                        style={{
+                          fontSize: "14px",
+                        }}
+                      >
                         Mulai dari{" "}
-                        <span className="text-danger" style={{ 
-                          fontSize: "14px"
-                         }}>
+                        <span
+                          className="text-danger"
+                          style={{
+                            fontSize: "14px",
+                          }}
+                        >
                           {index % 2 === 0 ? "IDR 950.000" : "IDR 3.650.000"}
                         </span>
                       </p>
@@ -875,15 +906,6 @@ const Homepage = () => {
         />
       </div>
     </>
-  ) : (
-    <SearchFlight
-      fromInput={fromInput}
-      toInput={toInput}
-      departureDate={departureDate}
-      returnDate={returnDate ? returnDate : null}
-      passengers={totalPassengers}
-      classInput={classInput}
-    />
   );
 };
 

@@ -24,8 +24,8 @@ import notFoundImage from "../../assets/homepage/not-found.png";
 import ticketSoldOutImage from "../../assets/homepage/tickets-sold-out.png";
 import {format, addWeeks, subWeeks, startOfWeek, addDays, isSameDay} from "date-fns";
 import { id } from "date-fns/locale";
+import { Navigate, useNavigate } from "@tanstack/react-router";
 
-import HomePageScreen from "../Homepage/ScreenHomepage"
 
 const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers, classInput}) => {
   const [filterShowModal, setFilterShowModal] = useState(false);
@@ -34,7 +34,6 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
   const [selectedFilter, setSelectedFilter] = useState("");
   const [selectedElement, setSelectedElement] = useState("");
   const [dateBtnActive, setDateBtnActive] = useState(null);
-  const [homePage, setHomePage] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
@@ -51,16 +50,21 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
   // update tanggal saat minggu berubah
   useEffect(() => {
     const week = calculateWeekDates(currentWeek);
-    setWeekDates(week);
 
-    // Tentukan tombol aktif default berdasarkan departureDate
-    // Set tombol aktif hanya saat aplikasi pertama kali dimuat
+    // Update hanya jika weekDates berubah
+    setWeekDates((prevWeekDates) => {
+      if (JSON.stringify(prevWeekDates) !== JSON.stringify(week)) {
+        return week;
+      }
+      return prevWeekDates;
+    });
+
     if (dateBtnActive === null) {
       const activeIndex = week.findIndex((date) =>
         isSameDay(date, departureDateObj)
       );
       setDateBtnActive(activeIndex);
-    } 
+    }
   }, [currentWeek, departureDateObj]);
 
   const handleNextWeek = () => {
@@ -91,7 +95,9 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
     setTempFilter(label); // Simpan nilai sementara dari pilihan
   };
 
-  return !homePage ? (
+  const navigate = useNavigate();
+
+  return (
     <>
       <Container className="">
         <Row className="mt-5 mb-2">
@@ -102,10 +108,11 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
             <Button
               className="p-3 w-100 text-start back-btn"
               style={{ background: "#A06ECE" }}
-              onClick={() => setHomePage(true)}
+              onClick={() => navigate({ to: "/" })}
             >
               <FaArrowLeft className="me-2" />
-              {fromInput} > {toInput} - {passengers} Penumpang - {classInput}
+              {fromInput} > {toInput} - {passengers} Penumpang -{" "}
+              {classInput.replace("+", " ")}
             </Button>
           </Col>
           <Col>
@@ -1583,8 +1590,6 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
         </Modal>
       </Container>
     </>
-  ) : (
-    <HomePageScreen />
   );
 };
 
