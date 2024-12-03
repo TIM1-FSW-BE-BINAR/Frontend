@@ -35,6 +35,9 @@ import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import toast, { Toaster } from "react-hot-toast";
 
+import {useQuery} from "@tanstack/react-query";
+import {getFlights} from "../../service/flight/flightService"
+
 const ScreenHomepage = () => {
   return <Homepage />;
 };
@@ -139,6 +142,22 @@ const Homepage = () => {
       setSearchPage(true);
     }
   };
+
+  const [flights, setFlights] = useState([]);
+
+  // Menggunakan react query
+  const { data, isSuccess, isPending } = useQuery({
+    queryKey: ["flights"],
+    queryFn: () => getFlights(),
+    enabled: true,
+  });
+
+  useEffect(() => {
+    if (isSuccess) {
+      setFlights(data);
+      console.log(flights);
+    }
+  }, [data, isSuccess, flights]);
 
   return !searchPage ? (
     <>
@@ -778,7 +797,7 @@ const Homepage = () => {
                   sm={3}
                   md={2}
                   lg={1}
-                  className={`d-flex align-items-center justify-content-center p-2 m-2 rounded responsive-button ${
+                  className={`d-flex align-items-center justify-content-center m-2 rounded responsive-button ${
                     activeButton === index ? "active" : ""
                   }`}
                   onClick={() => handleButtonCardClick(index)}
@@ -801,27 +820,35 @@ const Homepage = () => {
                     </span>
                   </div>
                   <Card.Img variant="top" src={cardImg} />
-                  <Card.Body>
+                  <Card.Body className="custom-card-body">
                     <Card.Title
                       className="card-title"
                       style={{
-                        fontSize: "16px",
+                        fontSize: "14px",
                       }}
                     >
                       {index % 2 === 0
                         ? "Jakarta -> Bangkok"
                         : "Jakarta -> Sydney"}
                     </Card.Title>
-                    <p className="text-primary fs-6 mb-1">AirAsia</p>
+                    <p className="text-primary mb-1" style={{ 
+                      fontSize: "12px",
+                     }}>AirAsia</p>
                     <Card.Text>
-                      <p className="fs-6 mb-1">
+                      <p className="mb-1" style={{ 
+                        fontSize: "10px"
+                       }}>
                         {index % 2 === 0
                           ? "20 - 30 Maret 2023"
                           : "5 - 25 Maret 2023"}
                       </p>
-                      <p className="fs-6">
+                      <p className="" style={{ 
+                        fontSize: "14px"
+                       }}>
                         Mulai dari{" "}
-                        <span className="text-danger">
+                        <span className="text-danger" style={{ 
+                          fontSize: "14px"
+                         }}>
                           {index % 2 === 0 ? "IDR 950.000" : "IDR 3.650.000"}
                         </span>
                       </p>
