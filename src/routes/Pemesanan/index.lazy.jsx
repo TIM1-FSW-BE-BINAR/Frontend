@@ -132,7 +132,7 @@ function Pemesanan() {
       <NavbarPemesanan />
       <div className="container my-4">
         <div className="row">
-          <div className="col-lg- col-md-7  d-flex align-items-center flex-column">
+          <div className="col-lg-6 col-md-7  d-flex align-items-center flex-column">
             <form className="p-3">
               {/* Card Pemesan */}
               <div className="mb-3 ">
@@ -911,6 +911,7 @@ function Pemesanan() {
                 </Card>
               </div>
 
+              {/* Button save */}
               <div className="mb-3">
                 {/* {!isSaved && ( */}
                 <div className="d-flex justify-content-center">
@@ -944,6 +945,7 @@ function Pemesanan() {
             </form>
           </div>
 
+          {/* Card detail booking */}
           <div className="col-lg-4 col-md-7  d-flex align-items-center flex-column">
             {/* <FlightDetailCard /> */}
             <DetailPenerbangan />
