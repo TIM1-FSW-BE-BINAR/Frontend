@@ -10,10 +10,20 @@ const ScreenRiwayat = () => {
       <Row>
         {/* Bagian kiri: Riwayat Pemesanan */}
         <Col md={8} className="pe-3">
-          <h5 className="fw-bold mb-3">Maret 2023</h5>
+          <h5
+            className="d-flex fw-bold mb-3"
+            style={{ position: "relative", left: "19.5rem" }}
+          >
+            Maret 2023
+          </h5>
           <Card
             className="mb-3"
-            style={{ borderRadius: "10px", border: "1px solid #7126B5BF" }}
+            style={{
+              borderRadius: "10px",
+              border: "1px solid #7126B5BF",
+              width: "35rem",
+              left: "19rem",
+            }}
           >
             <Card.Body>
               <div className="d-flex justify-content-between align-items-center mb-2">
