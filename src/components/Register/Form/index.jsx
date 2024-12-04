@@ -8,6 +8,8 @@ import { useMutation } from "@tanstack/react-query";
 import { register } from "../../../service/auth";
 import { setToken } from "../../../redux/slices/auth";
 import toast, { Toaster } from "react-hot-toast";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 const RegisterForm = () => {
   const dispatch = useDispatch();
@@ -22,6 +24,9 @@ const RegisterForm = () => {
 
   const [type, setType] = useState("password");
   const [icon, setIcon] = useState(<IoEyeOffOutline />);
+
+  const [confirmType, setConfirmType] = useState("password");
+  const [confirmIcon, setConfirmIcon] = useState(<IoEyeOffOutline />);
 
   const [errors, setErrors] = useState({
     firstName: "",
@@ -163,13 +168,23 @@ const RegisterForm = () => {
     registerUser(request);
   };
 
-  const handleEyeToggle = () => {
-    if (type === "password") {
-      setType("text");
-      setIcon(<IoEyeOutline />);
-    } else {
-      setType("password");
-      setIcon(<IoEyeOffOutline />);
+  const handleEyeToggle = (field) => {
+    if (field === "password") {
+      if (type === "password") {
+        setType("text");
+        setIcon(<IoEyeOutline />);
+      } else {
+        setType("password");
+        setIcon(<IoEyeOffOutline />);
+      }
+    } else if (field === "confirmPassword") {
+      if (confirmType === "password") {
+        setConfirmType("text");
+        setConfirmIcon(<IoEyeOutline />);
+      } else {
+        setConfirmType("password");
+        setConfirmIcon(<IoEyeOffOutline />);
+      }
     }
   };
 
@@ -245,13 +260,13 @@ const RegisterForm = () => {
         {/* Nomor Telepon */}
         <Form.Group className="mb-3" controlId="validationCustom04">
           <Form.Label>Nomor Telepon</Form.Label>
-          <Form.Control
+          <PhoneInput
             ref={phoneRef}
             isInvalid={!!errors.phone}
-            type="number"
-            placeholder="+62 "
+            defaultCountry="ID"
+            placeholder="Masukkan nomor telepon"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={setPhone}
             style={{
               borderRadius: "15px",
               padding: "1em",
@@ -281,7 +296,7 @@ const RegisterForm = () => {
               isInvalid={!!errors.password}
             />
             <span
-              onClick={handleEyeToggle}
+              onClick={() => handleEyeToggle("password")}
               style={{
                 position: "absolute",
                 top: errors.password ? "35%" : "50%",
@@ -305,7 +320,7 @@ const RegisterForm = () => {
           <div style={{ position: "relative" }}>
             <Form.Control
               ref={confirmPasswordRef}
-              type={type}
+              type={confirmType}
               placeholder="Konfirmasi password"
               style={{
                 borderRadius: "15px",
@@ -317,7 +332,7 @@ const RegisterForm = () => {
               isInvalid={!!errors.confirmPassword}
             />
             <span
-              onClick={handleEyeToggle}
+              onClick={() => handleEyeToggle("confirmPassword")}
               style={{
                 position: "absolute",
                 top: errors.confirmPassword ? "35%" : "50%",
@@ -327,7 +342,7 @@ const RegisterForm = () => {
                 zIndex: 2,
               }}
             >
-              {icon}
+              {confirmIcon}
             </span>
             <Form.Control.Feedback type="invalid">
               {errors.confirmPassword}
