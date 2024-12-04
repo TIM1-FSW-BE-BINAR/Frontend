@@ -106,7 +106,7 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
         <Row>
           <Col xs={12} sm={8} md={8} className="mb-2 mb-sm-0">
             <Button
-              className="p-3 w-100 text-start back-btn"
+              className="p-3 w-100 text-start back-btn animated-button"
               style={{ background: "#A06ECE" }}
               onClick={() => navigate({ to: "/" })}
             >
@@ -117,7 +117,7 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
           </Col>
           <Col>
             <Button
-              className="p-3 w-100 ubah-btn"
+              className="p-3 w-100 ubah-btn animated-button"
               style={{
                 background: "#73CA5C",
               }}
@@ -128,7 +128,7 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
         </Row>
         <Row className="d-flex align-items-center justify-content-between pt-3">
           <Col>
-            <Button onClick={handlePreviousWeek}>
+            <Button onClick={handlePreviousWeek} className="animated-button">
               <FaArrowLeft />
             </Button>
           </Col>
@@ -152,7 +152,7 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
             ))}
           </Col>
           <Col>
-            <Button onClick={handleNextWeek}>
+            <Button onClick={handleNextWeek} className="animated-button">
               <FaArrowRight />
             </Button>
           </Col>
@@ -391,7 +391,6 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
                                 alt="Arrow"
                                 className="img-fluid long-arrow-icon"
                                 style={{
-                                  maxWidth: "100%",
                                   width: "100%",
                                   maxWidth: "433px",
                                 }}

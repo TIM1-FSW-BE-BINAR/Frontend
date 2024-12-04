@@ -156,7 +156,6 @@ const Homepage = () => {
       navigate({
         to: `/search?${queryParams}`,
       });
-
     }
   };
 
@@ -291,13 +290,20 @@ const Homepage = () => {
                     </Form.Group>
                   </Col>
                   <Col sm={12} md={1} className="d-flex justify-content-center">
-                    <img
-                      src={returnIcon}
-                      className="mt-2 return-icon"
-                      alt=""
-                      style={{ cursor: "pointer" }}
-                      onClick={handleSwitch}
-                    />
+                    <Button
+                      style={{
+                        border: "none",
+                        backgroundColor: "transparent",
+                        padding: "0",
+                      }}
+                    >
+                      <img
+                        src={returnIcon}
+                        className="mt-2 return-icon animated-button"
+                        alt=""
+                        onClick={handleSwitch}
+                      />
+                    </Button>
                   </Col>
                   <Col sm={12} md={6}>
                     <Form.Group as={Row} className="mb-3">
@@ -446,7 +452,7 @@ const Homepage = () => {
                 {/* button */}
                 <Button
                   type="submit"
-                  className="btn btn-block btn-primary w-100 mt-2 mx-0"
+                  className="btn btn-block btn-primary w-100 mt-2 mx-0 animated-button"
                 >
                   Cari Penerbangan
                 </Button>
@@ -499,19 +505,28 @@ const Homepage = () => {
                 {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
                 <Col className="p-0 d-flex justify-content-end align-items-center">
                   {/* Tombol Minus */}
-                  <img
-                    src={minusIcon}
-                    className="img-fluid"
-                    alt=""
+                  <Button
+                    className="animated-button"
                     style={{
-                      maxWidth: "40px",
-                      maxHeight: "40px",
-                      cursor: "pointer",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      padding: "0",
                     }}
-                    onClick={() => {
-                      decrementInputPassengers("adult");
-                    }}
-                  />
+                  >
+                    <img
+                      src={minusIcon}
+                      className="img-fluid"
+                      alt=""
+                      style={{
+                        maxWidth: "40px",
+                        maxHeight: "40px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        decrementInputPassengers("adult");
+                      }}
+                    />
+                  </Button>
 
                   {/* Input Field */}
                   <input
@@ -528,19 +543,28 @@ const Homepage = () => {
                   />
 
                   {/* Tombol Plus */}
-                  <img
-                    src={plusIcon}
-                    className="img-fluid"
-                    alt=""
+                  <Button
+                    className="animated-button"
                     style={{
-                      maxWidth: "40px",
-                      maxHeight: "40px",
-                      cursor: "pointer",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      padding: "0",
                     }}
-                    onClick={() => {
-                      incrementInputPassengers("adult");
-                    }}
-                  />
+                  >
+                    <img
+                      src={plusIcon}
+                      className="img-fluid"
+                      alt=""
+                      style={{
+                        maxWidth: "40px",
+                        maxHeight: "40px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        incrementInputPassengers("adult");
+                      }}
+                    />
+                  </Button>
                 </Col>
               </Row>
               <Row className="d-flex justify-content-between align-items-center">
@@ -562,19 +586,28 @@ const Homepage = () => {
                 {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
                 <Col className="p-0 d-flex justify-content-end align-items-center">
                   {/* Tombol Minus */}
-                  <img
-                    src={minusIcon}
-                    className="img-fluid"
-                    alt=""
+                  <Button
+                    className="animated-button"
                     style={{
-                      maxWidth: "40px",
-                      maxHeight: "40px",
-                      cursor: "pointer",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      padding: "0",
                     }}
-                    onClick={() => {
-                      decrementInputPassengers("child");
-                    }}
-                  />
+                  >
+                    <img
+                      src={minusIcon}
+                      className="img-fluid"
+                      alt=""
+                      style={{
+                        maxWidth: "40px",
+                        maxHeight: "40px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        decrementInputPassengers("child");
+                      }}
+                    />
+                  </Button>
 
                   {/* Input Field */}
                   <input
@@ -591,19 +624,28 @@ const Homepage = () => {
                   />
 
                   {/* Tombol Plus */}
-                  <img
-                    src={plusIcon}
-                    className="img-fluid"
-                    alt=""
+                  <Button
+                    className="animated-button"
                     style={{
-                      maxWidth: "40px",
-                      maxHeight: "40px",
-                      cursor: "pointer",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      padding: "0",
                     }}
-                    onClick={() => {
-                      incrementInputPassengers("child");
-                    }}
-                  />
+                  >
+                    <img
+                      src={plusIcon}
+                      className="img-fluid"
+                      alt=""
+                      style={{
+                        maxWidth: "40px",
+                        maxHeight: "40px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        incrementInputPassengers("child");
+                      }}
+                    />
+                  </Button>
                 </Col>
               </Row>
               <Row className="d-flex justify-content-between align-items-center">
@@ -625,19 +667,28 @@ const Homepage = () => {
                 {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
                 <Col className="p-0 d-flex justify-content-end align-items-center">
                   {/* Tombol Minus */}
-                  <img
-                    src={minusIcon}
-                    className="img-fluid"
-                    alt=""
+                  <Button
+                    className="animated-button"
                     style={{
-                      maxWidth: "40px",
-                      maxHeight: "40px",
-                      cursor: "pointer",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      padding: "0",
                     }}
-                    onClick={() => {
-                      decrementInputPassengers("baby");
-                    }}
-                  />
+                  >
+                    <img
+                      src={minusIcon}
+                      className="img-fluid"
+                      alt=""
+                      style={{
+                        maxWidth: "40px",
+                        maxHeight: "40px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        decrementInputPassengers("baby");
+                      }}
+                    />
+                  </Button>
 
                   {/* Input Field */}
                   <input
@@ -654,25 +705,38 @@ const Homepage = () => {
                   />
 
                   {/* Tombol Plus */}
-                  <img
-                    src={plusIcon}
-                    className="img-fluid"
-                    alt=""
+                  <Button
+                    className="animated-button"
                     style={{
-                      maxWidth: "40px",
-                      maxHeight: "40px",
-                      cursor: "pointer",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      padding: "0",
                     }}
-                    onClick={() => {
-                      incrementInputPassengers("baby");
-                    }}
-                  />
+                  >
+                    <img
+                      src={plusIcon}
+                      className="img-fluid"
+                      alt=""
+                      style={{
+                        maxWidth: "40px",
+                        maxHeight: "40px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        incrementInputPassengers("baby");
+                      }}
+                    />
+                  </Button>
                 </Col>
               </Row>
             </Container>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="primary" onClick={handleSavePassengers}>
+            <Button
+              variant="primary"
+              onClick={handleSavePassengers}
+              className="animated-button"
+            >
               Simpan
             </Button>
           </Modal.Footer>
@@ -789,10 +853,18 @@ const Homepage = () => {
             </Container>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={handleClassClose}>
+            <Button
+              variant="secondary"
+              onClick={handleClassClose}
+              className="animated-button"
+            >
               Tutup
             </Button>
-            <Button variant="primary" onClick={handleSaveClass}>
+            <Button
+              variant="primary"
+              onClick={handleSaveClass}
+              className="animated-button"
+            >
               Simpan
             </Button>
           </Modal.Footer>
