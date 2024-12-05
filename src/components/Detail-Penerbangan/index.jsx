@@ -10,7 +10,7 @@ const DetailPenerbangan = ({ student }) => {
   return (
     <>
       <div className="mt-3">
-        <Card style={{ width: "26rem", border: "none" }} className="card ">
+        <Card style={{ width: "25rem", border: "none" }} className="card ">
           <Card.Body>
             <div>
               <Card.Title style={{ fontSize: "18px", marginBottom: "1px" }}>
@@ -38,7 +38,7 @@ const DetailPenerbangan = ({ student }) => {
 
             <div>
               <Row>
-                <div style={{ marginLeft: "45px" }}>
+                <div style={{ marginLeft: "2rem" }}>
                   <b>{"Jet Air-Economy"}</b>
                   <br></br>
                   <b>
@@ -49,8 +49,8 @@ const DetailPenerbangan = ({ student }) => {
                 </div>
               </Row>
               <Row>
-                <Col className="col-lg-1" style={{ size: "10px" }}>
-                  <img src="../../public/img/logokkecil"></img>
+                <Col className=" col-md-1" style={{ size: "10px" }}>
+                  <img src="../../public/img/logokkecil.png"></img>
                 </Col>
                 <Col className="col-lg-10">
                   <b>Informasi: </b> <br></br>

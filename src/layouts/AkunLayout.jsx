@@ -21,7 +21,12 @@ function PageHeader() {
           className="offset-md-2"
           style={{ marginTop: "25px" }}
         >
-          <h1 className="m-0 fw-bold fs-4 text-start">Akun</h1>
+          <h1
+            className="m-0 fw-bold fs-4 text-start"
+            style={{ color: "#000000" }}
+          >
+            Akun
+          </h1>
         </Col>
       </Row>
       <Row className="m-5 align-items-center">

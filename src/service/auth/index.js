@@ -131,6 +131,7 @@ export const profile = async () => {
   });
 
   const result = await response.json();
+  console.log(result);
   return result?.data;
 };
 export const sendEmail = async (request) => {

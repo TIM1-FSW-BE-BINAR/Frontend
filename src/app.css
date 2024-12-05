@@ -45,108 +45,12 @@ body {
   align-items: center;
   justify-content: center;
   padding: 0;
-  position: absolute; /* Pastikan tombol memiliki posisi absolut */
-  top: 10px; /* Jarak dari atas */
+  position: absolute; 
+  top: 10px; 
   right: 20px;
 }
 .custom-input:focus {
   border-color: purple; 
   box-shadow: 0 0 0px 3px rgba(111, 66, 193, 0.5); 
   outline: none;
-}
-.col-lg-6 d-flex flex-column py-auto {
-    display:flex;
-    align-items: center;
-}
-/* Global Styling */
-.App {
-  font-family: "Arial", sans-serif;
-  text-align: center;
-  margin: 20px;
-}
-
-h1 {
-  font-size: 2rem;
-  margin-bottom: 10px;
-  color: #4CAF50;
-}
-
-h2 {
-  margin: 20px 0;
-  color: #333;
-}
-
-/* Seat Map Styling */
-.seat-map {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.row {
-  display: flex;
-  gap: 5px;
-}
-
-.column-labels {
-  display: flex;
-  gap: 5px;
-}
-
-.column-label {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
-  background-color: #f0f0f0;
-  color: #333;
-}
-
-.seat {
-  width: 40px;
-  height: 40px;
-  background-color: #ccc;
-  border: 1px solid #888;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: bold;
-  transition: transform 0.2s, background-color 0.2s;
-}
-
-.seat.booked {
-  background-color: #7e57c2; /* Warna ungu untuk kursi yang sudah dipesan */
-  color: white;
-  cursor: not-allowed;
-}
-
-.seat.selected {
-  background-color: #4CAF50; /* Warna hijau untuk kursi yang dipilih */
-  color: white;
-}
-
-.seat:hover {
-  transform: scale(1.1);
-}
-
-/* Button Confirm */
-.btn-confirm {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-top: 20px;
-}
-
-.btn-confirm:hover {
-  background-color: #45a049;
 }

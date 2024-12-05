@@ -6,11 +6,11 @@ import { Container, Row, Col, Button, Form, Image } from "react-bootstrap";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { useMutation } from "@tanstack/react-query";
 import { register } from "../../../service/auth";
-<<<<<<< HEAD
+
 import { setToken } from "../../../redux/slices/auth";
 import toast, { Toaster } from "react-hot-toast";
-=======
->>>>>>> e680011bd640e47652230a69286d127236c70cc5
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 const RegisterForm = () => {
   const dispatch = useDispatch();
@@ -25,6 +25,9 @@ const RegisterForm = () => {
 
   const [type, setType] = useState("password");
   const [icon, setIcon] = useState(<IoEyeOffOutline />);
+
+  const [confirmType, setConfirmType] = useState("password");
+  const [confirmIcon, setConfirmIcon] = useState(<IoEyeOffOutline />);
 
   const [errors, setErrors] = useState({
     firstName: "",
@@ -110,6 +113,7 @@ const RegisterForm = () => {
     // }
   };
 
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setErrors({
@@ -166,50 +170,27 @@ const RegisterForm = () => {
     registerUser(request);
   };
 
-  const handleEyeToggle = () => {
-    if (type === "password") {
-      setType("text");
-      setIcon(<IoEyeOutline />);
-    } else {
-      setType("password");
-      setIcon(<IoEyeOffOutline />);
+  const handleEyeToggle = (field) => {
+    if (field === "password") {
+      if (type === "password") {
+        setType("text");
+        setIcon(<IoEyeOutline />);
+      } else {
+        setType("password");
+        setIcon(<IoEyeOffOutline />);
+      }
+    } else if (field === "confirmPassword") {
+      if (confirmType === "password") {
+        setConfirmType("text");
+        setConfirmIcon(<IoEyeOutline />);
+      } else {
+        setConfirmType("password");
+        setConfirmIcon(<IoEyeOffOutline />);
+      }
     }
   };
 
-<<<<<<< HEAD
-=======
-  const handleRegister = async (e) => {
-    e.preventDefault();
 
-    const form = e.currentTarget;
-    if (form.checkValidity() === false) {
-      e.preventDefault();
-      e.stopPropagation();
-      setValidated(true);
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      alert("Password tidak cocok");
-      return;
-    }
-
-    const request = {
-      firstName,
-      lastName,
-      phone,
-      email,
-      password,
-    };
-
-    const result = await register(request);
-
-    if (result.meta.statusCode === 201) {
-      alert("Registrasi berhasil!");
-      navigate({ to: "/otp" });
-    }
-  };
->>>>>>> e680011bd640e47652230a69286d127236c70cc5
   return (
     <div
       style={{
@@ -217,10 +198,7 @@ const RegisterForm = () => {
         width: "100%",
       }}
     >
-<<<<<<< HEAD
       {" "}
-=======
->>>>>>> e680011bd640e47652230a69286d127236c70cc5
       <h2 className="fw-bold text-start mb-4">Daftar</h2>
       <Form noValidate onSubmit={handleRegister}>
         {/* Nama */}
@@ -285,13 +263,13 @@ const RegisterForm = () => {
         {/* Nomor Telepon */}
         <Form.Group className="mb-3" controlId="validationCustom04">
           <Form.Label>Nomor Telepon</Form.Label>
-          <Form.Control
+          <PhoneInput
             ref={phoneRef}
             isInvalid={!!errors.phone}
-            type="number"
-            placeholder="+62 "
+            defaultCountry="ID"
+            placeholder="Masukkan nomor telepon"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={setPhone}
             style={{
               borderRadius: "15px",
               padding: "1em",
@@ -321,7 +299,7 @@ const RegisterForm = () => {
               isInvalid={!!errors.password}
             />
             <span
-              onClick={handleEyeToggle}
+              onClick={() => handleEyeToggle("password")}
               style={{
                 position: "absolute",
                 top: errors.password ? "35%" : "50%",
@@ -345,7 +323,7 @@ const RegisterForm = () => {
           <div style={{ position: "relative" }}>
             <Form.Control
               ref={confirmPasswordRef}
-              type={type}
+              type={confirmType}
               placeholder="Konfirmasi password"
               style={{
                 borderRadius: "15px",
@@ -357,7 +335,7 @@ const RegisterForm = () => {
               isInvalid={!!errors.confirmPassword}
             />
             <span
-              onClick={handleEyeToggle}
+              onClick={() => handleEyeToggle("confirmPassword")}
               style={{
                 position: "absolute",
                 top: errors.confirmPassword ? "35%" : "50%",
@@ -367,7 +345,7 @@ const RegisterForm = () => {
                 zIndex: 2,
               }}
             >
-              {icon}
+              {confirmIcon}
             </span>
             <Form.Control.Feedback type="invalid">
               {errors.confirmPassword}
@@ -390,7 +368,6 @@ const RegisterForm = () => {
           Daftar
         </Button>
       </Form>
-
       <div
         className="text-center"
         style={{
