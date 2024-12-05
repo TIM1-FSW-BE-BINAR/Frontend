@@ -99,20 +99,7 @@ const RegisterForm = () => {
       setErrors((prev) => ({ ...prev, phone: errorMessage }));
       phoneRef.current?.focus();
     }
-
-    // if (message.includes("password") || message.includes("credential")) {
-    //   setErrors((prev) => ({ ...prev, password: errorMessage }));
-    //   lastNameRef.current?.focus();
-    // }
-
-    // if (message.includes("password") || message.includes("")) {
-    //   setErrors((prev) => ({ ...prev, password: errorMessage }));
-    //   passwordRef.current?.focus();
-    // } else {
-    //   setErrors((prev) => ({ ...prev, email: errorMessage }));
-    // }
   };
-
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -190,16 +177,15 @@ const RegisterForm = () => {
     }
   };
 
-
   return (
     <div
       style={{
-        maxWidth: "425px",
+        maxWidth: "450px",
         width: "100%",
       }}
     >
       {" "}
-      <h2 className="fw-bold text-start mb-4">Daftar</h2>
+      <h2 className="fw-bold text-start my-4">Daftar</h2>
       <Form noValidate onSubmit={handleRegister}>
         {/* Nama */}
         <Form.Group className="mb-3" controlId="validationCustom01">
@@ -271,8 +257,32 @@ const RegisterForm = () => {
             value={phone}
             onChange={setPhone}
             style={{
+              width: "100%",
               borderRadius: "15px",
               padding: "1em",
+              border: errors.phone ? "1px solid #dc3545" : "1px solid #ced4da",
+              boxShadow: errors.phone
+                ? "0 0 0 0.25rem rgba(220,53,69,.25)"
+                : "none",
+              outline: "none !important", // Pastikan outline hilang di input utama
+            }}
+            inputStyle={{
+              width: "100%",
+              paddingLeft: "50px", // Untuk ruang ikon bendera
+              border: "none", // Hilangkan border default
+              outline: "none !important", // Pastikan hilangkan outline pada input
+              boxSizing: "border-box",
+            }}
+            countrySelectProps={{
+              style: {
+                position: "absolute",
+                left: "10px", // Posisi ikon negara
+                top: "50%",
+                transform: "translateY(-50%)", // Vertikal center
+                pointerEvents: "auto", // Agar ikon dapat diklik
+                zIndex: 1, // Pastikan ikon di atas input
+                outline: "none !important", // Hilangkan outline pada dropdown negara
+              },
             }}
           />
           <Form.Control.Feedback type="invalid">
