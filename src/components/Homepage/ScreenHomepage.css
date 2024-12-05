@@ -307,4 +307,9 @@ body{
   transform: scale(0.9);
 }
 
+.list-item-city-modal:hover{
+  background-color: #f1f1f1;
+  transition: background-color 0.2s ease;
+}
+
 

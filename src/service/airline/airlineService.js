@@ -15,7 +15,7 @@ export const getAirlines = async (filters = {}) => {
 
   // get data
   const result = await response.json();
-  if (!result?.success) {
+  if (!result) {
     throw new Error(result?.message);
   }
   return result?.data;

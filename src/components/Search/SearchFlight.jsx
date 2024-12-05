@@ -106,7 +106,7 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
         <Row>
           <Col xs={12} sm={8} md={8} className="mb-2 mb-sm-0">
             <Button
-              className="p-3 w-100 text-start back-btn animated-button"
+              className="p-3 w-100 text-start back-btn"
               style={{ background: "#A06ECE" }}
               onClick={() => navigate({ to: "/" })}
             >

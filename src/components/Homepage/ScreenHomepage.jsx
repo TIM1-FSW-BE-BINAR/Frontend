@@ -36,6 +36,8 @@ import toast, { Toaster } from "react-hot-toast";
 
 import { useQuery } from "@tanstack/react-query";
 import { getFlights } from "../../service/flight/flightService";
+import { getAirlines } from "../../service/airline/airlineService";
+import { getAirports } from "../../service/airport/airportService";
 import { useNavigate } from "@tanstack/react-router";
 
 const ScreenHomepage = () => {
@@ -162,18 +164,30 @@ const Homepage = () => {
   const [flights, setFlights] = useState([]);
 
   // Menggunakan react query
-  const { data, isSuccess, isPending } = useQuery({
+  const { data: flightData, isSuccess: isSuccessFlight, isPending: isPendingFlight, isError: isErrorFlight } = useQuery({
     queryKey: ["flights"],
     queryFn: () => getFlights(),
     enabled: true,
   });
 
+  
+
+   if (isErrorFlight) {
+     console.log("flight error");
+   }
   useEffect(() => {
-    if (isSuccess) {
-      setFlights(data);
-      console.log(flights);
+    if (isSuccessFlight) {
+      setFlights(flightData);
     }
-  }, [data, isSuccess, flights]);
+  }, [flightData,isSuccessFlight]);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate(); // Mendapatkan hari (15)
+    const month = date.toLocaleString("en-US", { month: "long" }); // Mendapatkan bulan dalam bentuk teks (July)
+    const year = date.getFullYear(); // Mendapatkan tahun (2024)
+    return `${day} ${month} ${year}`;
+  };
 
   return (
     <>
@@ -464,6 +478,7 @@ const Homepage = () => {
         {/* Memanggil from to modal */}
         <HomepageModal
           show={modalShow}
+          flights={flights}
           onHide={() => setModalShow(false)}
           inputValue={modalInputValue}
           setInputValue={setModalInputValue}
@@ -897,8 +912,8 @@ const Homepage = () => {
               )
             )}
           </Row>
-          <Row className="g-3">
-            {[...Array(7)].map((_, index) => (
+          <Row className="g-3 mb-5">
+            {flights?.map((flight, index) => (
               <Col key={index} xs={12} sm={6} md={4} lg={2} className="d-flex">
                 <Card className="custom-card">
                   <div className="badge-container">
@@ -916,9 +931,7 @@ const Homepage = () => {
                         fontSize: "14px",
                       }}
                     >
-                      {index % 2 === 0
-                        ? "Jakarta -> Bangkok"
-                        : "Jakarta -> Sydney"}
+                      {flight?.departure.city} -> {flight?.arrival.city}
                     </Card.Title>
                     <p
                       className="text-primary mb-1"
@@ -926,7 +939,7 @@ const Homepage = () => {
                         fontSize: "12px",
                       }}
                     >
-                      AirAsia
+                      {flight?.airline.name}
                     </p>
                     <Card.Text>
                       <p
@@ -935,9 +948,7 @@ const Homepage = () => {
                           fontSize: "10px",
                         }}
                       >
-                        {index % 2 === 0
-                          ? "20 - 30 Maret 2023"
-                          : "5 - 25 Maret 2023"}
+                        {formatDate(flight?.departureTime)}
                       </p>
                       <p
                         className=""
@@ -952,7 +963,7 @@ const Homepage = () => {
                             fontSize: "14px",
                           }}
                         >
-                          {index % 2 === 0 ? "IDR 950.000" : "IDR 3.650.000"}
+                          IDR {flight?.price}
                         </span>
                       </p>
                     </Card.Text>

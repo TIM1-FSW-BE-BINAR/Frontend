@@ -7,9 +7,7 @@ export const getFlights = async (filters = {}) => {
      }
    });
 
-   console.log(params);
-  let url = `${import.meta.env.VITE_API_URL}/flights`;
-  console.log(url);
+  let url = `${import.meta.env.VITE_API_URL}/flights?${params.toString()}`;
 
   const response = await fetch(url, {
     method: "GET",
