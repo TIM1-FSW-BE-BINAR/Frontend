@@ -5,7 +5,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { setToken, setUser } from "../../redux/slices/auth";
 import { useCallback, useEffect, useState } from "react";
-import { profile } from "../../service/auth";
+import { profileMe } from "../../service/auth";
 import { useQuery } from "@tanstack/react-query";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -36,8 +36,8 @@ export default function SidebarAkun({
   }, [dispatch, navigate]);
 
   const { data, isSuccess, isError } = useQuery({
-    queryKey: ["profile"],
-    queryFn: profile,
+    queryKey: ["profileMe"],
+    queryFn: profileMe,
     enabled: token ? true : false,
   });
 
