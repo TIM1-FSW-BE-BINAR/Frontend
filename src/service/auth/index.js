@@ -97,6 +97,31 @@ export const verifyEmail = async (request) => {
     throw error;
   }
 };
+
+export const resendOtp = async (request) => {
+  const token = localStorage.getItem("token");
+
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/v1/auth/reset-otp`,
+      {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      }
+    );
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error fetching data:", error.message);
+    throw error;
+  }
+};
+
 export const resetPassword = async (request) => {
   const token = localStorage.getItem("token");
 
@@ -123,15 +148,12 @@ export const resetPassword = async (request) => {
 
 export const profile = async () => {
   const token = localStorage.getItem("token");
-  const response = await fetch(
-    `${import.meta.env.VITE_API_URL}/api/v1/auth/me`,
-    {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-      method: "GET",
-    }
-  );
+  const response = await fetch(`${import.meta.env.VITE_API_URL}`, {
+    headers: {
+      authorization: `Bearer ${token}`,
+    },
+    method: "GET",
+  });
 
   const result = await response.json();
   console.log(result);
