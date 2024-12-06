@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { Container, Button, Card, Form, Row, Col } from "react-bootstrap";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { profile } from "../../service/auth";
+import { profileMe } from "../../service/auth";
 import { updateUser } from "../../service/user";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
@@ -21,8 +21,8 @@ const ScreenUbahProfil = () => {
 
   // Fetch profil data
   const { data, isSuccess, isLoading } = useQuery({
-    queryKey: ["profile"],
-    queryFn: profile,
+    queryKey: ["profileMe"],
+    queryFn: profileMe,
     enabled: !!token,
   });
 
@@ -31,7 +31,7 @@ const ScreenUbahProfil = () => {
     mutationFn: updateUser,
     onSuccess: () => {
       toast.success("Profil berhasil diperbarui!");
-      queryClient.invalidateQueries(["profile"]); // Refresh data profil
+      queryClient.invalidateQueries(["profileMe"]); // Refresh data profil
     },
     onError: (error) => {
       toast.error(`Gagal memperbarui profil: ${error?.message}`);

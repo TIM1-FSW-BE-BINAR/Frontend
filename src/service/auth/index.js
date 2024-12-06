@@ -159,6 +159,24 @@ export const profile = async () => {
   console.log(result);
   return result?.data;
 };
+
+export const profileMe = async () => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/v1/auth/me`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+      method: "GET",
+    }
+  );
+
+  const result = await response.json();
+  console.log(result);
+  return result?.data;
+};
+
 export const sendEmail = async (request) => {
   console.log(request);
   try {

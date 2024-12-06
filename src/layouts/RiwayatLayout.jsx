@@ -41,8 +41,8 @@ function PageHeader() {
           style={{ marginTop: "25px" }}
         >
           <h1
-            className="m-0 fw-bold fs-4 text-start"
-            style={{ color: "#000000" }}
+            className="d-flex m-0 fw-bold fs-4 text-start"
+            style={{ position: "relative", color: "#000000", right: "7rem" }}
           >
             History
           </h1>
@@ -50,9 +50,12 @@ function PageHeader() {
       </Row>
 
       {/* Tombol Beranda dan Filter */}
-      <Row className="m-5 align-items-center">
-        <Col md={9} className="offset-md-2 d-flex align-items-center">
-          <ListGroup className="w-100">
+      <Row className="m-5 justify-content-center">
+        <Col
+          md={9}
+          className="d-flex align-items-center justify-content-center"
+        >
+          <ListGroup>
             <ListGroup.Item
               style={{
                 background: "#A06ECE",
@@ -60,6 +63,7 @@ function PageHeader() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 borderRadius: "15px",
+                width: "70rem",
               }}
             >
               {/* Tombol Beranda */}
