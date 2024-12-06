@@ -1,21 +1,62 @@
-import React from "react";
-import { Card, Row, Col, Button } from "react-bootstrap";
+// components/Detail/DetailPesanan.jsx
 
-const DetailPesanan = () => {
+import React, { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Card, Button, Row, Col } from "react-bootstrap";
+import { getIdBooking } from "../../../service/booking";
+import { useSelector } from "react-redux";
+import { format } from "date-fns";
+import { enUS } from "date-fns/locale";
+
+const DetailPesanan = ({ id }) => {
+  const { token } = useSelector((state) => state.auth);
+  const [booking, setBookingDetail] = useState(null);
+
+  const { data, isLoading, isSuccess, isError, error } = useQuery({
+    queryKey: ["getIdBooking", id],
+    queryFn: () => getIdBooking(id),
+    enabled: !!id && !!token,
+  });
+
+  const groupedPassengers = booking?.bookingDetail?.reduce((acc, detail) => {
+    const type = detail.passenger?.type || "UNKNOWN";
+    if (!acc[type]) {
+      acc[type] = { count: 0, totalPrice: 0 };
+    }
+    acc[type].count += 1;
+    acc[type].totalPrice += detail.price || 0;
+    return acc;
+  }, {});
+
+  useEffect(() => {
+    if (isSuccess) {
+      console.log("Booking details fetched successfully:", data);
+      setBookingDetail(data);
+    }
+
+    if (isError) {
+      console.error("Error fetching booking details:", error);
+    }
+  }, [isSuccess, data, isError, error]);
+
+  if (isLoading) return <p>Loading details...</p>;
+  if (isError) return <p>Error fetching details: {error.message}</p>;
+
   return (
     <Card
       style={{
-        width: "25rem",
+        width: "24rem",
         borderRadius: "10px",
         border: "1px solid #D0D0D0",
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-        right: "6.5rem",
+        position: "absolute",
+        right: "13rem",
       }}
     >
       <Card.Body>
         {/* Status Pesanan */}
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h6 className="fw-bold ">Detail Pesanan</h6>
+          <h6 className="fw-bold">Detail Pesanan</h6>
           <span
             className="px-3 py-1 text-white"
             style={{
@@ -24,24 +65,42 @@ const DetailPesanan = () => {
               fontSize: "12px",
             }}
           >
-            Issued
+            {booking?.status}
           </span>
         </div>
 
         {/* Booking Code */}
         <div className="d-flex align-items-center mb-3">
           <span className="fw-bold me-2">Booking Code:</span>
-          <span style={{ color: "#4B1979", fontWeight: "bold" }}>
-            6723y2GHK
+          <span style={{ color: "#7126B5", fontWeight: "bold" }}>
+            {booking?.code || "N/A"}
           </span>
         </div>
 
         {/* Keberangkatan */}
-        <div className="mb-3 d-flex align-items-start">
+        <div className="mb-3 d-flex align-items-start justify-content-between">
           <div>
-            <p className="m-0 fw-bold">19:10</p>
-            <p className="m-0">5 Maret 2023</p>
-            <p className="m-0">Soekarno Hatta - Terminal IA Domestik</p>
+            <p className="m-0 fw-bold">
+              {booking?.flight?.departureTime
+                ? format(new Date(booking.flight.departureTime), "HH:mm", {
+                    locale: enUS,
+                  })
+                : "N/A"}
+            </p>
+            <p className="m-0">
+              {booking?.flight?.departureTime
+                ? format(
+                    new Date(booking.flight.departureTime),
+                    "dd MMMM yyyy",
+                    {
+                      locale: enUS,
+                    }
+                  )
+                : "N/A"}
+            </p>
+            <p className="m-0">
+              {booking?.flight?.departure?.name || "Departure Airport N/A"}
+            </p>
           </div>
           <span className="fw-bold" style={{ color: "#A06ECE" }}>
             Keberangkatan
@@ -60,35 +119,52 @@ const DetailPesanan = () => {
 
           <div>
             {/* Detail Maskapai */}
-            <h6 className="fw-bolder m-0">Jet Air - Economy</h6>
-            <p className="m-0 fw-bold">JT - 203</p>
+            <h6 className="fw-bolder m-0">
+              {booking?.flight?.airline?.name || "Airline not available"} -{" "}
+              {booking?.flight?.class || "N/A"}
+            </h6>
+            <p className="m-0 fw-bold">
+              {booking?.flight?.flightNumber || "Flight Number N/A"}
+            </p>
             {/* Informasi Penumpang */}
             <div className="mt-4">
-              <h6 className="fw-bolder">Informasi: </h6>
-              <p
-                className="m-0"
-                style={{ color: "#4B1979", fontWeight: "500" }}
-              >
-                Penumpang 1: Mr. Harry Potter
-              </p>
-              <p className="m-0">ID: 1234567</p>
-              <p
-                className="m-0"
-                style={{ color: "#4B1979", fontWeight: "500" }}
-              >
-                Penumpang 2: Miss Hermione
-              </p>
-              <p className="m-0">ID: 789658</p>
+              <h6 className="fw-bolder mb-0">Informasi:</h6>
+              {booking?.bookingDetail?.map((detail, index) => (
+                <div key={detail.id}>
+                  <p
+                    className="m-0"
+                    style={{ color: "#4B1979", fontWeight: "500" }}
+                  >
+                    {`Penumpang ${index + 1}: ${detail.passenger?.name} ${detail.passenger?.familyName} `}
+                  </p>
+                  <p className="m-0">{`ID: ${detail.passenger?.identityNumber || "N/A"}`}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
         <hr />
 
+        {/* Kedatangan */}
         <div className="mb-3 d-flex align-items-start justify-content-between">
           <div>
-            <p className="m-0">21:10</p>
-            <p className="m-0">5 Maret 2023</p>
-            <p className="m-0">Melbourne International Airport</p>
+            <p className="m-0 fw-bold">
+              {booking?.flight?.arrivalTime
+                ? format(new Date(booking.flight.arrivalTime), "HH:mm", {
+                    locale: enUS,
+                  })
+                : "N/A"}
+            </p>
+            <p className="m-0">
+              {booking?.flight?.arrivalTime
+                ? format(new Date(booking.flight.arrivalTime), "dd MMMM yyyy", {
+                    locale: enUS,
+                  })
+                : "N/A"}
+            </p>
+            <p className="m-0">
+              {booking?.flight?.arrival?.name || "Arrival Airport N/A"}
+            </p>
           </div>
 
           <span className="fw-bold" style={{ color: "#A06ECE" }}>
@@ -100,22 +176,23 @@ const DetailPesanan = () => {
         {/* Rincian Harga */}
         <div className="mb-3">
           <h6 className="fw-bold">Rincian Harga:</h6>
-          <Row>
-            <Col xs={8}>
-              <p className="m-0">2 Adults</p>
-              <p className="m-0">1 Baby</p>
-              <p className="m-0">Tax</p>
-            </Col>
-            <Col xs={4} className="text-end">
-              <p className="m-0">IDR 9.550.000</p>
-              <p className="m-0">IDR 0</p>
-              <p className="m-0">IDR 300.000</p>
-            </Col>
-          </Row>
+          <div>
+            {groupedPassengers &&
+              Object.entries(groupedPassengers).map(([type, data]) => (
+                <Row key={type}>
+                  <Col xs={8}>
+                    <p className="m-0">{`${data.count} ${type}`}</p>
+                  </Col>
+                  <Col xs={4} className="text-end">
+                    <p className="m-0">{`IDR ${data.totalPrice.toLocaleString("id-ID")}`}</p>
+                  </Col>
+                </Row>
+              ))}
+          </div>
           <hr />
           <div className="d-flex justify-content-between fw-bold">
             <p>Total</p>
-            <p>IDR 8.850.000</p>
+            <p>IDR {booking?.totalPrice || "N/A"}</p>
           </div>
         </div>
 
