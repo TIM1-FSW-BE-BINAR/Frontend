@@ -136,7 +136,6 @@ const Homepage = () => {
 
   const handleSearchPage = (e) => {
     e.preventDefault();
-    console.log("button dipencet");
     if (
       fromInput == "" ||
       toInput == "" ||
@@ -164,22 +163,25 @@ const Homepage = () => {
   const [flights, setFlights] = useState([]);
 
   // Menggunakan react query
-  const { data: flightData, isSuccess: isSuccessFlight, isPending: isPendingFlight, isError: isErrorFlight } = useQuery({
+  const {
+    data: flightData,
+    isSuccess: isSuccessFlight,
+    isPending: isPendingFlight,
+    isError: isErrorFlight,
+  } = useQuery({
     queryKey: ["flights"],
     queryFn: () => getFlights(),
     enabled: true,
   });
 
-  
-
-   if (isErrorFlight) {
-     console.log("flight error");
-   }
+  if (isErrorFlight) {
+    console.log("flight error");
+  }
   useEffect(() => {
     if (isSuccessFlight) {
       setFlights(flightData);
     }
-  }, [flightData,isSuccessFlight]);
+  }, [flightData, isSuccessFlight]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -299,6 +301,7 @@ const Homepage = () => {
                             setActiveModal("from");
                             setModalShow(true);
                           }}
+                          readOnly
                         />
                       </Col>
                     </Form.Group>
@@ -339,6 +342,7 @@ const Homepage = () => {
                             setActiveModal("to");
                             setModalShow(true);
                           }}
+                          readOnly
                         />
                       </Col>
                     </Form.Group>
@@ -448,6 +452,7 @@ const Homepage = () => {
                               : ""
                           }
                           onClick={() => setPassengerModalShow(true)}
+                          readOnly
                         />
                       </Col>
                       <Col className="mt-2">
@@ -458,6 +463,7 @@ const Homepage = () => {
                           className="custom-placeholder form-input"
                           onClick={() => setClassModalShow(true)}
                           value={classInput}
+                          readOnly
                         />
                       </Col>
                     </Form.Group>
@@ -478,6 +484,7 @@ const Homepage = () => {
         {/* Memanggil from to modal */}
         <HomepageModal
           show={modalShow}
+          activeModal={activeModal}
           flights={flights}
           onHide={() => setModalShow(false)}
           inputValue={modalInputValue}
@@ -555,6 +562,7 @@ const Homepage = () => {
                       marginRight: "10px",
                     }}
                     value={adultInput}
+                    readOnly
                   />
 
                   {/* Tombol Plus */}
@@ -636,6 +644,7 @@ const Homepage = () => {
                       marginRight: "10px",
                     }}
                     value={childInput}
+                    readOnly
                   />
 
                   {/* Tombol Plus */}
@@ -717,6 +726,7 @@ const Homepage = () => {
                       marginRight: "10px",
                     }}
                     value={babyInput}
+                    readOnly
                   />
 
                   {/* Tombol Plus */}
@@ -931,7 +941,7 @@ const Homepage = () => {
                         fontSize: "14px",
                       }}
                     >
-                      {flight?.departure.city} -> {flight?.arrival.city}
+                      {flight?.departure.city} -{`>`} {flight?.arrival.city}
                     </Card.Title>
                     <p
                       className="text-primary mb-1"

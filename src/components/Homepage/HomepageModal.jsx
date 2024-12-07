@@ -2,14 +2,20 @@ import React, { useEffect, useState } from "react";
 import { Col, Container, Form, Modal, Row } from "react-bootstrap";
 import searchIcon from "../../assets/homepage/icon/search-icon.png";
 import { SlLocationPin } from "react-icons/sl";
-import xIcon from "../../assets/homepage/icon/x-icon.png";
 
 const HomepageModal = (props) => {
-  const { inputValue, setInputValue, onSubmit, show, onHide, flights } = props;
+  const {
+    inputValue,
+    setInputValue,
+    onSubmit,
+    show,
+    onHide,
+    flights,
+    activeModal,
+  } = props;
 
   useEffect(() => {
     if (show) {
-      console.log("input value kereset");
       setInputValue(""); // Reset nilai input saat modal dibuka
     }
   }, [show, setInputValue]);
@@ -101,24 +107,49 @@ const HomepageModal = (props) => {
               overflowX: "hidden",
             }}
           >
-            {flights?.map((flight, index) => (
-              <Row
-                className="py-3 border-bottom list-item-city-modal"
-                key={index}
-                style={{
-                  cursor: "pointer",
-                  padding: "10px",
-                }}
-                onClick={() => {
-                  handleCitySelect(flight?.departure.city);
-                }}
-              >
-                <Col className="d-flex">
-                  <SlLocationPin className="me-2" />
-                  <h6>{flight?.departure.city}</h6>
-                </Col>
-              </Row>
-            ))}
+            {flights?.map((flight, index) =>
+              activeModal === "from" ? (
+                <Row
+                  className="py-3 border-bottom list-item-city-modal"
+                  key={index}
+                  style={{
+                    cursor: "pointer",
+                    padding: "10px",
+                  }}
+                  onClick={() => {
+                    const cityId = `${flight?.departure.city}-${flight.departure.code}`;
+                    handleCitySelect(cityId);
+                  }}
+                >
+                  <Col className="d-flex">
+                    <SlLocationPin className="me-2" />
+                    <h6>
+                      {flight?.departure.city} - {flight?.departure.code}
+                    </h6>
+                  </Col>
+                </Row>
+              ) : (
+                <Row
+                  className="py-3 border-bottom list-item-city-modal"
+                  key={index}
+                  style={{
+                    cursor: "pointer",
+                    padding: "10px",
+                  }}
+                  onClick={() => {
+                    const cityId = `${flight?.arrival.city}-${flight.arrival.code}`;
+                    handleCitySelect(cityId);
+                  }}
+                >
+                  <Col className="d-flex">
+                    <SlLocationPin className="me-2" />
+                    <h6>
+                      {flight?.arrival.city} - {flight?.arrival.code}
+                    </h6>
+                  </Col>
+                </Row>
+              )
+            )}
           </div>
         </Container>
       </Modal.Body>
