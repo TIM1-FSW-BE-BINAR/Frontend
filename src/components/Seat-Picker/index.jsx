@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 const seatLayout = [
   {
@@ -38,14 +38,15 @@ const seatLayout = [
   },
 ];
 
-const App = () => {
-  const [seatClass, setSeatClass] = useState("First Class"); 
-  const [selectedSeats, setSelectedSeats] = useState([]); 
-  const [bookedSeats, setBookedSeats] = useState(["1A"]); 
+const Seatpicker = () => {
+  const [seatClass, setSeatClass] = useState("First Class");
+  const [selectedSeats, setSelectedSeats] = useState([]);
+  const [bookedSeats, setBookedSeats] = useState(["1A"]);
 
   const currentLayout = seatLayout.find((layout) => layout.type === seatClass);
 
   const handleSeatClick = (seat) => {
+
     if (!seat || bookedSeats.includes(seat)) {
       alert(seat ? "Kursi ini sudah dipesan!" : "Kursi tidak valid!");
       return;
@@ -64,75 +65,56 @@ const App = () => {
     } else {
       setBookedSeats([...bookedSeats, ...selectedSeats]);
       alert(`Kursi ${selectedSeats.join(", ")} berhasil dipesan.`);
-      setSelectedSeats([]); 
+      setSelectedSeats([]);
     }
   };
 
   return (
-    <div className="App">
+    <div className="App" style={{ textAlign: "center", margin: "20px" }}>
       <style>
         {`
-          .App {
-            font-family: "Arial", sans-serif;
-            text-align: center;
-            margin: 20px;
-          }
-
-          h2 {
-            margin: 20px 0;
-            color: #333;
-          }
-
           .class-selection button {
             margin: 0 10px;
             padding: 10px 20px;
-            font-size: 16px;
             border: none;
             border-radius: 5px;
             background-color: #73CA5C;
             color: white;
-            cursor: pointer;
           }
-
           .class-selection button:hover {
             background-color: #45a049;
           }
-
-          .seat-map {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-          }
-
           .row {
             display: flex;
             gap: 5px;
             justify-content: center;
           }
-
           .seat {
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             background-color: #73CA5C;
-            border: 1px solid #888;
             display: flex;
             justify-content: center;
             align-items: center;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
             transition: transform 0.2s, background-color 0.2s;
           }
-
+            .seat-map {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+          }
+          .seat:hover {
+            transform: scale(1.1);
+          }
           .seat.booked {
             background-color: #D0D0D0;
             color: white;
             cursor: not-allowed;
             position: relative;
           }
-
           .seat.booked:after {
             content: "X";
             position: absolute;
@@ -142,45 +124,9 @@ const App = () => {
             left: 50%;
             transform: translate(-50%, -50%);
           }
-
           .seat.selected {
-            background-color: #7126B5; /* Kursi yang Dipilih */
-            color: white;
+            background-color: #7126B5; 
           }
-
-          .seat:hover {
-            transform: scale(1.1);
-          }
-
-          .btn-confirm {
-            background-color: #73CA5C;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
-          }
-
-          .btn-confirm:hover {
-            background-color: #45a049;
-          }
-
-          .info-text {
-            font-weight: bold;
-            font-size: 14px;
-            color: #333;
-          }
-
-          .info-box {
-            font-size: 14px;
-            font-weight: bold;
-            color: #555;
-            border: 1px solid #ddd;
-            margin: 0 5px;
-          }
-
         `}
       </style>
       <div className="class-selection">
@@ -195,12 +141,12 @@ const App = () => {
         </button>
       </div>
 
-      <h2>{seatClass}</h2>
+      <h2 style={{ margin: "20px 0", color: "#333" }}>{seatClass}</h2>
       <div className="seat-map">
         {currentLayout.rows.map((row, rowIndex) => (
           <div key={rowIndex} className="row">
             {row.map((seat, seatIndex) => {
-              const isHeaderRow = rowIndex === 0; 
+              const isHeaderRow = rowIndex === 0;
               const isInfoColumn =
                 (currentLayout.type === "First Class" && seatIndex === 1) ||
                 (currentLayout.type === "Business Class" && seatIndex === 2) ||
@@ -210,8 +156,11 @@ const App = () => {
                 return (
                   <div
                     key={seatIndex}
-                    className="info-text"
-                    style={{ width: "40px", textAlign: "center" }}
+                    style={{
+                      width: "34px",
+                      textAlign: "center",
+                      color: "#8A8A8A",
+                    }}
                   >
                     {seat}
                   </div>
@@ -222,16 +171,17 @@ const App = () => {
                 return (
                   <div
                     key={seatIndex}
-                    className="info-box"
                     style={{
-                      width: "20px",
-                      height: "40px",
+                      width: "18px",
+                      height: "35px",
                       backgroundColor: "#F2F2F2",
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
                       borderRadius: "4px",
-                      margin: "0 5px",
+                      margin: "0 3px",
+                      padding: "2px",
+                      color: "#8A8A8A",
                     }}
                   >
                     {seat}
@@ -240,7 +190,7 @@ const App = () => {
               }
 
               if (seat === "") {
-                return <div key={seatIndex} style={{ width: "40px" }}></div>;
+                return <div key={seatIndex} style={{ width: "35px" }}></div>;
               }
 
               const isBooked = bookedSeats.includes(seat);
@@ -260,11 +210,25 @@ const App = () => {
         ))}
       </div>
 
-      <button className="btn-confirm" onClick={handleConfirm}>
+      <button
+        style={{
+          backgroundColor: "#73CA5C",
+          color: "white",
+          padding: "10px 20px",
+          border: "none",
+          borderRadius: "5px",
+          fontSize: "16px",
+          cursor: "pointer",
+          marginTop: "20px",
+        }}
+        onMouseEnter={(e) => (e.target.style.backgroundColor = "#45a049")}
+        onMouseLeave={(e) => (e.target.style.backgroundColor = "#73CA5C")}
+        onClick={handleConfirm}
+      >
         Konfirmasi Pemesanan
       </button>
     </div>
   );
 };
 
-export default App;
+export default Seatpicker;

@@ -2,19 +2,6 @@
 body {
   font-family: "Poppins", sans-serif;
 }
-.breadcrumb-item + .breadcrumb-item::before {
-  content: ">";
-  color: #6c757d; 
-}
-#black-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); 
-  z-index: 3; 
-}
 #box-timer {
   clear: both; 
   list-style: none;
@@ -31,23 +18,6 @@ body {
   justify-content: center;
   align-items: center;
   position: relative;
-}
-#close-button {
-  background-color: transparent;
-  border: 2px solid white;
-  color: #FFFFFF;
-  font-size: 15px;
-  cursor: pointer;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  position: absolute; 
-  top: 10px; 
-  right: 20px;
 }
 .custom-input:focus {
   border-color: purple; 

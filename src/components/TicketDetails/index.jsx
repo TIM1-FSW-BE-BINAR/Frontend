@@ -1,16 +1,11 @@
-
-import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
+import {Card, Button, Col, Row } from "react-bootstrap";
 import PropTypes from "prop-types";
-//import { Link } from "@tanstack/react-router";
-import Col from "react-bootstrap/Col";
-import Row from "react-bootstrap/Row";
 
-const DetailPenerbangan = ({ student }) => {
+const TicketDetails = ({ student }) => {
   return (
     <>
       <div className="mt-3">
-        <Card style={{ width: "25rem", border: "none" }} className="card ">
+        <Card style={{ border: "none" }} className="card ">
           <Card.Body>
             <div>
               <Card.Title style={{ fontSize: "18px", marginBottom: "1px" }}>
@@ -38,7 +33,7 @@ const DetailPenerbangan = ({ student }) => {
 
             <div>
               <Row>
-                <div style={{ marginLeft: "2rem" }}>
+                <div style={{ marginLeft: "26%" }}>
                   <b>{"Jet Air-Economy"}</b>
                   <br></br>
                   <b>
@@ -49,7 +44,7 @@ const DetailPenerbangan = ({ student }) => {
                 </div>
               </Row>
               <Row>
-                <Col className=" col-md-1" style={{ size: "10px" }}>
+                <Col className=" col-md-1" style={{ size: "10%" }}>
                   <img src="../../public/img/logokkecil.png"></img>
                 </Col>
                 <Col className="col-lg-10">
@@ -160,8 +155,8 @@ const DetailPenerbangan = ({ student }) => {
   );
 };
 
-DetailPenerbangan.propTypes = {
+TicketDetails.propTypes = {
   student: PropTypes.object,
 };
 
-export default DetailPenerbangan;
+export default TicketDetails;

@@ -1,39 +1,43 @@
+import * as React from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
+import { Card, Button, Col, Form, Row } from "react-bootstrap";
 import { useState } from "react";
-import Col from "react-bootstrap/Col";
-import Form from "react-bootstrap/Form";
-import Row from "react-bootstrap/Row";
-import NavbarPemesanan from "../../components/Navbar-Pemesanan";
-import Footer from "../../components/Footer";
-import NavigationBar from "../../components/Navbar";
-//import { Container } from "react-bootstrap";
-
+import NavbarBooking from "../components/NavbarBooking";
+import Footer from "../components/Footer";
+import NavigationBar from "../components/Navbar";
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
-
-import * as React from "react";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
-
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import TicketDetails from "../components/TicketDetails";
+import Seatpicker from "../components/Seat-Picker";
 
-import DetailPenerbangan from "../../components/Detail-Penerbangan";
-//import FlightDetailCard from "../../components/Detail-item";
-import App from "../../components/Seat-Picker";
 
-export const Route = createLazyFileRoute("/Pemesanan/")({
-  component: Pemesanan,
+export const Route = createLazyFileRoute("/booking")({
+  component: Booking,
 });
 
-function Pemesanan() {
+function Booking() {
   const [validated, setValidated] = useState(false);
   const [hasFamilyName, setHasFamilyName] = useState(true);
-
-  //const [isSaved, setIsSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+  });
+  const handleSave = () => {
+    setIsSaved(true); // Ubah isSaved menjadi true
+  };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
 
   const handleSubmit = (event) => {
     const form = event.currentTarget;
@@ -124,19 +128,18 @@ function Pemesanan() {
   const handleChangeNP = (event) => {
     setNegaraPenerbit(event.target.value);
   };
-  //setIsSaved(true);
 
   return (
     <>
       <NavigationBar />
-      <NavbarPemesanan />
+      <NavbarBooking />
       <div className="container my-4">
         <div className="row">
-          <div className="col-lg-6 col-md-7  d-flex align-items-center flex-column">
+          <div className="col-sm-12 col-md-12 col-lg-7 col-xl-6 d-flex align-items-center flex-column">
             <form className="p-3">
               {/* Card Pemesan */}
-              <div className="mb-3 ">
-                <Card style={{ width: "34rem" }}>
+              <div className="mb-3 shadow-sm">
+                <Card style={{ width: "" }}>
                   <Card.Body>
                     <Card.Title>
                       <b>Isi Data Pemesan</b>
@@ -165,6 +168,10 @@ function Pemesanan() {
                                 placeholder="Nama Lengkap"
                                 defaultValue="Harry"
                                 className="custom-input"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleInputChange}
+                                disabled={isSaved}
                               />
                             </Form.Group>
                           </Row>
@@ -222,6 +229,10 @@ function Pemesanan() {
                                 type="email"
                                 placeholder="Contoh: johndoe@gmail.com"
                                 className="custom-input"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleInputChange}
+                                disabled={isSaved}
                               />
                             </Form.Group>
                           </Row>
@@ -233,8 +244,8 @@ function Pemesanan() {
               </div>
 
               {/* Card penumpang */}
-              <div className="mb-3 ">
-                <Card style={{ width: "34rem" }}>
+              <div className="mb-3 shadow-sm">
+                <Card style={{ width: "" }}>
                   <Card.Body>
                     <Card.Title>
                       <b>Isi Data Penumpang</b>
@@ -888,8 +899,8 @@ function Pemesanan() {
               </div>
 
               {/* Card Seat */}
-              <div className="mb-3">
-                <Card style={{ width: "34rem" }}>
+              <div className="mb-3 shadow-sm">
+                <Card style={{ width: "" }}>
                   <Card.Body>
                     <Card.Title>
                       <b>Pilih Kursi</b>
@@ -906,13 +917,13 @@ function Pemesanan() {
                     >
                       {"Economy - 45 Seats Available"}
                     </div>
-                    <App />
+                    <Seatpicker />
                   </Card.Body>
                 </Card>
               </div>
 
               {/* Button save */}
-              <div className="mb-3">
+              <div className="mb-3 shadow-sm">
                 {/* {!isSaved && ( */}
                 <div className="d-flex justify-content-center">
                   <Button
@@ -920,22 +931,13 @@ function Pemesanan() {
                     variant="purple"
                     className=" px-4 py-2 w-100"
                     style={{
-                      backgroundColor: "#6a1b9a",
-                      borderColor: "#6a1b9a",
-                      color: "white",
+                      backgroundColor: isSaved ? "#D0D0D0" : "#6a1b9a", // Warna berubah sesuai status
+                      borderColor: isSaved ? "#D0D0D0" : "#6a1b9a",
+                      color: isSaved ? "white" : "white",
+                      cursor: isSaved ? "not-allowed" : "pointer", // Cursor menunjukkan tombol tidak dapat diklik
                     }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = "#9c4dcc";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = "#6a1b9a";
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.backgroundColor = "#9c4dcc";
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.backgroundColor = "#6a1b9a";
-                    }}
+                    onClick={handleSave}
+                    disabled={isSaved} // Disable tombol jika isSaved true
                   >
                     Simpan
                   </Button>
@@ -946,9 +948,9 @@ function Pemesanan() {
           </div>
 
           {/* Card detail booking */}
-          <div className="col-lg-4 col-md-7  d-flex align-items-center flex-column">
+          <div className="col-sm-12 col-md-12 col-lg-5 col-xl-4 d-flex align-items-center flex-column">
             {/* <FlightDetailCard /> */}
-            <DetailPenerbangan />
+            <TicketDetails />
           </div>
         </div>
       </div>
