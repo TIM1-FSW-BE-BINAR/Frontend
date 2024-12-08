@@ -1,3 +1,7 @@
+body{
+  overflow-x: hidden;
+}
+
 .form-section {
   position: relative;
   padding: 20px;

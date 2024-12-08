@@ -6,8 +6,11 @@ import { Container, Row, Col, Button, Form, Image } from "react-bootstrap";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { useMutation } from "@tanstack/react-query";
 import { register } from "../../../service/auth";
+
 import { setToken } from "../../../redux/slices/auth";
 import toast, { Toaster } from "react-hot-toast";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 const RegisterForm = () => {
   const dispatch = useDispatch();
@@ -22,6 +25,9 @@ const RegisterForm = () => {
 
   const [type, setType] = useState("password");
   const [icon, setIcon] = useState(<IoEyeOffOutline />);
+
+  const [confirmType, setConfirmType] = useState("password");
+  const [confirmIcon, setConfirmIcon] = useState(<IoEyeOffOutline />);
 
   const [errors, setErrors] = useState({
     firstName: "",
@@ -93,18 +99,6 @@ const RegisterForm = () => {
       setErrors((prev) => ({ ...prev, phone: errorMessage }));
       phoneRef.current?.focus();
     }
-
-    // if (message.includes("password") || message.includes("credential")) {
-    //   setErrors((prev) => ({ ...prev, password: errorMessage }));
-    //   lastNameRef.current?.focus();
-    // }
-
-    // if (message.includes("password") || message.includes("")) {
-    //   setErrors((prev) => ({ ...prev, password: errorMessage }));
-    //   passwordRef.current?.focus();
-    // } else {
-    //   setErrors((prev) => ({ ...prev, email: errorMessage }));
-    // }
   };
 
   const handleRegister = async (e) => {
@@ -163,25 +157,35 @@ const RegisterForm = () => {
     registerUser(request);
   };
 
-  const handleEyeToggle = () => {
-    if (type === "password") {
-      setType("text");
-      setIcon(<IoEyeOutline />);
-    } else {
-      setType("password");
-      setIcon(<IoEyeOffOutline />);
+  const handleEyeToggle = (field) => {
+    if (field === "password") {
+      if (type === "password") {
+        setType("text");
+        setIcon(<IoEyeOutline />);
+      } else {
+        setType("password");
+        setIcon(<IoEyeOffOutline />);
+      }
+    } else if (field === "confirmPassword") {
+      if (confirmType === "password") {
+        setConfirmType("text");
+        setConfirmIcon(<IoEyeOutline />);
+      } else {
+        setConfirmType("password");
+        setConfirmIcon(<IoEyeOffOutline />);
+      }
     }
   };
 
   return (
     <div
       style={{
-        maxWidth: "425px",
+        maxWidth: "450px",
         width: "100%",
       }}
     >
       {" "}
-      <h2 className="fw-bold text-start mb-4">Daftar</h2>
+      <h2 className="fw-bold text-start my-4">Daftar</h2>
       <Form noValidate onSubmit={handleRegister}>
         {/* Nama */}
         <Form.Group className="mb-3" controlId="validationCustom01">
@@ -245,16 +249,40 @@ const RegisterForm = () => {
         {/* Nomor Telepon */}
         <Form.Group className="mb-3" controlId="validationCustom04">
           <Form.Label>Nomor Telepon</Form.Label>
-          <Form.Control
+          <PhoneInput
             ref={phoneRef}
             isInvalid={!!errors.phone}
-            type="number"
-            placeholder="+62 "
+            defaultCountry="ID"
+            placeholder="Masukkan nomor telepon"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={setPhone}
             style={{
+              width: "100%",
               borderRadius: "15px",
               padding: "1em",
+              border: errors.phone ? "1px solid #dc3545" : "1px solid #ced4da",
+              boxShadow: errors.phone
+                ? "0 0 0 0.25rem rgba(220,53,69,.25)"
+                : "none",
+              outline: "none !important", // Pastikan outline hilang di input utama
+            }}
+            inputStyle={{
+              width: "100%",
+              paddingLeft: "50px", // Untuk ruang ikon bendera
+              border: "none", // Hilangkan border default
+              outline: "none !important", // Pastikan hilangkan outline pada input
+              boxSizing: "border-box",
+            }}
+            countrySelectProps={{
+              style: {
+                position: "absolute",
+                left: "10px", // Posisi ikon negara
+                top: "50%",
+                transform: "translateY(-50%)", // Vertikal center
+                pointerEvents: "auto", // Agar ikon dapat diklik
+                zIndex: 1, // Pastikan ikon di atas input
+                outline: "none !important", // Hilangkan outline pada dropdown negara
+              },
             }}
           />
           <Form.Control.Feedback type="invalid">
@@ -281,7 +309,7 @@ const RegisterForm = () => {
               isInvalid={!!errors.password}
             />
             <span
-              onClick={handleEyeToggle}
+              onClick={() => handleEyeToggle("password")}
               style={{
                 position: "absolute",
                 top: errors.password ? "35%" : "50%",
@@ -305,7 +333,7 @@ const RegisterForm = () => {
           <div style={{ position: "relative" }}>
             <Form.Control
               ref={confirmPasswordRef}
-              type={type}
+              type={confirmType}
               placeholder="Konfirmasi password"
               style={{
                 borderRadius: "15px",
@@ -317,7 +345,7 @@ const RegisterForm = () => {
               isInvalid={!!errors.confirmPassword}
             />
             <span
-              onClick={handleEyeToggle}
+              onClick={() => handleEyeToggle("confirmPassword")}
               style={{
                 position: "absolute",
                 top: errors.confirmPassword ? "35%" : "50%",
@@ -327,7 +355,7 @@ const RegisterForm = () => {
                 zIndex: 2,
               }}
             >
-              {icon}
+              {confirmIcon}
             </span>
             <Form.Control.Feedback type="invalid">
               {errors.confirmPassword}
