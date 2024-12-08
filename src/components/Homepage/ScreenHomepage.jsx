@@ -161,6 +161,40 @@ const Homepage = () => {
   };
 
   const [flights, setFlights] = useState([]);
+  const [flightsData, setFlightsData] = useState([]);
+
+  const [state, setState] = useState("");
+
+  useEffect(() => {
+    if (state === "Asia") {
+      const flightsDataFilter = flights.filter(
+        (flight) => flight.arrival.state === state
+      );
+      setFlightsData(flightsDataFilter);
+    } else if (state === "Amerika") {
+      const flightsDataFilter = flights.filter(
+        (flight) => flight.arrival.state === state
+      );
+      setFlightsData(flightsDataFilter);
+    } else if (state === "Australia") {
+      const flightsDataFilter = flights.filter(
+        (flight) => flight.arrival.state === state
+      );
+      setFlightsData(flightsDataFilter);
+    } else if (state === "Eropa") {
+      const flightsDataFilter = flights.filter(
+        (flight) => flight.arrival.state === state
+      );
+      setFlightsData(flightsDataFilter);
+    } else if (state === "Afrika") {
+      const flightsDataFilter = flights.filter(
+        (flight) => flight.arrival.state === state
+      );
+      setFlightsData(flightsDataFilter);
+    } else {
+      setFlightsData(flights);
+    }
+  }, [state, flights]);
 
   // Menggunakan react query
   const {
@@ -914,7 +948,10 @@ const Homepage = () => {
                   className={`d-flex align-items-center justify-content-center m-2 rounded responsive-button ${
                     activeButton === index ? "active" : ""
                   }`}
-                  onClick={() => handleButtonCardClick(index)}
+                  onClick={() => {
+                    handleButtonCardClick(index);
+                    setState(label);
+                  }}
                 >
                   <FaSearch className="icon" />
                   <span className="button-label">{label}</span>
@@ -923,7 +960,7 @@ const Homepage = () => {
             )}
           </Row>
           <Row className="g-3 mb-5">
-            {flights?.map((flight, index) => (
+            {flightsData?.map((flight, index) => (
               <Col key={index} xs={12} sm={6} md={4} lg={2} className="d-flex">
                 <Card className="custom-card">
                   <div className="badge-container">
