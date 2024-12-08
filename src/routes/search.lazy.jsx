@@ -36,8 +36,9 @@ function Search() {
   });
 
   const [airports, setAirports] = useState([]);
+  const [departureAirportId, setDepartureAirportId] = useState(null);
+  const [returnAirportId, setReturnAirportId] = useState(null);
 
-  // ambil id dari data departureAirport(from) dan retrunAirport(to)
   const { data, isSuccess, isError } = useQuery({
     queryKey: ["airports"],
     queryFn: () => getAirports(),
@@ -47,20 +48,31 @@ function Search() {
   useEffect(() => {
     if (isSuccess) {
       setAirports(data);
+      // Reset departure and return airport IDs
+      setDepartureAirportId(null);
+      setReturnAirportId(null);
     } else if (isError) {
       console.log("Airports error occurred.");
     }
   }, [data, isError, isSuccess]);
 
-  const filteredAirportDeparture = airports.filter(
-    (airport) => airport.code == departureAirportCode
-  );
-  const filteredAirportReturn = airports.filter(
-    (airport) => airport.code == returnAirportCode
-  );
+  useEffect(() => {
+    if (departureAirportCode) {
+      const filteredAirportDeparture = airports.filter(
+        (airport) => airport.code == departureAirportCode
+      );
+      setDepartureAirportId(filteredAirportDeparture[0]?.id || null);
+    }
+  }, [departureAirportCode, airports]);
 
-  const departureAirportId = filteredAirportDeparture[0]?.id;
-  const returnAirportId = filteredAirportReturn[0]?.id;
+  useEffect(() => {
+    if (returnAirportCode) {
+      const filteredAirportReturn = airports.filter(
+        (airport) => airport.code == returnAirportCode
+      );
+      setReturnAirportId(filteredAirportReturn[0]?.id || null);
+    }
+  }, [returnAirportCode, airports]);
 
   return (
     <>

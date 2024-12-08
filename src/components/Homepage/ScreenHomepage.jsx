@@ -970,7 +970,7 @@ const Homepage = () => {
                       {index % 2 === 0 ? "Limited!" : "50% OFF"}
                     </span>
                   </div>
-                  <Card.Img variant="top" src={cardImg} />
+                  <Card.Img variant="top" src={flight?.arrival.imageUrl} className="img-fluid" />
                   <Card.Body className="custom-card-body">
                     <Card.Title
                       className="card-title"

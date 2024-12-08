@@ -19,25 +19,75 @@ const HomepageModal = (props) => {
   useEffect(() => {
     if (show) {
       setInputValue(""); // Reset nilai input saat modal dibuka
-    }
-  }, [show, setInputValue]);
 
-  useEffect(() => {
-    // Filter flights berdasarkan inputValue
-    if (inputValue.trim() === "") {
-      setFilteredFlights(flights);
-    } else {
-      const lowerCaseInput = inputValue.toLowerCase();
-      const filtered = flights.filter((flight) => {
-        const targetFields =
-          activeModal === "from"
-            ? `${flight.departure.city} ${flight.departure.code}`
-            : `${flight.arrival.city} ${flight.arrival.code}`;
-        return targetFields.toLowerCase().includes(lowerCaseInput);
-      });
-      setFilteredFlights(filtered);
+      // Remove duplicates when modal is opened
+      const uniqueFlights = flights.reduce(
+        (acc, flight) => {
+          const key =
+            activeModal === "from"
+              ? `${flight.departure.city}-${flight.departure.code}`
+              : `${flight.arrival.city}-${flight.arrival.code}`;
+          if (!acc.map.has(key)) {
+            acc.map.set(key, true);
+            acc.list.push(flight);
+          }
+          return acc;
+        },
+        { map: new Map(), list: [] }
+      ).list;
+
+      setFilteredFlights(uniqueFlights);
     }
-  }, [inputValue, flights, activeModal]);
+  }, [show, flights, activeModal, setInputValue]);
+
+ useEffect(() => {
+   if (inputValue.trim() === "") {
+     // Jika input kosong, tampilkan seluruh data unik
+     const uniqueFlights = flights.reduce(
+       (acc, flight) => {
+         const key =
+           activeModal === "from"
+             ? `${flight.departure.city}-${flight.departure.code}`
+             : `${flight.arrival.city}-${flight.arrival.code}`;
+         if (!acc.map.has(key)) {
+           acc.map.set(key, true);
+           acc.list.push(flight);
+         }
+         return acc;
+       },
+       { map: new Map(), list: [] }
+     ).list;
+
+     setFilteredFlights(uniqueFlights);
+   } else {
+     const lowerCaseInput = inputValue.toLowerCase();
+     const filtered = flights.filter((flight) => {
+       const targetFields =
+         activeModal === "from"
+           ? `${flight.departure.city} ${flight.departure.code}`
+           : `${flight.arrival.city} ${flight.arrival.code}`;
+       return targetFields.toLowerCase().includes(lowerCaseInput);
+     });
+
+     // Remove duplicates based on city and code for filtered results
+     const uniqueFiltered = filtered.reduce(
+       (acc, flight) => {
+         const key =
+           activeModal === "from"
+             ? `${flight.departure.city}-${flight.departure.code}`
+             : `${flight.arrival.city}-${flight.arrival.code}`;
+         if (!acc.map.has(key)) {
+           acc.map.set(key, true);
+           acc.list.push(flight);
+         }
+         return acc;
+       },
+       { map: new Map(), list: [] }
+     ).list;
+
+     setFilteredFlights(uniqueFiltered);
+   }
+ }, [inputValue, flights, activeModal]);
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {

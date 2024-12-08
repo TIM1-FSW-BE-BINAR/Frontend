@@ -128,7 +128,7 @@ const SearchFlight = ({
         departureAirport: departureAirportId,
         arrivalAirport: returnAirportId,
         seatClass: seatClassValue,
-        departureDate: departureDateActive,
+        departureTime: departureDateActive,
         ...filterChange,
       }),
     enabled: !!departureAirportId && !!returnAirportId && !!saveFilter, // Fetch jika ID sudah ada
@@ -143,7 +143,7 @@ const SearchFlight = ({
       } else {
         setNotFound(false);
       }
-      console.log(data);
+      console.log("fetch search berhasil ",data);
     } else if (isError) {
       console.log("fetch search nya error");
     } else if (isPending) {
@@ -200,6 +200,7 @@ const SearchFlight = ({
               style={{
                 background: "#73CA5C",
               }}
+              onClick={() => navigate({ to: "/" })}
             >
               Ubah Pencarian
             </Button>
@@ -407,7 +408,7 @@ const SearchFlight = ({
               <Accordion flush>
                 {flightsData.map((flight, index) => (
                   <Accordion.Item
-                    eventKey="0"
+                    eventKey={index}
                     className="flight-box shadow-sm"
                     key={index}
                   >
@@ -417,7 +418,7 @@ const SearchFlight = ({
                         <Row className="align-items-center">
                           <Col className="d-flex align-items-center">
                             <img
-                              src={flight.airline.imageUrl}
+                              src={flight?.airline.imageUrl}
                               alt="Logo"
                               style={{
                                 width: "24px",
@@ -428,7 +429,7 @@ const SearchFlight = ({
                               className="ms-3 mb-0 fw-bold"
                               style={{ fontSize: "14px" }}
                             >
-                              {flight.airline.name} - {flight.class}
+                              {flight?.airline.name} - {flight?.class}
                             </h6>
                           </Col>
                         </Row>
@@ -456,7 +457,7 @@ const SearchFlight = ({
                                     fontWeight: "bold",
                                   }}
                                 >
-                                  {formatTime(flight.departureTime)}
+                                  {formatTime(flight?.departureTime)}
                                 </span>
                                 <p
                                   style={{
@@ -465,7 +466,7 @@ const SearchFlight = ({
                                     color: "#6B7280",
                                   }}
                                 >
-                                  {flight.departure.code}
+                                  {flight?.departure.code}
                                 </p>
                               </Col>
 
@@ -477,7 +478,7 @@ const SearchFlight = ({
                                 <span
                                   style={{ fontSize: "12px", color: "#6B7280" }}
                                 >
-                                  {flight.duration}
+                                  {flight?.duration}
                                 </span>
                                 <img
                                   src={longArrowRight}
@@ -491,7 +492,7 @@ const SearchFlight = ({
                                 <span
                                   style={{ fontSize: "12px", color: "#6B7280" }}
                                 >
-                                  {flight.information}
+                                  {flight?.information}
                                 </span>
                               </Col>
 
@@ -506,7 +507,7 @@ const SearchFlight = ({
                                     fontWeight: "bold",
                                   }}
                                 >
-                                  {formatTime(flight.arrivalTime)}
+                                  {formatTime(flight?.arrivalTime)}
                                 </span>
                                 <p
                                   style={{
@@ -515,7 +516,7 @@ const SearchFlight = ({
                                     color: "#6B7280",
                                   }}
                                 >
-                                  {flight.arrival.code}
+                                  {flight?.arrival.code}
                                 </p>
                               </Col>
                             </Container>
@@ -543,7 +544,7 @@ const SearchFlight = ({
                                 fontSize: "18px",
                               }}
                             >
-                              IDR {flight.price}
+                              IDR {flight?.price}
                             </h5>
                             <Button
                               className="btn btn-block w-full"
@@ -553,7 +554,7 @@ const SearchFlight = ({
                               onClick={(event) => {
                                 event.stopPropagation(); // Prevent Accordion from toggling
                                 console.log(
-                                  `Flight selected: ${flight.flightNumber}`
+                                  `Flight selected: ${flight?.flightNumber}`
                                 );
                               }}
                             >
@@ -591,21 +592,21 @@ const SearchFlight = ({
                                 fontWeight: "bold",
                               }}
                             >
-                              {formatTime(flight.departureTime)}
+                              {formatTime(flight?.departureTime)}
                             </h6>
                             <span
                               style={{
                                 fontSize: "14px",
                               }}
                             >
-                              {formatDate(flight.departureTime)}
+                              {formatDate(flight?.departureTime)}
                             </span>
                             <span
                               style={{
                                 fontSize: "14px",
                               }}
                             >
-                              {flight.departure.name} - {flight.arrival.name}
+                              {flight?.departure.name} - {flight?.arrival.name}
                             </span>
                           </Col>
                           <Col>
@@ -627,7 +628,7 @@ const SearchFlight = ({
                             className="d-flex justify-content-center align-items-center"
                           >
                             <img
-                              src={flight.airline.imageUrl}
+                              src={flight?.airline.imageUrl}
                               alt="Logo"
                               style={{
                                 width: "24px",
@@ -643,9 +644,9 @@ const SearchFlight = ({
                               }}
                             >
                               <span className="fw-bold">
-                                {flight.airline.name} - {flight.class}
+                                {flight?.airline.name} - {flight?.class}
                               </span>
-                              <span>{flight.flightNumber}</span>
+                              <span>{flight?.flightNumber}</span>
                             </div>
 
                             <div
@@ -657,7 +658,7 @@ const SearchFlight = ({
                               <h6 className="fw-bold">Informasi</h6>
                               <span>Baggage 20 kg</span>
                               <span>Cabin baggage 7 kg</span>
-                              <span>{flight.information}</span>
+                              <span>{flight?.information}</span>
                             </div>
                           </Col>
                         </Row>
@@ -674,11 +675,11 @@ const SearchFlight = ({
                             }}
                           >
                             <span className="fw-bold">
-                              {formatTime(flight.arrivalTime)}
+                              {formatTime(flight?.arrivalTime)}
                             </span>
-                            <span>{formatDate(flight.arrivalTime)}</span>
+                            <span>{formatDate(flight?.arrivalTime)}</span>
                             <span className="fw-bold">
-                              {flight.arrival.name}
+                              {flight?.arrival.name}
                             </span>
                           </Col>
                           <Col>
@@ -753,7 +754,7 @@ const SearchFlight = ({
                     "terpendek",
                     "Durasi - Terpendek"
                   );
-                  handleFilterChange({ isShortest: true });
+                  handleFilterChange({ shortest: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
