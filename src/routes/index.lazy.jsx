@@ -16,7 +16,7 @@ function Index() {
         setOpenHomepage={setOpenHomepage}
       >
         {openHomepage && <ScreenHomepage />}
-        <SuccessPayment />
+        {/* <SuccessPayment /> */}
       </GuestLayout>
     </>
   );
