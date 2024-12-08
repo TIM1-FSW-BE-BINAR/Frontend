@@ -14,18 +14,34 @@ const HomepageModal = (props) => {
     activeModal,
   } = props;
 
+  const [filteredFlights, setFilteredFlights] = useState([]);
+
   useEffect(() => {
     if (show) {
       setInputValue(""); // Reset nilai input saat modal dibuka
     }
   }, [show, setInputValue]);
 
+  useEffect(() => {
+    // Filter flights berdasarkan inputValue
+    if (inputValue.trim() === "") {
+      setFilteredFlights(flights);
+    } else {
+      const lowerCaseInput = inputValue.toLowerCase();
+      const filtered = flights.filter((flight) => {
+        const targetFields =
+          activeModal === "from"
+            ? `${flight.departure.city} ${flight.departure.code}`
+            : `${flight.arrival.city} ${flight.arrival.code}`;
+        return targetFields.toLowerCase().includes(lowerCaseInput);
+      });
+      setFilteredFlights(filtered);
+    }
+  }, [inputValue, flights, activeModal]);
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       e.preventDefault(); // Mencegah submit default
-      if (onSubmit && typeof onSubmit === "function") {
-        onSubmit(inputValue); // Kirim data input ke fungsi onSubmit
-      }
     }
   };
 
@@ -107,7 +123,7 @@ const HomepageModal = (props) => {
               overflowX: "hidden",
             }}
           >
-            {flights?.map((flight, index) =>
+            {filteredFlights.map((flight, index) =>
               activeModal === "from" ? (
                 <Row
                   className="py-3 border-bottom list-item-city-modal"
