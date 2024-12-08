@@ -67,3 +67,21 @@ export const getGroupBooking = async () => {
   const result = await response.json();
   return result?.data;
 };
+
+export const createBooking = async (booking) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/v1/booking`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+      method: "POST",
+      body: booking,
+    }
+  );
+
+  // get data
+  const result = await response.json();
+  return result?.data;
+};

@@ -1,103 +1,87 @@
-import * as React from "react";
-import { createLazyFileRoute } from "@tanstack/react-router";
-import { Card, Button, Col, Form, Row } from "react-bootstrap";
-//import { useState } from "react";
-import NavbarBooking from "../components/NavbarBooking";
-import Footer from "../components/Footer";
-import NavigationBar from "../components/Navbar";
-import { styled } from "@mui/material/styles";
-import Switch from "@mui/material/Switch";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import TicketDetails from "../components/TicketDetails";
-import Seatpicker from "../components/Seat-Picker";
+import * as React from 'react'
+import { createLazyFileRoute } from '@tanstack/react-router'
+import { Card, Button, Col, Form, Row } from 'react-bootstrap'
+import { useState } from 'react'
+import NavbarBooking from '../components/NavbarBooking'
+import Footer from '../components/Footer'
+import NavigationBar from '../components/Navbar'
+import { styled } from '@mui/material/styles'
+import Switch from '@mui/material/Switch'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import TicketDetails from '../components/TicketDetails'
+import Seatpicker from '../components/Seat-Picker'
 //import { toast } from "react-toastify";
 //import { FormControl } from "@mui/material";
-import "font-awesome/css/font-awesome.min.css";
+import 'font-awesome/css/font-awesome.min.css'
 //import { useNavigate, useLocation } from "@tanstack/react-router";
 //import createBooking from "../service/booking/index";
-import { toast } from "react-toastify";
-import { useMutation } from "@tanstack/react-query";
 
-
-export const Route = createLazyFileRoute("/booking")({
+export const Route = createLazyFileRoute('/booking/lazy copy')({
   component: Booking,
-});
+})
 
-function Booking(selected) {
-  const [hasFamilyName, setHasFamilyName] = React.useState(true);
-  const [isSaved, setIsSaved] = React.useState(false);
-  const [selectedSeats, setSelectedSeats] = React.useState([selected]);
+function Booking() {
+  const [hasFamilyName, setHasFamilyName] = useState(true)
+  const [isSaved, setIsSaved] = useState(false)
 
-  const [orderData, setOrderData] = React.useState({
-    name: "",
-    familyName: "",
-    phoneNumber: "",
-    email: "",
-  });
-  const [passengerData, setPassengerData] = React.useState({
-    title: "",
-    name: "",
-    familyName: "",
-    dob: null,
-    citizenship: "Indonesia",
-    identityNumber: "",
-    countryOfIssue: "Indonesia",
-    expiredDate: null,
-    type: null,
-  });
-  const handleOrderChange = (event) => {
-    const { name, value } = event.target;
-    setOrderData((prev) => ({ ...prev, [name]: value }));
-  };
-  const handlePassengerChange = (event) => {
-    const { name, value } = event.target;
-    setPassengerData((prev) => ({ ...prev, [name]: value }));
-  };
-  const handleDateChange = (field, value) => {
-    setPassengerData((prev) => ({ ...prev, [field]: value }));
-  };
+  const [orderData, setOrderData] = useState({
+    name: '',
+    familyName: '',
+    phoneNumber: '',
+    email: '',
+  })
+  const [passengerData, setPassengerData] = useState({
+    title: '',
+    name: '',
+    familyName: '',
+    dob: '',
+    citizenship: '',
+    idType: '',
+    identityNumber: '',
+    countryOfIssue: '',
+    expiredDate: '',
+    type: '',
+  })
+  const handleOrderChange = async (event) => {
+    event.preventDefault()
+    const { name, value } = event.target
+    setOrderData({
+      ...orderData,
+      [name]: value,
+    })
+  }
+  const handlePassengerChange = async (index, event) => {
+    event.preventDefault()
+    const { name, value } = event.target
+    setPassengerData({
+      ...passengerData,
+      [name]: value,
+    })
+  }
+
   const handleSwitchChange = (e) => {
-    setHasFamilyName(e.target.checked);
-  };
+    setHasFamilyName(e.target.checked)
+  }
 
-  const [passagerId, setPassagerId] = React.useState("KTP");
+  const [title, setTitle] = React.useState('')
+  const [passagerId, setPassagerId] = React.useState('KTP')
+  const [negaraPenerbit, setNegaraPenerbit] = React.useState('Indonesia')
+  const handleChange = (event) => {
+    setTitle(event.target.value)
+  }
   const handleChangePI = (event) => {
-    setPassagerId(event.target.value);
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log("Order Data:", orderData);
-    console.log("Passenger Data:", passengerData);
-    //console.log("Selected Seat:", selectedSeats);
-    setIsSaved(true);
-  };
-  const handleSeatSelection = (selected) => {
-    setSelectedSeats(selected);
-  };
-
-  const { mutate: booking } = useMutation({
-    mutationFn: (booking) => createBooking(booking),
-    onSuccess: () => {
-     toast.success(`Data berhasil disimpan.`);
-     //merubah boxtimer menjadi hijau dan "data berhasil dirubah"
-    }
-  });
-
-  const onSubmit = async (event) => {
-    event.preventDefault();
-
-    const booking = {
-      orderData,
-      passengerData,
-      selectedSeats,
-    };
-    booking(booking);
-  };
+    setPassagerId(event.target.value)
+  }
+  const handleChangeNP = (event) => {
+    setNegaraPenerbit(event.target.value)
+  }
+  const handleSave = () => {
+    setIsSaved(true)
+  }
 
   const IOSSwitch = styled((props) => (
     <Switch
@@ -109,59 +93,59 @@ function Booking(selected) {
     width: 42,
     height: 26,
     padding: 0,
-    "& .MuiSwitch-switchBase": {
+    '& .MuiSwitch-switchBase': {
       padding: 0,
       margin: 2,
-      transitionDuration: "300ms",
-      "&.Mui-checked": {
-        transform: "translateX(16px)",
-        color: "#fff",
-        "& + .MuiSwitch-track": {
-          backgroundColor: "#9C27B0",
+      transitionDuration: '300ms',
+      '&.Mui-checked': {
+        transform: 'translateX(16px)',
+        color: '#fff',
+        '& + .MuiSwitch-track': {
+          backgroundColor: '#9C27B0',
           opacity: 1,
           border: 0,
-          ...theme.applyStyles("dark", {
-            backgroundColor: "#9C27B0",
+          ...theme.applyStyles('dark', {
+            backgroundColor: '#9C27B0',
           }),
         },
-        "&.Mui-disabled + .MuiSwitch-track": {
+        '&.Mui-disabled + .MuiSwitch-track': {
           opacity: 0.5,
         },
       },
-      "&.Mui-focusVisible .MuiSwitch-thumb": {
-        color: "#9C27B0",
-        border: "6px solid #fff",
+      '&.Mui-focusVisible .MuiSwitch-thumb': {
+        color: '#9C27B0',
+        border: '6px solid #fff',
       },
-      "&.Mui-disabled .MuiSwitch-thumb": {
+      '&.Mui-disabled .MuiSwitch-thumb': {
         color: theme.palette.grey[100],
-        ...theme.applyStyles("dark", {
+        ...theme.applyStyles('dark', {
           color: theme.palette.grey[600],
         }),
       },
-      "&.Mui-disabled + .MuiSwitch-track": {
+      '&.Mui-disabled + .MuiSwitch-track': {
         opacity: 0.7,
-        ...theme.applyStyles("dark", {
+        ...theme.applyStyles('dark', {
           opacity: 0.3,
         }),
       },
     },
-    "& .MuiSwitch-thumb": {
-      boxSizing: "border-box",
+    '& .MuiSwitch-thumb': {
+      boxSizing: 'border-box',
       width: 22,
       height: 22,
     },
-    "& .MuiSwitch-track": {
+    '& .MuiSwitch-track': {
       borderRadius: 26 / 2,
-      backgroundColor: "#E9E9EA",
+      backgroundColor: '#E9E9EA',
       opacity: 1,
-      transition: theme.transitions.create(["background-color"], {
+      transition: theme.transitions.create(['background-color'], {
         duration: 500,
       }),
-      ...theme.applyStyles("dark", {
-        backgroundColor: "#39393D",
+      ...theme.applyStyles('dark', {
+        backgroundColor: '#39393D',
       }),
     },
-  }));
+  }))
 
   return (
     <>
@@ -173,31 +157,31 @@ function Booking(selected) {
             <form className="p-3">
               {/* Card Pemesan */}
               <div className="mb-3 shadow-sm">
-                <Card style={{ width: "" }}>
+                <Card style={{ width: '' }}>
                   <Card.Body>
                     <Card.Title>
                       <b>Isi Data Pemesan</b>
                     </Card.Title>
-                    <Card style={{ border: "none" }}>
+                    <Card style={{ border: 'none' }}>
                       <Card.Header
                         className="text-white"
-                        style={{ background: "#3C3C3C" }}
+                        style={{ background: '#3C3C3C' }}
                       >
                         Data Diri Pemesan
                         {isSaved && (
                           <div
                             className="fa fa-check-circle"
                             style={{
-                              color: "#73CA5C",
-                              fontSize: "20px",
-                              position: "absolute",
-                              right: "10px",
+                              color: '#73CA5C',
+                              fontSize: '20px',
+                              position: 'absolute',
+                              right: '10px',
                             }}
                           ></div>
                         )}
                       </Card.Header>
                       <Card.Body
-                        style={{ color: "purple", fontWeight: "bold" }}
+                        style={{ color: 'purple', fontWeight: 'bold' }}
                       >
                         <Form>
                           <Row className="mb-3">
@@ -222,7 +206,7 @@ function Booking(selected) {
                               className="d-flex justify-content-between"
                             >
                               <Form.Label
-                                style={{ color: "black", fontWeight: "normal" }}
+                                style={{ color: 'black', fontWeight: 'normal' }}
                               >
                                 Punya nama keluarga?
                               </Form.Label>
@@ -251,7 +235,7 @@ function Booking(selected) {
                             </Row>
                           )}
                           <Row className="mb-3">
-                            <Form.Group>
+                            <Form.Group as={Col} controlId="validationCustom01">
                               <Form.Label>Nomor Telepon</Form.Label>
                               <Form.Control
                                 required
@@ -289,7 +273,7 @@ function Booking(selected) {
 
               {/* Card penumpang */}
               <div className="mb-3 shadow-sm">
-                <Card style={{ width: "" }}>
+                <Card style={{ width: '' }}>
                   <Card.Body>
                     <Card.Title>
                       <b>Isi Data Penumpang</b>
@@ -302,26 +286,26 @@ function Booking(selected) {
 
             </div>
           )} */}
-                    <Card style={{ border: "none" }}>
+                    <Card style={{ border: 'none' }}>
                       <Card.Header
                         className="text-white"
-                        style={{ background: "#3C3C3C" }}
+                        style={{ background: '#3C3C3C' }}
                       >
                         Data Diri Pemesan 1 -Adult
                         {isSaved && (
                           <div
                             className="fa fa-check-circle"
                             style={{
-                              color: "#73CA5C",
-                              fontSize: "20px",
-                              position: "absolute",
-                              right: "10px",
+                              color: '#73CA5C',
+                              fontSize: '20px',
+                              position: 'absolute',
+                              right: '10px',
                             }}
                           ></div>
                         )}
                       </Card.Header>
                       <Card.Body
-                        style={{ color: "purple", fontWeight: "bold" }}
+                        style={{ color: 'purple', fontWeight: 'bold' }}
                       >
                         <Form>
                           <Row className="mb-3">
@@ -329,25 +313,23 @@ function Booking(selected) {
                               <Form.Label>Title</Form.Label>
                               <Col>
                                 <Select
-                                  name="title"
-                                  value={passengerData.title}
-                                  onChange={(event) =>
-                                    setPassengerData((prev) => ({
-                                      ...prev,
-                                      title: event.target.value,
-                                    }))
-                                  }
+                                  // name="title"
+                                  // value={passengerData.title}
+                                  // onChange={handlePassengerChange}
+                                  value={title}
+                                  onChange={handleChange}
+                                  displayEmpty
                                   fullWidth
                                   sx={{
-                                    width: "100%",
-                                    height: "40px",
-                                    border: "none",
+                                    width: '100%',
+                                    height: '40px',
+                                    border: 'none',
                                   }}
                                   disabled={isSaved}
                                 >
-                                  <MenuItem value="Mr.">Mr.</MenuItem>
-                                  <MenuItem value="Ms.">Ms.</MenuItem>
-                                  <MenuItem value="Mrs.">Mrs.</MenuItem>
+                                  <MenuItem value="">Mr.</MenuItem>
+                                  <MenuItem value={1}>Ms.</MenuItem>
+                                  <MenuItem value={3}>Mrs.</MenuItem>
                                 </Select>
                               </Col>
                             </Form.Group>
@@ -374,7 +356,7 @@ function Booking(selected) {
                               className="d-flex justify-content-between"
                             >
                               <Form.Label
-                                style={{ color: "black", fontWeight: "normal" }}
+                                style={{ color: 'black', fontWeight: 'normal' }}
                               >
                                 Punya nama keluarga?
                               </Form.Label>
@@ -410,11 +392,7 @@ function Booking(selected) {
                               <Form.Label>Tanggal Lahir</Form.Label>
                               <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DatePicker
-                                  sx={{ width: "100%" }}
-                                  value={passengerData.dob}
-                                  onChange={(value) =>
-                                    handleDateChange("dob", value)
-                                  }
+                                  sx={{ width: '100%' }}
                                   disabled={isSaved}
                                 />
                               </LocalizationProvider>
@@ -425,10 +403,12 @@ function Booking(selected) {
                               <Form.Label>Kewarganegaraan</Form.Label>
                               <Form.Control
                                 required
-                                type="text"
-                                name="citizenship"
+                                type="email"
+                                defaultValue="Indonesia"
+                                citizenship="citizenship"
                                 value={passengerData.citizenship}
                                 onChange={handlePassengerChange}
+                                placeholder="Kewarganegaraan"
                                 className="custom-input"
                                 disabled={isSaved}
                               />
@@ -444,10 +424,10 @@ function Booking(selected) {
                                   fullWidth
                                   defaultValue="KTP"
                                   sx={{
-                                    width: "100%",
-                                    height: "40px",
-                                    border: "none",
-                                    borderRadius: "7px",
+                                    width: '100%',
+                                    height: '40px',
+                                    border: 'none',
+                                    borderRadius: '7px',
                                   }}
                                   disabled={isSaved}
                                 >
@@ -472,7 +452,7 @@ function Booking(selected) {
                               />
                             </Form.Group>
                           </Row>
-                          {passagerId === "Paspor" && (
+                          {passagerId === 'Paspor' && (
                             <>
                               <Row className="mb-3 ">
                                 <Form.Group
@@ -482,20 +462,15 @@ function Booking(selected) {
                                   <Form.Label>Negara Penerbit</Form.Label>
                                   <Col>
                                     <Select
-                                      name="countryOfIssue"
-                                      value={passengerData.countryOfIssue}
-                                      onChange={(event) =>
-                                        setPassengerData((prev) => ({
-                                          ...prev,
-                                          countryOfIssue: event.target.value,
-                                        }))
-                                      }
+                                      value={negaraPenerbit}
+                                      onChange={handleChangeNP}
+                                      displayEmpty
                                       fullWidth
                                       sx={{
-                                        width: "100%",
-                                        height: "40px",
-                                        border: "none",
-                                        borderRadius: "7px",
+                                        width: '100%',
+                                        height: '40px',
+                                        border: 'none',
+                                        borderRadius: '7px',
                                       }}
                                       disabled={isSaved}
                                     >
@@ -626,18 +601,20 @@ function Booking(selected) {
                               </Row>
 
                               <Row className="mb-3">
-                                <Form.Group>
+                                <Form.Group
+                                  as={Col}
+                                  controlId="validationCustom01"
+                                >
                                   <Form.Label>Berlaku Sampai</Form.Label>
                                   <LocalizationProvider
                                     dateAdapter={AdapterDayjs}
                                   >
                                     <DatePicker
-                                      sx={{ width: "100%" }}
-                                      value={passengerData.expiredDate}
-                                      onChange={(value) =>
-                                        handleDateChange("expiredDate", value)
-                                      }
+                                      sx={{ width: '100%' }}
                                       disabled={isSaved}
+                                      expiredDate="expiredDate"
+                                      value={passengerData.expiredDate}
+                                      onChange={handlePassengerChange}
                                     />
                                   </LocalizationProvider>
                                 </Form.Group>
@@ -653,7 +630,7 @@ function Booking(selected) {
 
               {/* Card Seat */}
               <div className="mb-3 shadow-sm">
-                <Card style={{ width: "" }}>
+                <Card style={{ width: '' }}>
                   <Card.Body>
                     <Card.Title>
                       <b>Pilih Kursi</b>
@@ -661,19 +638,19 @@ function Booking(selected) {
                     <div
                       id="box-timer"
                       style={{
-                        background: "#73CA5C",
-                        border: "1px solid white",
-                        borderRadius: "10px",
-                        marginTop: "15px",
-                        zIndex: "1",
+                        background: '#73CA5C',
+                        border: '1px solid white',
+                        borderRadius: '10px',
+                        marginTop: '15px',
+                        zIndex: '1',
                       }}
                     >
-                      {"Economy - 45 Seats Available"}
+                      {'Economy - 45 Seats Available'}
                     </div>
                     <Seatpicker
                       isSaved={isSaved}
-                      onSave={handleSeatSelection}
-                      selectedSeats={selectedSeats}
+
+                      //navsaved={navsaved}
                     />
                   </Card.Body>
                 </Card>
@@ -687,12 +664,12 @@ function Booking(selected) {
                     variant="purple"
                     className=" px-4 py-2 w-100"
                     style={{
-                      backgroundColor: isSaved ? "#D0D0D0" : "#6a1b9a",
-                      borderColor: isSaved ? "#D0D0D0" : "#6a1b9a",
-                      color: isSaved ? "black" : "white",
-                      cursor: isSaved ? "not-allowed" : "pointer",
+                      backgroundColor: isSaved ? '#D0D0D0' : '#6a1b9a',
+                      borderColor: isSaved ? '#D0D0D0' : '#6a1b9a',
+                      color: isSaved ? 'black' : 'white',
+                      cursor: isSaved ? 'not-allowed' : 'pointer',
                     }}
-                    onClick={handleSubmit}
+                    onClick={handleSave}
                     disabled={isSaved}
                   >
                     Simpan
@@ -712,5 +689,5 @@ function Booking(selected) {
 
       <Footer />
     </>
-  );
+  )
 }

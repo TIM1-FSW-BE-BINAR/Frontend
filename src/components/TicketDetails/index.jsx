@@ -1,7 +1,25 @@
 import {Card, Button, Col, Row } from "react-bootstrap";
 import PropTypes from "prop-types";
 
-const TicketDetails = ({ student }) => {
+const TicketDetails = ({ flight, airline }) => {
+  const parseDateAndTime = (isoString) => {
+    if (!isoString) return { date: "", time: "" };
+
+    const date = new Date(isoString);
+    const formattedDate = date.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    const formattedTime = date.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    return { date: formattedDate, time: formattedTime };
+  };
+  const { dDate, dTime } = parseDateAndTime(flight?.departureTime);
+  const { aDate, aTime } = parseDateAndTime(flight?.arrivalTime);
   return (
     <>
       <div className="mt-3">
@@ -13,7 +31,7 @@ const TicketDetails = ({ student }) => {
               </Card.Title>
               <div className="d-flex justify-content-between">
                 <span>
-                  <b>07:00{student?.nick_name}</b>
+                  <b>07:00{dTime}</b>
                 </span>
                 <span
                   style={{
@@ -25,8 +43,13 @@ const TicketDetails = ({ student }) => {
                   Keberangkatan
                 </span>
               </div>
-              <h6> 3 Maret 2023 {student?.nick_name}</h6>
-              <h6>Soekarno Hatta - Terminal 1A Domestik</h6>
+              <h6> 3 Maret 2023 {dDate}</h6>
+              <h6>
+                Soekarno Hatta - Terminal 1A Domestik
+                {flight?.departureAirport && flight?.terminal
+                  ? ` - ${flight.terminal}`
+                  : ""}
+              </h6>
             </div>
 
             <hr></hr>
@@ -34,22 +57,27 @@ const TicketDetails = ({ student }) => {
             <div>
               <Row>
                 <div style={{ marginLeft: "26%" }}>
-                  <b>{"Jet Air-Economy"}</b>
+                  <b>Jet Air-Economy{airline?.name}</b>
                   <br></br>
                   <b>
-                    {"JT-203"}
+                    JT-203
+                    {flight?.flightNumber}
                     <br></br>
                   </b>
                   <br></br>
                 </div>
               </Row>
               <Row>
-                <Col className=" col-md-1" style={{ size: "10%" }}>
-                  <img src="../../public/img/logokkecil.png"></img>
+                <Col md={1}>
+                  <img
+                    src="../../public/img/logokkecil.png"
+                  ></img>
+                  {/* {airline?.imageUrl} */}
                 </Col>
-                <Col className="col-lg-10">
+                <Col md={1} style={{ marginLeft: "6%" }}>
                   <b>Informasi: </b> <br></br>
-                  {"Baggage 20 kg"}
+                  {flight?.information}
+                  Baggage 20 kg
                   <br></br>
                   {"Cabin Baggage 20 kg"}
                   <br></br>
@@ -63,7 +91,7 @@ const TicketDetails = ({ student }) => {
             <div>
               <div className="d-flex justify-content-between">
                 <span>
-                  <b>07:00{student?.nick_name}</b>
+                  <b>07:00{aTime}</b>
                 </span>
                 <span
                   style={{
@@ -75,7 +103,7 @@ const TicketDetails = ({ student }) => {
                   Kedatangan
                 </span>
               </div>
-              <h6> 3 Maret 2023 {student?.nick_name}</h6>
+              <h6> 3 Maret 2023 {aDate}</h6>
               <h6>Melbourne International Airport</h6>
             </div>
 
@@ -85,7 +113,7 @@ const TicketDetails = ({ student }) => {
               <b>Rincian Harga</b>
               <div className="d-flex justify-content-between">
                 <span>
-                  <h6>2 Adults{student?.nick_name}</h6>
+                  <h6>2 Adults{flight?.nick_name}</h6>
                 </span>
                 <span
                   style={{
@@ -97,7 +125,7 @@ const TicketDetails = ({ student }) => {
               </div>
               <div className="d-flex justify-content-between">
                 <span>
-                  <h6>1 Baby{student?.nick_name}</h6>
+                  <h6>1 Baby{flight?.nick_name}</h6>
                 </span>
                 <span
                   style={{
@@ -109,7 +137,7 @@ const TicketDetails = ({ student }) => {
               </div>
               <div className="d-flex justify-content-between">
                 <span>
-                  <h6>Tax{student?.nick_name}</h6>
+                  <h6>Tax{flight?.nick_name}</h6>
                 </span>
                 <span
                   style={{
@@ -126,7 +154,7 @@ const TicketDetails = ({ student }) => {
             <div className="d-flex justify-content-between">
               <span>
                 <h4>
-                  <b>Total{student?.nick_name}</b>
+                  <b>Total{flight?.nick_name}</b>
                 </h4>
               </span>
               <span
@@ -140,14 +168,14 @@ const TicketDetails = ({ student }) => {
               </span>
             </div>
 
-             <Button
-              href={`/students/${student?.id}`}
+            <Button
+              href={`/flights/${flight?.id}`}
               variant="danger"
               id="box-timer"
-              style={{zIndex: "1"}}
+              style={{ zIndex: "1" }}
             >
               Lanjut Bayar
-            </Button> 
+            </Button>
           </Card.Body>
         </Card>
       </div>

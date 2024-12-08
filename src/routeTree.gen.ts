@@ -23,6 +23,7 @@ const OtpLazyImport = createFileRoute('/otp')()
 const NotificationLazyImport = createFileRoute('/notification')()
 const LoginLazyImport = createFileRoute('/login')()
 const HistoryLazyImport = createFileRoute('/history')()
+const CheckoutLazyImport = createFileRoute('/checkout')()
 const BookingLazyImport = createFileRoute('/booking')()
 const AccountLazyImport = createFileRoute('/account')()
 const IndexLazyImport = createFileRoute('/')()
@@ -71,6 +72,12 @@ const HistoryLazyRoute = HistoryLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/history.lazy').then((d) => d.Route))
 
+const CheckoutLazyRoute = CheckoutLazyImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/checkout.lazy').then((d) => d.Route))
+
 const BookingLazyRoute = BookingLazyImport.update({
   id: '/booking',
   path: '/booking',
@@ -112,6 +119,13 @@ declare module '@tanstack/react-router' {
       path: '/booking'
       fullPath: '/booking'
       preLoaderRoute: typeof BookingLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutLazyImport
       parentRoute: typeof rootRoute
     }
     '/history': {
@@ -172,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/account': typeof AccountLazyRoute
   '/booking': typeof BookingLazyRoute
+  '/checkout': typeof CheckoutLazyRoute
   '/history': typeof HistoryLazyRoute
   '/login': typeof LoginLazyRoute
   '/notification': typeof NotificationLazyRoute
@@ -185,6 +200,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '/account': typeof AccountLazyRoute
   '/booking': typeof BookingLazyRoute
+  '/checkout': typeof CheckoutLazyRoute
   '/history': typeof HistoryLazyRoute
   '/login': typeof LoginLazyRoute
   '/notification': typeof NotificationLazyRoute
@@ -199,6 +215,7 @@ export interface FileRoutesById {
   '/': typeof IndexLazyRoute
   '/account': typeof AccountLazyRoute
   '/booking': typeof BookingLazyRoute
+  '/checkout': typeof CheckoutLazyRoute
   '/history': typeof HistoryLazyRoute
   '/login': typeof LoginLazyRoute
   '/notification': typeof NotificationLazyRoute
@@ -214,6 +231,7 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/booking'
+    | '/checkout'
     | '/history'
     | '/login'
     | '/notification'
@@ -226,6 +244,7 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/booking'
+    | '/checkout'
     | '/history'
     | '/login'
     | '/notification'
@@ -238,6 +257,7 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/booking'
+    | '/checkout'
     | '/history'
     | '/login'
     | '/notification'
@@ -252,6 +272,7 @@ export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   AccountLazyRoute: typeof AccountLazyRoute
   BookingLazyRoute: typeof BookingLazyRoute
+  CheckoutLazyRoute: typeof CheckoutLazyRoute
   HistoryLazyRoute: typeof HistoryLazyRoute
   LoginLazyRoute: typeof LoginLazyRoute
   NotificationLazyRoute: typeof NotificationLazyRoute
@@ -265,6 +286,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   AccountLazyRoute: AccountLazyRoute,
   BookingLazyRoute: BookingLazyRoute,
+  CheckoutLazyRoute: CheckoutLazyRoute,
   HistoryLazyRoute: HistoryLazyRoute,
   LoginLazyRoute: LoginLazyRoute,
   NotificationLazyRoute: NotificationLazyRoute,
@@ -287,6 +309,7 @@ export const routeTree = rootRoute
         "/",
         "/account",
         "/booking",
+        "/checkout",
         "/history",
         "/login",
         "/notification",
@@ -304,6 +327,9 @@ export const routeTree = rootRoute
     },
     "/booking": {
       "filePath": "booking.lazy.jsx"
+    },
+    "/checkout": {
+      "filePath": "checkout.lazy.jsx"
     },
     "/history": {
       "filePath": "history.lazy.jsx"

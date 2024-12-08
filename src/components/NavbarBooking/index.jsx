@@ -100,10 +100,10 @@ const [isSaved, setisSaved] = useState(false);
             <Row>
               <Breadcrumb>
                 <Breadcrumb.Item
-                  active={isActive("/Pemesanan")}
-                  onClick={() => handleNavigation("/Pemesanan")}
+                  active={isActive("/Booking")}
+                  onClick={() => handleNavigation("/Booking")}
                   style={
-                    isActive("/Pemesanan")
+                    isActive("/Booking")
                       ? {
                           fontWeight: "bold",
                           color: "black",
@@ -120,10 +120,10 @@ const [isSaved, setisSaved] = useState(false);
                   Isi Data Diri
                 </Breadcrumb.Item>
                 <Breadcrumb.Item
-                  active={isActive("/Bayar")}
-                  onClick={() => handleNavigation("/Bayar")}
+                  active={isActive("/payment")}
+                  onClick={() => handleNavigation("/payment")}
                   style={
-                    isActive("/Bayar")
+                    isActive("/payment")
                       ? {
                           fontWeight: "bold",
                           color: "black",

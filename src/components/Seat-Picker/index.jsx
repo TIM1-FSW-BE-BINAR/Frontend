@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState } from "react";import { toast } from "react-toastify"; 
+import "react-toastify/dist/ReactToastify.css"; 
+
 
 const seatLayout = [
   {
@@ -39,16 +41,17 @@ const seatLayout = [
 ];
 
 const Seatpicker = () => {
+// const Seatpicker = (onSave, selectedSeats) => {
   const [seatClass, setSeatClass] = useState("First Class");
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [bookedSeats, setBookedSeats] = useState(["1A"]);
+  //const [selected, setSelected] = useState(selectedSeats);
 
   const currentLayout = seatLayout.find((layout) => layout.type === seatClass);
 
   const handleSeatClick = (seat) => {
-
     if (!seat || bookedSeats.includes(seat)) {
-      alert(seat ? "Kursi ini sudah dipesan!" : "Kursi tidak valid!");
+      toast.error(seat ? "Kursi ini sudah dipesan!" : "Kursi tidak valid!");
       return;
     }
 
@@ -59,15 +62,42 @@ const Seatpicker = () => {
     }
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = (e) => {
+    e.preventDefault();
     if (selectedSeats.length === 0) {
-      alert("Silakan pilih setidaknya satu kursi!");
+      toast.warning("Silakan pilih setidaknya satu kursi!");
     } else {
       setBookedSeats([...bookedSeats, ...selectedSeats]);
-      alert(`Kursi ${selectedSeats.join(", ")} berhasil dipesan.`);
+      toast.success(`Kursi ${selectedSeats.join(", ")} berhasil dipesan.`);
+      console.log("Kursi yang dipilih:", selectedSeats);
       setSelectedSeats([]);
     }
   };
+
+  // const handleSeatClick = (seat) => {
+  //   if (!seat || bookedSeats.includes(seat)) {
+  //     toast.error(seat ? "Kursi ini sudah dipesan!" : "Kursi tidak valid!");
+  //     return;
+  //   }
+
+  //   if (Array.isArray(selected) && selected.includes(seat)) {
+  //     setSelected(selected.filter((s) => s !== seat));
+  //   } else {
+  //     setSelected([...selected, seat]);
+  //   }
+  // };
+
+  // const handleConfirm = (e) => {
+  //   e.preventDefault();
+  //   if (selected.length === 0) {
+  //     toast.warning("Silakan pilih setidaknya satu kursi!");
+  //   } else {
+  //     setBookedSeats([...bookedSeats, ...selected]);
+  //     toast.success(`Kursi ${selected.join(", ")} berhasil dipesan.`);
+  //     console.log("Kursi yang dipilih:", selected);
+  //     onSave(selected);
+  //   }
+  // };
 
   return (
     <div className="App" style={{ textAlign: "center", margin: "20px" }}>
@@ -194,6 +224,7 @@ const Seatpicker = () => {
               }
 
               const isBooked = bookedSeats.includes(seat);
+              // const isSelected = selected.includes(seat);
               const isSelected = selectedSeats.includes(seat);
 
               return (
@@ -225,7 +256,7 @@ const Seatpicker = () => {
         onMouseLeave={(e) => (e.target.style.backgroundColor = "#73CA5C")}
         onClick={handleConfirm}
       >
-        Konfirmasi Pemesanan
+        Konfirmasi Kursi
       </button>
     </div>
   );
