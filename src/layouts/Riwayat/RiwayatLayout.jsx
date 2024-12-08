@@ -1,4 +1,5 @@
-import NavigationBar from "../components/Navbar";
+import React, { useState } from "react";
+import NavigationBar from "../../components/Navbar";
 import {
   Container,
   Row,
@@ -15,13 +16,14 @@ import {
   VscSearch,
   VscChromeClose,
 } from "react-icons/vsc";
-import React, { useState } from "react";
-import DatePicker from "react-datepicker";
+import { LocalizationProvider, DateRangePicker } from "@mui/x-date-pickers-pro";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import "./RiwayatLayout.css";
 
 function PageHeader() {
   const [showFilterDate, setShowFilterDate] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState([null, null]);
 
   const handleShowDate = () => setShowFilterDate(true);
   const handleCloseDate = () => setShowFilterDate(false);
@@ -30,7 +32,7 @@ function PageHeader() {
 
   return (
     <Container fluid className="bg-light">
-      {/* Header Notifikasi */}
+      {/* Header riwayat */}
       <Row className="align-items-center">
         <Col
           xs={6}
@@ -39,18 +41,21 @@ function PageHeader() {
           style={{ marginTop: "25px" }}
         >
           <h1
-            className="m-0 fw-bold fs-4 text-start"
-            style={{ color: "#000000" }}
+            className="d-flex m-0 fw-bold fs-4 text-start"
+            style={{ position: "relative", color: "#000000", right: "7rem" }}
           >
-            Notifikasi
+            History
           </h1>
         </Col>
       </Row>
 
       {/* Tombol Beranda dan Filter */}
-      <Row className="m-5 align-items-center">
-        <Col md={9} className="offset-md-2 d-flex align-items-center">
-          <ListGroup className="w-100">
+      <Row className="m-5 justify-content-center">
+        <Col
+          md={9}
+          className="d-flex align-items-center justify-content-center"
+        >
+          <ListGroup>
             <ListGroup.Item
               style={{
                 background: "#A06ECE",
@@ -58,6 +63,7 @@ function PageHeader() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 borderRadius: "15px",
+                width: "70rem",
               }}
             >
               {/* Tombol Beranda */}
@@ -107,6 +113,7 @@ function PageHeader() {
         </Col>
       </Row>
 
+      {/* Modal Pencarian */}
       <Modal
         style={{ top: "4rem", left: "19rem" }}
         show={showSearch}
@@ -129,8 +136,8 @@ function PageHeader() {
                 style={{
                   position: "absolute",
                   top: "50%",
-                  right: "10px", // Posisi di sisi kanan input
-                  transform: "translateY(-50%)", // Tengah vertikal
+                  right: "10px",
+                  transform: "translateY(-50%)",
                   color: "#D0D0D0",
                   cursor: "pointer",
                 }}
@@ -162,31 +169,38 @@ function PageHeader() {
         </Modal.Body>
       </Modal>
 
+      {/* Modal Filter Tanggal */}
       <Modal
-        style={{ width: "17rem", top: "12.8rem", left: "63rem" }}
+        style={{ width: "25rem", top: "12rem", left: "54rem" }}
         show={showFilterDate}
         onHide={handleCloseDate}
       >
         <Modal.Header closeButton></Modal.Header>
         <Modal.Body>
-          <Form>
-            <Form.Group
-              controlId="filterDate"
-              className="d-flex align-items-center justify-content-center"
-            >
-              <DatePicker
-                selected={selectedDate}
-                onChange={(date) => setSelectedDate(date)}
-                inline
-                calendarClassName="custom-calendar" // Tambahkan className untuk calendar
-                dayClassName={(date) =>
-                  date.getDay() === 0 || date.getDay() === 6
-                    ? "weekend-day" // Kustom untuk weekend
-                    : undefined
-                }
-              />
-            </Form.Group>
-          </Form>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DateRangePicker
+              startText="Start Date"
+              endText="End Date"
+              value={selectedDate}
+              onChange={(newValue) => setSelectedDate(newValue)}
+              renderInput={(startProps, endProps) => (
+                <div className="d-flex flex-column">
+                  <Form.Group className="mb-3">
+                    <Form.Control
+                      {...startProps.inputProps}
+                      ref={startProps.inputRef}
+                    />
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Control
+                      {...endProps.inputProps}
+                      ref={endProps.inputRef}
+                    />
+                  </Form.Group>
+                </div>
+              )}
+            />
+          </LocalizationProvider>
         </Modal.Body>
         <Modal.Footer>
           <Button style={{ backgroundColor: "#4B1979" }} variant="primary">
@@ -194,32 +208,11 @@ function PageHeader() {
           </Button>
         </Modal.Footer>
       </Modal>
-
-      {/* Custom Style */}
-      <style jsx>{`
-        .custom-calendar {
-          border: none;
-          background-color: #f9f9f9;
-        }
-
-        .react-datepicker__day--selected {
-          background-color: #7126b5 !important;
-          color: white !important;
-        }
-
-        .weekend-day {
-          color: red;
-        }
-
-        .react-datepicker__header {
-          border: none;
-        }
-      `}</style>
     </Container>
   );
 }
 
-export default function NotifikasiLayout({ children }) {
+export default function RiwayatLayout({ children }) {
   return (
     <>
       <NavigationBar />
