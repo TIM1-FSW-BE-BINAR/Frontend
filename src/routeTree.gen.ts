@@ -16,6 +16,7 @@ import { Route as rootRoute } from './routes/__root'
 
 // Create Virtual Routes
 
+const SearchLazyImport = createFileRoute('/search')()
 const ResetPasswordLazyImport = createFileRoute('/resetPassword')()
 const RegisterLazyImport = createFileRoute('/register')()
 const OtpLazyImport = createFileRoute('/otp')()
@@ -28,6 +29,12 @@ const PemesananIndexLazyImport = createFileRoute('/Pemesanan/')()
 const BayarIndexLazyImport = createFileRoute('/Bayar/')()
 
 // Create/Update Routes
+
+const SearchLazyRoute = SearchLazyImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/search.lazy').then((d) => d.Route))
 
 const ResetPasswordLazyRoute = ResetPasswordLazyImport.update({
   id: '/resetPassword',
@@ -151,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordLazyImport
       parentRoute: typeof rootRoute
     }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/Bayar/': {
       id: '/Bayar/'
       path: '/Bayar'
@@ -179,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/otp': typeof OtpLazyRoute
   '/register': typeof RegisterLazyRoute
   '/resetPassword': typeof ResetPasswordLazyRoute
+  '/search': typeof SearchLazyRoute
   '/Bayar': typeof BayarIndexLazyRoute
   '/Pemesanan': typeof PemesananIndexLazyRoute
 }
@@ -192,6 +207,7 @@ export interface FileRoutesByTo {
   '/otp': typeof OtpLazyRoute
   '/register': typeof RegisterLazyRoute
   '/resetPassword': typeof ResetPasswordLazyRoute
+  '/search': typeof SearchLazyRoute
   '/Bayar': typeof BayarIndexLazyRoute
   '/Pemesanan': typeof PemesananIndexLazyRoute
 }
@@ -206,6 +222,7 @@ export interface FileRoutesById {
   '/otp': typeof OtpLazyRoute
   '/register': typeof RegisterLazyRoute
   '/resetPassword': typeof ResetPasswordLazyRoute
+  '/search': typeof SearchLazyRoute
   '/Bayar/': typeof BayarIndexLazyRoute
   '/Pemesanan/': typeof PemesananIndexLazyRoute
 }
@@ -221,6 +238,7 @@ export interface FileRouteTypes {
     | '/otp'
     | '/register'
     | '/resetPassword'
+    | '/search'
     | '/Bayar'
     | '/Pemesanan'
   fileRoutesByTo: FileRoutesByTo
@@ -233,6 +251,7 @@ export interface FileRouteTypes {
     | '/otp'
     | '/register'
     | '/resetPassword'
+    | '/search'
     | '/Bayar'
     | '/Pemesanan'
   id:
@@ -245,6 +264,7 @@ export interface FileRouteTypes {
     | '/otp'
     | '/register'
     | '/resetPassword'
+    | '/search'
     | '/Bayar/'
     | '/Pemesanan/'
   fileRoutesById: FileRoutesById
@@ -259,6 +279,7 @@ export interface RootRouteChildren {
   OtpLazyRoute: typeof OtpLazyRoute
   RegisterLazyRoute: typeof RegisterLazyRoute
   ResetPasswordLazyRoute: typeof ResetPasswordLazyRoute
+  SearchLazyRoute: typeof SearchLazyRoute
   BayarIndexLazyRoute: typeof BayarIndexLazyRoute
   PemesananIndexLazyRoute: typeof PemesananIndexLazyRoute
 }
@@ -272,6 +293,7 @@ const rootRouteChildren: RootRouteChildren = {
   OtpLazyRoute: OtpLazyRoute,
   RegisterLazyRoute: RegisterLazyRoute,
   ResetPasswordLazyRoute: ResetPasswordLazyRoute,
+  SearchLazyRoute: SearchLazyRoute,
   BayarIndexLazyRoute: BayarIndexLazyRoute,
   PemesananIndexLazyRoute: PemesananIndexLazyRoute,
 }
@@ -294,6 +316,7 @@ export const routeTree = rootRoute
         "/otp",
         "/register",
         "/resetPassword",
+        "/search",
         "/Bayar/",
         "/Pemesanan/"
       ]
@@ -321,6 +344,9 @@ export const routeTree = rootRoute
     },
     "/resetPassword": {
       "filePath": "resetPassword.lazy.jsx"
+    },
+    "/search": {
+      "filePath": "search.lazy.jsx"
     },
     "/Bayar/": {
       "filePath": "Bayar/index.lazy.jsx"
