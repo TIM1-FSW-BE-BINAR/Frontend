@@ -70,3 +70,31 @@
     max-width: 150px;
   }
 }
+
+.class-modal-content p {
+  color: #007bff;
+}
+
+.class-modal-content .row:hover {
+  background-color: #4b1979;
+  color: white !important;
+}
+
+.class-modal-content .selected {
+  background-color: #4b1979;
+  color: white !important;
+}
+
+.modal-x-icon {
+  width: 20px;
+  height: 20px;
+  max-width: 30px;
+  max-height: 30px;
+}
+
+.selected-icon {
+  width: 40px;
+  height: 40px;
+  max-width: 50px;
+  max-height: 50px;
+}
