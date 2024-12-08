@@ -1,31 +1,111 @@
-import React, { useEffect } from "react";
-import {  Col, Container, Form, Modal, Row } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Col, Container, Form, Modal, Row } from "react-bootstrap";
 import searchIcon from "../../assets/homepage/icon/search-icon.png";
-import xIcon from "../../assets/homepage/icon/x-icon.png";
+import { SlLocationPin } from "react-icons/sl";
 
 const HomepageModal = (props) => {
-  const { inputValue, setInputValue, onSubmit, show, onHide } = props;
+  const {
+    inputValue,
+    setInputValue,
+    onSubmit,
+    show,
+    onHide,
+    flights,
+    activeModal,
+  } = props;
 
-    useEffect(() => {
-      if (show) {
-        setInputValue(""); // Reset nilai input saat modal dibuka
-      }
-    }, [show, setInputValue]);
+  const [filteredFlights, setFilteredFlights] = useState([]);
+
+  useEffect(() => {
+    if (show) {
+      setInputValue(""); // Reset nilai input saat modal dibuka
+
+      // Remove duplicates when modal is opened
+      const uniqueFlights = flights.reduce(
+        (acc, flight) => {
+          const key =
+            activeModal === "from"
+              ? `${flight.departure.city}-${flight.departure.code}`
+              : `${flight.arrival.city}-${flight.arrival.code}`;
+          if (!acc.map.has(key)) {
+            acc.map.set(key, true);
+            acc.list.push(flight);
+          }
+          return acc;
+        },
+        { map: new Map(), list: [] }
+      ).list;
+
+      setFilteredFlights(uniqueFlights);
+    }
+  }, [show, flights, activeModal, setInputValue]);
+
+ useEffect(() => {
+   if (inputValue.trim() === "") {
+     // Jika input kosong, tampilkan seluruh data unik
+     const uniqueFlights = flights.reduce(
+       (acc, flight) => {
+         const key =
+           activeModal === "from"
+             ? `${flight.departure.city}-${flight.departure.code}`
+             : `${flight.arrival.city}-${flight.arrival.code}`;
+         if (!acc.map.has(key)) {
+           acc.map.set(key, true);
+           acc.list.push(flight);
+         }
+         return acc;
+       },
+       { map: new Map(), list: [] }
+     ).list;
+
+     setFilteredFlights(uniqueFlights);
+   } else {
+     const lowerCaseInput = inputValue.toLowerCase();
+     const filtered = flights.filter((flight) => {
+       const targetFields =
+         activeModal === "from"
+           ? `${flight.departure.city} ${flight.departure.code}`
+           : `${flight.arrival.city} ${flight.arrival.code}`;
+       return targetFields.toLowerCase().includes(lowerCaseInput);
+     });
+
+     // Remove duplicates based on city and code for filtered results
+     const uniqueFiltered = filtered.reduce(
+       (acc, flight) => {
+         const key =
+           activeModal === "from"
+             ? `${flight.departure.city}-${flight.departure.code}`
+             : `${flight.arrival.city}-${flight.arrival.code}`;
+         if (!acc.map.has(key)) {
+           acc.map.set(key, true);
+           acc.list.push(flight);
+         }
+         return acc;
+       },
+       { map: new Map(), list: [] }
+     ).list;
+
+     setFilteredFlights(uniqueFiltered);
+   }
+ }, [inputValue, flights, activeModal]);
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       e.preventDefault(); // Mencegah submit default
-      if (onSubmit && typeof onSubmit === "function") {
-        onSubmit(inputValue); // Kirim data input ke fungsi onSubmit
-      }
     }
+  };
+
+  const handleCitySelect = (city) => {
+    if (city) {
+      onSubmit(city);
+    }
+    onHide();
   };
 
   return (
     <Modal
       show={show}
       onHide={onHide}
-      size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered
       className="modal-dialog-centered"
@@ -40,7 +120,12 @@ const HomepageModal = (props) => {
         style={{ border: "none" }}
       >
         <Modal.Title id="contained-modal-title-vcenter" className="w-100">
-          <form className="d-flex w-100">
+          <form
+            className="d-flex"
+            style={{
+              maxWidth: "98%",
+            }}
+          >
             <div className="position-relative w-100">
               <Form.Control
                 type="search"
@@ -48,8 +133,8 @@ const HomepageModal = (props) => {
                 className="ps-5"
                 aria-label="Search"
                 style={{
-                  paddingLeft: "40px", // Ruang untuk ikon
-                  width: "100%", // Pastikan lebar penuh
+                  paddingLeft: "40px",
+                  width: "100%",
                 }}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
@@ -61,10 +146,10 @@ const HomepageModal = (props) => {
                 alt="Search Icon"
                 className="position-absolute"
                 style={{
-                  left: "10px", // Posisi ikon dari tepi kiri input
-                  top: "50%", // Menjaga ikon tetap di tengah secara vertikal
-                  transform: "translateY(-50%)", // Vertikal tepat di tengah
-                  width: "20px", // Ukuran ikon
+                  left: "10px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  width: "20px",
                 }}
               />
             </div>
@@ -75,37 +160,63 @@ const HomepageModal = (props) => {
       <Modal.Body className="pt-2">
         <Container className="p-0">
           <Row className="pt-1">
-            <Col xs={8} sm={10} className="">
-              <h6 className="fw-bold">Pencarian terkini</h6>
-            </Col>
-            <Col className="">
-              <h6 className="text-danger text-center">Hapus</h6>
+            <Col>
+              <h6 className="fw-bold">Pencarian</h6>
             </Col>
           </Row>
-          <Row className="pt-1 mt-3 border-bottom">
-            <Col xs={8} sm={10}>
-              <h6>Jakarta</h6>
-            </Col>
-            <Col className="d-flex justify-content-center">
-              <img src={xIcon} className="img-fluid modal-x-icon" alt="" />
-            </Col>
-          </Row>
-          <Row className="pt-1 mt-3 border-bottom">
-            <Col xs={8} sm={10}>
-              <h6>Bandung</h6>
-            </Col>
-            <Col className="d-flex justify-content-center">
-              <img src={xIcon} className="img-fluid modal-x-icon" alt="" />
-            </Col>
-          </Row>
-          <Row className="mt-3 border-bottom">
-            <Col xs={8} sm={10}>
-              <h6>Surabaya</h6>
-            </Col>
-            <Col className="d-flex justify-content-center">
-              <img src={xIcon} className="img-fluid modal-x-icon" alt="" />
-            </Col>
-          </Row>
+
+          {/* Scrollable List Section */}
+          <div
+            style={{
+              maxHeight: "300px",
+              overflowY: "auto",
+              overflowX: "hidden",
+            }}
+          >
+            {filteredFlights.map((flight, index) =>
+              activeModal === "from" ? (
+                <Row
+                  className="py-3 border-bottom list-item-city-modal"
+                  key={index}
+                  style={{
+                    cursor: "pointer",
+                    padding: "10px",
+                  }}
+                  onClick={() => {
+                    const cityId = `${flight?.departure.city}-${flight.departure.code}`;
+                    handleCitySelect(cityId);
+                  }}
+                >
+                  <Col className="d-flex">
+                    <SlLocationPin className="me-2" />
+                    <h6>
+                      {flight?.departure.city} - {flight?.departure.code}
+                    </h6>
+                  </Col>
+                </Row>
+              ) : (
+                <Row
+                  className="py-3 border-bottom list-item-city-modal"
+                  key={index}
+                  style={{
+                    cursor: "pointer",
+                    padding: "10px",
+                  }}
+                  onClick={() => {
+                    const cityId = `${flight?.arrival.city}-${flight.arrival.code}`;
+                    handleCitySelect(cityId);
+                  }}
+                >
+                  <Col className="d-flex">
+                    <SlLocationPin className="me-2" />
+                    <h6>
+                      {flight?.arrival.city} - {flight?.arrival.code}
+                    </h6>
+                  </Col>
+                </Row>
+              )
+            )}
+          </div>
         </Container>
       </Modal.Body>
     </Modal>
