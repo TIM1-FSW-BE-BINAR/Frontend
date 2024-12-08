@@ -18,6 +18,7 @@ import { Route as rootRoute } from './routes/__root'
 
 const ResetPasswordLazyImport = createFileRoute('/resetPassword')()
 const RegisterLazyImport = createFileRoute('/register')()
+const PaymentLazyImport = createFileRoute('/payment')()
 const OtpLazyImport = createFileRoute('/otp')()
 const NotificationLazyImport = createFileRoute('/notification')()
 const LoginLazyImport = createFileRoute('/login')()
@@ -25,7 +26,6 @@ const HistoryLazyImport = createFileRoute('/history')()
 const AccountLazyImport = createFileRoute('/account')()
 const IndexLazyImport = createFileRoute('/')()
 const PemesananIndexLazyImport = createFileRoute('/Pemesanan/')()
-const BayarIndexLazyImport = createFileRoute('/Bayar/')()
 
 // Create/Update Routes
 
@@ -40,6 +40,12 @@ const RegisterLazyRoute = RegisterLazyImport.update({
   path: '/register',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/register.lazy').then((d) => d.Route))
+
+const PaymentLazyRoute = PaymentLazyImport.update({
+  id: '/payment',
+  path: '/payment',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/payment.lazy').then((d) => d.Route))
 
 const OtpLazyRoute = OtpLazyImport.update({
   id: '/otp',
@@ -84,12 +90,6 @@ const PemesananIndexLazyRoute = PemesananIndexLazyImport.update({
 } as any).lazy(() =>
   import('./routes/Pemesanan/index.lazy').then((d) => d.Route),
 )
-
-const BayarIndexLazyRoute = BayarIndexLazyImport.update({
-  id: '/Bayar/',
-  path: '/Bayar/',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/Bayar/index.lazy').then((d) => d.Route))
 
 // Populate the FileRoutesByPath interface
 
@@ -137,6 +137,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OtpLazyImport
       parentRoute: typeof rootRoute
     }
+    '/payment': {
+      id: '/payment'
+      path: '/payment'
+      fullPath: '/payment'
+      preLoaderRoute: typeof PaymentLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -149,13 +156,6 @@ declare module '@tanstack/react-router' {
       path: '/resetPassword'
       fullPath: '/resetPassword'
       preLoaderRoute: typeof ResetPasswordLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/Bayar/': {
-      id: '/Bayar/'
-      path: '/Bayar'
-      fullPath: '/Bayar'
-      preLoaderRoute: typeof BayarIndexLazyImport
       parentRoute: typeof rootRoute
     }
     '/Pemesanan/': {
@@ -177,9 +177,9 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginLazyRoute
   '/notification': typeof NotificationLazyRoute
   '/otp': typeof OtpLazyRoute
+  '/payment': typeof PaymentLazyRoute
   '/register': typeof RegisterLazyRoute
   '/resetPassword': typeof ResetPasswordLazyRoute
-  '/Bayar': typeof BayarIndexLazyRoute
   '/Pemesanan': typeof PemesananIndexLazyRoute
 }
 
@@ -190,9 +190,9 @@ export interface FileRoutesByTo {
   '/login': typeof LoginLazyRoute
   '/notification': typeof NotificationLazyRoute
   '/otp': typeof OtpLazyRoute
+  '/payment': typeof PaymentLazyRoute
   '/register': typeof RegisterLazyRoute
   '/resetPassword': typeof ResetPasswordLazyRoute
-  '/Bayar': typeof BayarIndexLazyRoute
   '/Pemesanan': typeof PemesananIndexLazyRoute
 }
 
@@ -204,9 +204,9 @@ export interface FileRoutesById {
   '/login': typeof LoginLazyRoute
   '/notification': typeof NotificationLazyRoute
   '/otp': typeof OtpLazyRoute
+  '/payment': typeof PaymentLazyRoute
   '/register': typeof RegisterLazyRoute
   '/resetPassword': typeof ResetPasswordLazyRoute
-  '/Bayar/': typeof BayarIndexLazyRoute
   '/Pemesanan/': typeof PemesananIndexLazyRoute
 }
 
@@ -219,9 +219,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/notification'
     | '/otp'
+    | '/payment'
     | '/register'
     | '/resetPassword'
-    | '/Bayar'
     | '/Pemesanan'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -231,9 +231,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/notification'
     | '/otp'
+    | '/payment'
     | '/register'
     | '/resetPassword'
-    | '/Bayar'
     | '/Pemesanan'
   id:
     | '__root__'
@@ -243,9 +243,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/notification'
     | '/otp'
+    | '/payment'
     | '/register'
     | '/resetPassword'
-    | '/Bayar/'
     | '/Pemesanan/'
   fileRoutesById: FileRoutesById
 }
@@ -257,9 +257,9 @@ export interface RootRouteChildren {
   LoginLazyRoute: typeof LoginLazyRoute
   NotificationLazyRoute: typeof NotificationLazyRoute
   OtpLazyRoute: typeof OtpLazyRoute
+  PaymentLazyRoute: typeof PaymentLazyRoute
   RegisterLazyRoute: typeof RegisterLazyRoute
   ResetPasswordLazyRoute: typeof ResetPasswordLazyRoute
-  BayarIndexLazyRoute: typeof BayarIndexLazyRoute
   PemesananIndexLazyRoute: typeof PemesananIndexLazyRoute
 }
 
@@ -270,9 +270,9 @@ const rootRouteChildren: RootRouteChildren = {
   LoginLazyRoute: LoginLazyRoute,
   NotificationLazyRoute: NotificationLazyRoute,
   OtpLazyRoute: OtpLazyRoute,
+  PaymentLazyRoute: PaymentLazyRoute,
   RegisterLazyRoute: RegisterLazyRoute,
   ResetPasswordLazyRoute: ResetPasswordLazyRoute,
-  BayarIndexLazyRoute: BayarIndexLazyRoute,
   PemesananIndexLazyRoute: PemesananIndexLazyRoute,
 }
 
@@ -292,9 +292,9 @@ export const routeTree = rootRoute
         "/login",
         "/notification",
         "/otp",
+        "/payment",
         "/register",
         "/resetPassword",
-        "/Bayar/",
         "/Pemesanan/"
       ]
     },
@@ -316,14 +316,14 @@ export const routeTree = rootRoute
     "/otp": {
       "filePath": "otp.lazy.jsx"
     },
+    "/payment": {
+      "filePath": "payment.lazy.jsx"
+    },
     "/register": {
       "filePath": "register.lazy.jsx"
     },
     "/resetPassword": {
       "filePath": "resetPassword.lazy.jsx"
-    },
-    "/Bayar/": {
-      "filePath": "Bayar/index.lazy.jsx"
     },
     "/Pemesanan/": {
       "filePath": "Pemesanan/index.lazy.jsx"
