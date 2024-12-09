@@ -66,7 +66,7 @@ const NavigationBar = () => {
                 </Offcanvas.Title>
               </Offcanvas.Header>
               <Offcanvas.Body>
-                <Nav className="justify-content-end flex-grow-1 pe-3 text-black align-items-center">
+                <Nav className="justify-content-end flex-grow-1 pe-3 text-black align-items-center  ">
                   {user ? (
                     <>
                       <Nav.Link as={Link} to="/history">
