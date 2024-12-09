@@ -72,7 +72,7 @@ const TicketDetails = ({ flight, airline }) => {
                   <img src="../../public/img/logokkecil.png"></img>
                   {/* {airline?.imageUrl} */}
                 </Col>
-                <Col className="col-lg-10">
+                <Col className="col-lg-10" >
                   <b>Informasi: </b> <br></br>
                   {flight?.information}
                   Baggage 20 kg
