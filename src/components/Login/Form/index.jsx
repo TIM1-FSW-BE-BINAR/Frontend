@@ -11,7 +11,6 @@ import { useMutation } from "@tanstack/react-query";
 import toast, { Toaster } from "react-hot-toast";
 import { useGoogleLogin } from "@react-oauth/google";
 
-
 const loginForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -102,12 +101,10 @@ const loginForm = () => {
 
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: (tokenResponse) => {
-      console.log(tokenResponse),
       googleLoginUser(tokenResponse.access_token);
     },
     onError: (err) => {
       toast.error("Google login error");
-      console.error(err);
     },
   });
 
@@ -211,7 +208,6 @@ const loginForm = () => {
                 </Button>
               </div>
             </Form.Group>
-
             <Button
               variant="primary"
               type="submit"
@@ -233,26 +229,21 @@ const loginForm = () => {
               Masuk
             </Button>
           </Form>
+          <h6 className="text-muted text-center mb-3"> atau </h6>
           <Button
-            variant="light"
-            icon={<FcGoogle />}
+            variant=""
             type="submit"
-            className="w-100 mb-3"
+            className="w-100 mb-3 text-light d-flex align-items-center justify-content-center"
             onClick={handleGoogleLogin}
             style={{
-              backgroundColor: "#FFFFFF",
-              border: "none",
+              backgroundColor: "#000000",
               transition: "opacity 0.3s ease",
-              opacity: disabled ? "0.5" : "1",
             }}
-            onMouseEnter={(e) =>
-              !disabled && (e.currentTarget.style.opacity = "0.5")
-            }
-            onMouseLeave={(e) =>
-              !disabled && (e.currentTarget.style.opacity = "1")
-            }
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
           >
-            Masuk
+            <FcGoogle style={{ marginRight: "8px", fontSize: "20px" }} />
+            Masuk menggunakan Google
           </Button>
 
           <div
