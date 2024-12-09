@@ -12,9 +12,9 @@ export const Route = createLazyFileRoute("/otp")({
 function Otp() {
   const { token } = useSelector((state) => state.auth);
 
-  // if (token) {
-  //   navigate({ to: "/" });
-  // }
+  if (token) {
+    navigate({ to: "/" });
+  }
 
   return (
     <>
