@@ -147,7 +147,7 @@ const SearchFlight = ({
       } else {
         setNotFound(false);
       }
-      console.log("fetch search berhasil ",data);
+      console.log("fetch search berhasil ", data);
     } else if (isError) {
       console.log("fetch search nya error");
     } else if (isPending) {
@@ -180,26 +180,26 @@ const SearchFlight = ({
     return `${day} ${month} ${year}`;
   };
 
-  const handleBookingPage = async(flight) => {
+  const handleBookingPage = async (flight) => {
     const flightDataById = await getFlightId(flight?.id);
-    if(flightDataById.error?.message){
+    if (flightDataById.error?.message) {
       // tiket nya habis
       setTicketSoldOut(true);
-    }else{
+    } else {
       // tiket tersedia, kirim flight nya ke booking
       const queryParams = new URLSearchParams({
         flightId: flight.id,
         totalPassengers: passengers,
         adultInput,
         childInput,
-        babyInput
+        babyInput,
       }).toString();
 
       navigate({
         to: `/booking?${queryParams}`,
       });
     }
-  }
+  };
 
   return (
     <>

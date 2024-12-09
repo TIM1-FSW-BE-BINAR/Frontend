@@ -24,7 +24,7 @@ export const getAirports = async (filters = {}) => {
 // Daftar Params untuk data Airports
 //   page,
 //   limit,
-// Contoh Cara pemanggilan : 
+// Contoh Cara pemanggilan :
 // const airports = await getAirports({
 //   page: 1,
 //   limit: 10,

@@ -3,7 +3,7 @@ import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { useNavigate, useLocation } from "@tanstack/react-router";
 import OtpInput from "react-otp-input";
 import { IoArrowBack } from "react-icons/io5";
-import { verifyEmail } from "../../../service/auth";
+import { resendOtp, verifyEmail } from "../../../service/auth";
 import { useMutation } from "@tanstack/react-query";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -73,6 +73,44 @@ const OTPForm = () => {
       });
     },
   });
+
+  const { mutate: resendingOtp } = useMutation({
+    mutationFn: (request) => {
+      return resendOtp(request);
+    },
+    onSuccess: (result) => {
+      if (result?.meta) {
+        toast.success(result?.meta?.message, {
+          style: {
+            padding: "16px",
+            background: "#73CA5C",
+            color: "#FFFFFF",
+          },
+          iconTheme: {
+            primary: "#000",
+            secondary: "#fff",
+          },
+        });
+      } else {
+        handleApiError(result.message);
+      }
+    },
+    onError: (err) => {
+      handleApiError(err.message);
+      toast.error(err?.message, {
+        style: {
+          padding: "16px",
+          background: "#FF0000",
+          color: "#FFFFFF",
+        },
+        iconTheme: {
+          primary: "#000",
+          secondary: "#fff",
+        },
+      });
+    },
+  });
+
   const maskEmail = (email) => {
     if (!email) return "";
     const [username, domain] = email.split("@");
@@ -80,8 +118,13 @@ const OTPForm = () => {
     return `${maskedUsername}@${domain}`;
   };
 
-  const handleResendOtp = () => {
-    setTimer(60);
+  const handleResendOtp = (e) => {
+    e.preventDefault();
+    setTimer(5);
+    const request = {
+      email,
+    };
+    resendingOtp(request);
   };
 
   const handleSubmit = (e) => {

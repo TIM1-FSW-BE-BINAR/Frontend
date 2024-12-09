@@ -32,7 +32,7 @@ const ResetPasswordForm = ({ email, otp, onBack }) => {
             secondary: "#73CA5C",
           },
         });
-        navigate({ to: "/login" });
+        navigate({ to: "/" });
       } else {
         toast.error(result?.error?.message || "Gagal mengubah password");
       }

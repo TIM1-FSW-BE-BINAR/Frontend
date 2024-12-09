@@ -1,19 +1,18 @@
 export const getFlights = async (filters = {}) => {
   const params = new URLSearchParams();
-    
-   Object.entries(filters).forEach(([key, value]) => {
-     if (value !== undefined && value !== null) {
-       params.append(key, value);
-     }
-   });
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      params.append(key, value);
+    }
+  });
 
   let url = `${import.meta.env.VITE_API_URL}/api/v1/flights?${params.toString()}`;
-   console.log("url: ", url);
+  console.log("url: ", url);
 
   const response = await fetch(url, {
     method: "GET",
   });
-
 
   // get data
   const result = await response.json();
@@ -51,7 +50,7 @@ export const getFlightId = async (id) => {
 //   arrivalAirport,
 //   departureAirport,
 //   departureDate;
-// Contoh Cara pemanggilan : 
+// Contoh Cara pemanggilan :
 // const flights = await getFlights({
 //   page: 1,
 //   limit: 10,
