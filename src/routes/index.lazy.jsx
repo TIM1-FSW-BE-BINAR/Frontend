@@ -2,7 +2,6 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 import GuestLayout from "../layouts/GuestLayout";
 import { useState } from "react";
 import ScreenHomepage from "../components/Homepage/ScreenHomepage";
-import SuccessPayment from "../components/Payment/Payment/SuccessPayment";
 export const Route = createLazyFileRoute("/")({
   component: Index,
 });
@@ -16,7 +15,6 @@ function Index() {
         setOpenHomepage={setOpenHomepage}
       >
         {openHomepage && <ScreenHomepage />}
-        {/* <SuccessPayment /> */}
       </GuestLayout>
     </>
   );

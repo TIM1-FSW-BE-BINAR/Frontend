@@ -69,6 +69,10 @@ const Homepage = () => {
     setDepartureDate("");
   }, [checkedSwitch]);
 
+  useEffect(() => {
+    setDepartureDate("");
+  }, [checkedSwitch]);
+
   const handleButtonCardClick = (index) => {
     setActiveButton(index); // Set the active button index
   };
