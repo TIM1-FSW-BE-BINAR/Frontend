@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useSelector } from "react-redux";
 import toast, { Toaster } from "react-hot-toast";
 import { Container, Row, Col, Card, Spinner } from "react-bootstrap";
-import DetailPesanan from "./DetailPesanan";
+import TicketDetails from "../../TicketDetails";
 
 const PaymentOptions = () => {
   const [snapLoaded, setSnapLoaded] = useState(false);
@@ -97,7 +97,11 @@ const PaymentOptions = () => {
         <Col lg={5}>
           <Card className="shadow-sm ">
             <Card.Body>
-              <DetailPesanan />
+              <Card.Title className="text-secondary text-center">
+                Ticket Details
+              </Card.Title>
+              {/* Tambahkan detail tiket di sini */}
+              <TicketDetails />
             </Card.Body>
           </Card>
         </Col>
