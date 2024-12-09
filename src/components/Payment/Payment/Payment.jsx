@@ -3,12 +3,13 @@ import { useNavigate } from "@tanstack/react-router";
 import { useSelector } from "react-redux";
 import toast, { Toaster } from "react-hot-toast";
 import { Container, Row, Col, Card, Spinner } from "react-bootstrap";
+import DetailPesanan from "./DetailPesanan";
 
 const PaymentOptions = () => {
   const [snapLoaded, setSnapLoaded] = useState(false);
   const [paymentInitiated, setPaymentInitiated] = useState(false);
   const navigate = useNavigate();
-  const transaction_payment = "66e4fa55-fdac-4ef9-91b5-733b97d1b862" ;
+  const transaction_payment = "66e4fa55-fdac-4ef9-91b5-733b97d1b862";
   //   const { transaction_payment } = useSelector((state) => state.auth);
 
   useEffect(() => {
@@ -78,7 +79,7 @@ const PaymentOptions = () => {
               <div
                 id="snap-container"
                 className="rounded w-100"
-                style={{ height: "70vh"}}
+                style={{ height: "70vh" }}
               >
                 {!snapLoaded && (
                   <div className="text-center mt-4">
@@ -91,19 +92,15 @@ const PaymentOptions = () => {
           </Card>
         </Col>
         <Col lg={5}>
-          <Card className="shadow-sm">
+          <Card className="shadow-sm ">
             <Card.Body>
-              <Card.Title className="text-secondary text-center">
-                Ticket Details
-              </Card.Title>
-              {/* Tambahkan detail tiket di sini */}
+              <DetailPesanan />
             </Card.Body>
           </Card>
         </Col>
       </Row>
       <Toaster position="bottom-right" reverseOrder={false} />
     </Container>
-    
   );
 };
 

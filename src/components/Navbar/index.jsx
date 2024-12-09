@@ -22,7 +22,7 @@ const NavigationBar = () => {
   const { data, isSuccess, isError } = useQuery({
     queryKey: ["profile"],
     queryFn: profile,
-    enabled: token ? true : false,
+    enabled: !!token,
   });
 
   useEffect(() => {
@@ -42,7 +42,7 @@ const NavigationBar = () => {
           }}
           key={expand}
           expand={expand}
-          className="mb-0 "
+          className="mb-0"
         >
           <Container>
             <Navbar.Brand

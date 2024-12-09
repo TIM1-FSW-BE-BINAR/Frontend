@@ -43,9 +43,14 @@ const SuccessPayment = () => {
       <div className="d-grid gap-3 w-100 mt-3" style={{ maxWidth: "400px" }}>
         <Button
           style={{
-            background: "#7126B5",
+            backgroundColor: "#7126B5",
+            transition: "opacity 0.3s ease",
             border: "none",
+            marginInline: "1rem",
+            paddingBlock: "1rem",
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.5")}
+          onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
           size="lg"
           onClick={handlePublishTicket}
         >
@@ -54,9 +59,15 @@ const SuccessPayment = () => {
         <Button
           size="lg"
           style={{
-            background: "#D0B7E6",
+            backgroundColor: "#D0B7E6",
+            transition: "opacity 0.3s ease",
             border: "none",
+            marginInline: "1rem",
+            paddingBlock: "1rem",
+
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.5")}
+          onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
           onClick={handleFindOtherFlights}
         >
           Cari Penerbangan Lain
