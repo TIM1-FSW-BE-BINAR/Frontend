@@ -1,4 +1,4 @@
-import * as React from "react";
+//import * as React from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import RiwayatLayout from "../layouts/Riwayat/RiwayatLayout";
 import ScreenRiwayat from "../components/Riwayat/ScreenRiwayat";
