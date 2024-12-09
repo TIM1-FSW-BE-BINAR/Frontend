@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import "../styles/variables.scss";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useSelector } from "react-redux";
-import OtpForm from "../components/Register/OTP";
-import NavigationBarOtp from "../components/Register/OTP/NavbarOtp";
+import PaymentLayout from "../layouts/paymentLayout";
+import  PaymentOptions  from "../components/Payment/Payment/Payment";
+import  SuccessPayment  from "../components/Payment/Payment/SuccessPayment";
 
 export const Route = createLazyFileRoute("/payment")({
   component: payment,
@@ -15,11 +16,11 @@ function payment() {
   const [openDetailBooking, setOpenDetailBooking] = useState(false);
   const [openSuccess, setOpenSuccess] = useState(false);
 
-  const { data, isSuccess, isLoading } = useQuery({
-    queryKey: ["getAllbookings"],
-    queryFn: getAllBookings,
-    enabled: !!token,
-  });
+  // const { data, isSuccess, isLoading } = useQuery({
+  //   queryKey: ["getAllbookings"],
+  //   queryFn: getAllBookings,
+  //   enabled: !!token,
+  // });
 
   // // Effect untuk mengatur state jika tidak ada data
   // useEffect(() => {
@@ -36,13 +37,13 @@ function payment() {
       <PaymentLayout
         openPayment={openPayment}
         setOpenPayment={setOpenPayment}
-        openDetailBooking={openDetailBooking}
-        setOpenDetailBooking={setOpenDetailBooking}
+        // openDetailBooking={openDetailBooking}
+        // setOpenDetailBooking={setOpenDetailBooking}
         openSuccess={openSuccess}
         setOpenSuccess={setOpenSuccess}
       >
         {openPayment && <PaymentOptions />}
-        {openDetailBooking && <DetailPesanan />}
+        {/* {openDetailBooking && <DetailPesanan />} */}
         {openSuccess && <SuccessPayment />}
       </PaymentLayout>
     </>
