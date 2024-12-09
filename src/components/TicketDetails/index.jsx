@@ -68,13 +68,11 @@ const TicketDetails = ({ flight, airline }) => {
                 </div>
               </Row>
               <Row>
-                <Col md={1}>
-                  <img
-                    src="../../public/img/logokkecil.png"
-                  ></img>
+                <Col className=" col-md-1" style={{ size: "10%" }}>
+                  <img src="../../public/img/logokkecil.png"></img>
                   {/* {airline?.imageUrl} */}
                 </Col>
-                <Col md={1} style={{ marginLeft: "6%" }}>
+                <Col className="col-lg-10" >
                   <b>Informasi: </b> <br></br>
                   {flight?.information}
                   Baggage 20 kg
