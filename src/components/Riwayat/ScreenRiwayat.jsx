@@ -3,15 +3,18 @@ import { Container, Row, Col, Card } from "react-bootstrap";
 import { IoLocationSharp } from "react-icons/io5";
 import { VscArrowRight } from "react-icons/vsc";
 import DetailPesanan from "./Detail/DetailPesananan";
+import { useRiwayatContext } from "./RiwayatContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getAllBookings } from "../../service/booking";
 import format from "date-fns/format";
+import { id } from "date-fns/locale";
 
 const ScreenRiwayat = () => {
   const { token } = useSelector((state) => state.auth);
   const queryClient = useQueryClient();
+  const { filterDate, searchQuery } = useRiwayatContext();
   const [booking, setBooking] = useState([]);
   const [groupedBookings, setGroupedBookings] = useState([]);
   const [durations, setDurations] = useState({});
@@ -23,14 +26,29 @@ const ScreenRiwayat = () => {
     enabled: !!token,
   });
 
+  // Update this in ScreenRiwayat.jsx
   useEffect(() => {
     if (data && data.length > 0) {
-      // Urutkan data berdasarkan bookingDate terbaru ke terlama
-      const sortedData = data.sort(
+      // Apply filter by selected date range
+      let filteredData = data;
+
+      // Filter by selected date range (if any)
+      if (filterDate && filterDate[0] && filterDate[1]) {
+        const startDate = new Date(filterDate[0]);
+        const endDate = new Date(filterDate[1]);
+
+        filteredData = filteredData.filter((booking) => {
+          const bookingDate = new Date(booking.bookingDate);
+          return bookingDate >= startDate && bookingDate <= endDate;
+        });
+      }
+
+      // Sort filtered data based on bookingDate
+      const sortedData = filteredData.sort(
         (a, b) => new Date(b.bookingDate) - new Date(a.bookingDate)
       );
 
-      // Grouping berdasarkan bulan dan tahun
+      // Grouping based on month and year
       const grouped = sortedData.reduce((acc, booking) => {
         const bookingDate = new Date(booking.bookingDate);
         const formattedDate = format(bookingDate, "MMMM yyyy"); // Format "Month Year"
@@ -43,37 +61,65 @@ const ScreenRiwayat = () => {
         return acc;
       }, {});
 
-      // Konversi objek ke array dan simpan ke state
       setGroupedBookings(Object.entries(grouped));
     }
-  }, [data]);
+  }, [data, filterDate]); // Re-run whenever `data` or `filterDate` changes
 
+  // Modify this inside the useEffect in ScreenRiwayat.jsx
   useEffect(() => {
-    if (data) {
-      const calculatedDurations = data.reduce((acc, booking) => {
-        if (booking.flight?.departureTime && booking.flight?.arrivalTime) {
-          const departureTime = new Date(booking.flight.departureTime);
-          const arrivalTime = new Date(booking.flight.arrivalTime);
+    if (data && data.length > 0) {
+      // Apply search query (if any)
+      let filteredData = data;
 
-          const diffInMinutes = Math.floor(
-            (arrivalTime - departureTime) / 60000
-          ); // Selisih dalam menit
-          const hours = Math.floor(diffInMinutes / 60); // Jam
-          const minutes = diffInMinutes % 60; // Menit
+      // Apply search query (if any)
+      if (searchQuery.trim()) {
+        filteredData = filteredData.filter((booking) =>
+          booking.code.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
 
-          acc[booking.id] = `${hours}h ${minutes}m`;
-        } else {
-          acc[booking.id] = "N/A";
+      // Apply date filter if there's a date range
+      if (filterDate && filterDate[0] && filterDate[1]) {
+        const startDate = new Date(filterDate[0]);
+        const endDate = new Date(filterDate[1]);
+
+        startDate.setDate(1);
+        endDate.setMonth(endDate.getMonth() + 1);
+        endDate.setDate(0);
+
+        filteredData = filteredData.filter((booking) => {
+          const bookingDate = new Date(booking.bookingDate);
+          return bookingDate >= startDate && bookingDate <= endDate;
+        });
+      }
+
+      const sortedData = filteredData.sort(
+        (a, b) => new Date(b.bookingDate) - new Date(a.bookingDate)
+      );
+
+      // Group by month and year
+      const grouped = sortedData.reduce((acc, booking) => {
+        const bookingDate = new Date(booking.bookingDate);
+        const formattedDate = format(bookingDate, "MMMM yyyy");
+
+        if (!acc[formattedDate]) {
+          acc[formattedDate] = [];
         }
+        acc[formattedDate].push(booking);
+
         return acc;
       }, {});
 
-      setDurations(calculatedDurations);
+      setGroupedBookings(Object.entries(grouped));
     }
-  }, [data]);
+  }, [data, filterDate, searchQuery]);
+
+  useEffect(() => {
+    setSelectedId(null);
+  }, [searchQuery]);
 
   const handleCardClick = (id) => {
-    setSelectedId(id);
+    setSelectedId((prevId) => (prevId === id ? null : id));
   };
 
   return (
@@ -240,7 +286,17 @@ const ScreenRiwayat = () => {
               );
             })
           ) : (
-            <p>Tidak ada data pemesanan.</p>
+            <div
+              className="d-flex justify-content-center align-items-center mt-5 flex-column"
+              style={{ position: "relative", left: "10rem" }}
+            >
+              <img
+                src="src/assets/homepage/not-found.png"
+                alt="tidak-ditemukan"
+                style={{ width: "25rem" }}
+              />
+              <span className="mt-3">Maaf, pencarian Anda tidak ditemukan</span>
+            </div>
           )}
         </Col>
 
