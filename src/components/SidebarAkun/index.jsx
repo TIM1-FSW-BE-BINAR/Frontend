@@ -130,6 +130,7 @@ export default function SidebarAkun({
                     href="#"
                     className="align-middle text-black py-2 d-flex justify-content-center align-items-center m-0 p-0 w-100"
                     onClick={() => handleClick(setOpenUbahProfil)}
+                    style={{ cursor: "pointer" }}
                   >
                     <VscEdit
                       style={{
@@ -161,7 +162,7 @@ export default function SidebarAkun({
                   <Nav.Link
                     as={Col}
                     className="text-black py-2 d-flex  align-items-center m-0 p-0"
-                    style={{ width: "15rem" }}
+                    style={{ width: "15rem", cursor: "pointer" }}
                     onClick={() => handleClick(setOpenPengaturanAkun)}
                   >
                     <VscGear
