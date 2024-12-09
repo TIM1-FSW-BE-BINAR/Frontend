@@ -15,7 +15,7 @@ import { id } from "date-fns/locale";
 const ScreenNotifikasi = () => {
   const { token } = useSelector((state) => state.auth);
   const queryClient = useQueryClient();
-  const { filterDate } = useNotificationContext();
+  const { filterDate, searchQuery } = useNotificationContext();
 
   const { data, isLoading } = useQuery({
     queryKey: ["getUserNotification"],
@@ -35,13 +35,19 @@ const ScreenNotifikasi = () => {
     return format(new Date(dateString), "dd MMMM yyyy, HH:mm", { locale: id });
   };
 
-  const filteredNotifications = filterDate
-    ? data.filter((notif) => {
-        const notifDate = new Date(notif.createdAt).setHours(0, 0, 0, 0);
-        const selectedDate = new Date(filterDate).setHours(0, 0, 0, 0);
-        return notifDate === selectedDate;
-      })
-    : data;
+  const filteredNotifications = data?.filter((notif) => {
+    // Filter by date if filterDate exists
+    if (filterDate) {
+      const notifDate = new Date(notif.createdAt).setHours(0, 0, 0, 0);
+      const selectedDate = new Date(filterDate).setHours(0, 0, 0, 0);
+      if (notifDate !== selectedDate) return false;
+    }
+    // Filter by search query if searchQuery exists
+    if (searchQuery) {
+      return notif.title.toLowerCase().includes(searchQuery.toLowerCase());
+    }
+    return true;
+  });
 
   // Mutation to mark notification as read
   const mutation = useMutation({
@@ -78,74 +84,86 @@ const ScreenNotifikasi = () => {
     <Container fluid className="bg-light py-3">
       <Row className="align-items-center">
         <Col md={8} className="offset-md-2">
-          {filteredNotifications?.map((notif, index) => (
-            <Card
-              key={index}
-              className="mb-2"
-              id="card-notif"
-              style={{
-                borderRadius: "10px",
-                position: "relative",
-                alignSelf: "center",
-                cursor: "pointer",
-              }}
-              onClick={() =>
-                handleNotificationClick(index, notif.id, notif.isRead)
-              }
-            >
-              <IoNotificationsCircle
-                size={25}
-                style={{
-                  background: "white",
-                  borderRadius: "50%",
-                  color: "#7126B580",
-                  position: "absolute",
-                  top: "10px",
-                  left: "10px",
-                }}
+          {/* Tampilkan pesan jika tidak ada notifikasi yang ditemukan */}
+          {filteredNotifications?.length === 0 ? (
+            <div className="d-flex justify-content-center align-items-center mt-5 flex-column">
+              <img
+                src="src/assets/homepage/not-found.png"
+                alt="tidak-ditemukan"
+                style={{ width: "25rem" }}
               />
-              <Card.Body className="ps-5">
-                <Card.Title className="d-flex justify-content-between align-items-center">
-                  <span
-                    style={{
-                      fontSize: "0.7rem",
-                      fontWeight: "400",
-                      color: "#8A8A8A",
-                    }}
-                  >
-                    {notif.type}
-                  </span>
-                  <div
-                    className="d-flex align-items-center gap-2"
-                    style={{
-                      fontSize: "0.7rem",
-                      fontWeight: "400",
-                    }}
-                  >
-                    <span>{formatDateTime(notif.createdAt)}</span>
+              <span className="mt-3">Maaf, pencarian Anda tidak ditemukan</span>
+            </div>
+          ) : (
+            filteredNotifications?.map((notif, index) => (
+              <Card
+                key={index}
+                className="mb-2"
+                id="card-notif"
+                style={{
+                  borderRadius: "10px",
+                  position: "relative",
+                  alignSelf: "center",
+                  cursor: "pointer",
+                }}
+                onClick={() =>
+                  handleNotificationClick(index, notif.id, notif.isRead)
+                }
+              >
+                <IoNotificationsCircle
+                  size={25}
+                  style={{
+                    background: "white",
+                    borderRadius: "50%",
+                    color: "#7126B580",
+                    position: "absolute",
+                    top: "10px",
+                    left: "10px",
+                  }}
+                />
+                <Card.Body className="ps-5">
+                  <Card.Title className="d-flex justify-content-between align-items-center">
+                    <span
+                      style={{
+                        fontSize: "0.7rem",
+                        fontWeight: "400",
+                        color: "#8A8A8A",
+                      }}
+                    >
+                      {notif.type}
+                    </span>
+                    <div
+                      className="d-flex align-items-center gap-2"
+                      style={{
+                        fontSize: "0.7rem",
+                        fontWeight: "400",
+                      }}
+                    >
+                      <span>{formatDateTime(notif.createdAt)}</span>
 
-                    <IoEllipse
-                      style={{ color: notif.isRead ? "#198754" : "#dc3545" }}
-                    />
-                  </div>
-                </Card.Title>
-                <Card.Text style={{ fontSize: "1rem" }}>
-                  {notif.title}
-                </Card.Text>
-                {notif.isRead && (
-                  <Card.Text
-                    style={{
-                      fontSize: "0.7rem",
-                      fontWeight: "400",
-                      color: "#8A8A8A",
-                    }}
-                  >
-                    {notif.description}
+                      <IoEllipse
+                        style={{ color: notif.isRead ? "#198754" : "#dc3545" }}
+                      />
+                    </div>
+                  </Card.Title>
+                  <Card.Text style={{ fontSize: "1rem" }}>
+                    {notif.title}
                   </Card.Text>
-                )}
-              </Card.Body>
-            </Card>
-          ))}
+                  {notif.isRead && (
+                    <Card.Text
+                      style={{
+                        fontSize: "0.7rem",
+                        fontWeight: "400",
+                        color: "#8A8A8A",
+                      }}
+                    >
+                      {notif.description}
+                    </Card.Text>
+                  )}
+                </Card.Body>
+              </Card>
+            ))
+          )}
         </Col>
       </Row>
     </Container>

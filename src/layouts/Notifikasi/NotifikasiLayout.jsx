@@ -15,27 +15,61 @@ import {
   VscSearch,
   VscChromeClose,
 } from "react-icons/vsc";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "./NotifikasiLayout.css";
 import { useNotificationContext } from "../../components/Notifikasi/NotificationContext";
 
 function PageHeader() {
   const [showFilterDate, setShowFilterDate] = useState(false);
-  const { setFilterDate } = useNotificationContext();
+  const { setFilterDate, setSearchQuery } = useNotificationContext();
   const [showSearch, setShowSearch] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [confirmedDate, setConfirmedDate] = useState(new Date());
+  const [searchHistory, setSearchHistory] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
 
   const handleShowDate = () => setShowFilterDate(true);
   const handleCloseDate = () => setShowFilterDate(false);
   const handleShowSearch = () => setShowSearch(true);
   const handleCloseSearch = () => setShowSearch(false);
 
+  useEffect(() => {
+    const history = JSON.parse(localStorage.getItem("searchHistory")) || [];
+    setSearchHistory(history);
+  }, []);
+
   const handleSaveDate = () => {
-    setFilterDate(selectedDate); // Perbarui tanggal di context
-    setConfirmedDate(selectedDate); // Perbarui tanggal yang dikonfirmasi
-    setShowFilterDate(false); // Tutup modal
+    setFilterDate(selectedDate);
+    setConfirmedDate(selectedDate);
+    setShowFilterDate(false);
+  };
+
+  const handleSearch = () => {
+    if (!searchInput.trim()) {
+      setSearchQuery("");
+      setSearchInput("");
+      return;
+    }
+
+    setSearchQuery(searchInput);
+
+    const updatedHistory = [
+      searchInput,
+      ...searchHistory.filter((item) => item !== searchInput),
+    ];
+    setSearchHistory(updatedHistory);
+    localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
+  };
+
+  const handleHistorySearch = (item) => {
+    setSearchQuery(item);
+  };
+
+  const handleDeleteHistory = (item) => {
+    const updatedHistory = searchHistory.filter((history) => history !== item);
+    setSearchHistory(updatedHistory);
+    localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
   };
 
   return (
@@ -95,7 +129,7 @@ function PageHeader() {
                     padding: "5px 15px",
                     marginRight: "0.5rem",
                   }}
-                  onClick={handleShowDate} // Tampilkan modal
+                  onClick={handleShowDate}
                 >
                   <VscFilter className="me-2" size={20} /> Filter
                 </Button>
@@ -124,7 +158,6 @@ function PageHeader() {
         show={showSearch}
         onHide={handleCloseSearch}
         centered
-        className="modal-search"
       >
         <Modal.Header closeButton>
           <Modal.Title>
@@ -134,8 +167,16 @@ function PageHeader() {
             >
               <Form.Control
                 type="text"
-                placeholder="Masukkan Nomor Penerbangan"
+                placeholder="Masukkan Pencarian"
                 style={{ paddingRight: "40px" }}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)} // Update state input
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch(); // Jalankan pencarian saat Enter ditekan
+                    e.preventDefault();
+                  }
+                }}
               />
 
               <VscSearch
@@ -148,82 +189,33 @@ function PageHeader() {
                   cursor: "pointer",
                 }}
                 size={20}
+                onClick={handleSearch}
               />
             </Form.Group>
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body className="modal-search_body" style={{ height: "20rem" }}>
+        <Modal.Body style={{ height: "20rem", overflowY: "auto" }}>
           <Form>
             <div className="mt-3">
               <h6>Pencarian Terkini</h6>
               <ListGroup>
-                <ListGroup.Item className="d-flex justify-content-between align-items-center">
-                  1234ABC
-                  <Button variant="link" size="sm">
-                    <VscChromeClose style={{ color: "#8A8A8A" }} />
-                  </Button>
-                </ListGroup.Item>
-                <ListGroup.Item className="d-flex justify-content-between align-items-center">
-                  7UY7192
-                  <Button variant="link" size="sm">
-                    <VscChromeClose style={{ color: "#8A8A8A" }} />
-                  </Button>
-                </ListGroup.Item>
-              </ListGroup>
-            </div>
-          </Form>
-        </Modal.Body>
-      </Modal>
-
-      <Modal
-        style={{ top: "4rem", left: "19rem" }}
-        show={showSearch}
-        onHide={handleCloseSearch}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>
-            <Form.Group
-              controlId="filterSearch"
-              style={{ position: "relative", width: "27rem" }}
-            >
-              <Form.Control
-                type="text"
-                placeholder="Masukkan Nomor Penerbangan"
-                style={{ paddingRight: "40px" }}
-              />
-
-              <VscSearch
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  right: "10px", // Posisi di sisi kanan input
-                  transform: "translateY(-50%)", // Tengah vertikal
-                  color: "#D0D0D0",
-                  cursor: "pointer",
-                }}
-                size={20}
-              />
-            </Form.Group>
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body style={{ height: "20rem" }}>
-          <Form>
-            <div className="mt-3">
-              <h6>Pencarian Terkini</h6>
-              <ListGroup>
-                <ListGroup.Item className="d-flex justify-content-between align-items-center">
-                  1234ABC
-                  <Button variant="link" size="sm">
-                    <VscChromeClose style={{ color: "#8A8A8A" }} />
-                  </Button>
-                </ListGroup.Item>
-                <ListGroup.Item className="d-flex justify-content-between align-items-center">
-                  7UY7192
-                  <Button variant="link" size="sm">
-                    <VscChromeClose style={{ color: "#8A8A8A" }} />
-                  </Button>
-                </ListGroup.Item>
+                {searchHistory.map((item, index) => (
+                  <ListGroup.Item
+                    key={index}
+                    className="d-flex justify-content-between align-items-center"
+                    onClick={() => handleHistorySearch(item)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    {item}
+                    <Button
+                      variant="link"
+                      size="sm"
+                      onClick={() => handleDeleteHistory(item)}
+                    >
+                      <VscChromeClose style={{ color: "#8A8A8A" }} />
+                    </Button>
+                  </ListGroup.Item>
+                ))}
               </ListGroup>
             </div>
           </Form>

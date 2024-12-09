@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NavigationBar from "../../components/Navbar";
 import {
   Container,
@@ -19,16 +19,59 @@ import {
 import { LocalizationProvider, DateRangePicker } from "@mui/x-date-pickers-pro";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import "./RiwayatLayout.css";
+import { useRiwayatContext } from "../../components/Riwayat/RiwayatContext";
 
 function PageHeader() {
   const [showFilterDate, setShowFilterDate] = useState(false);
+  const { setFilterDate, setSearchQuery } = useRiwayatContext();
   const [showSearch, setShowSearch] = useState(false);
   const [selectedDate, setSelectedDate] = useState([null, null]);
+  const [confirmedDate, setConfirmedDate] = useState(new Date());
+  const [searchHistory, setSearchHistory] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
 
   const handleShowDate = () => setShowFilterDate(true);
   const handleCloseDate = () => setShowFilterDate(false);
   const handleShowSearch = () => setShowSearch(true);
   const handleCloseSearch = () => setShowSearch(false);
+
+  useEffect(() => {
+    const history = JSON.parse(localStorage.getItem("searchHistory")) || [];
+    setSearchHistory(history);
+  }, []);
+
+  const handleSaveDate = () => {
+    setFilterDate(selectedDate);
+    setConfirmedDate(selectedDate);
+    setShowFilterDate(false);
+  };
+
+  const handleSearch = () => {
+    if (!searchInput.trim()) {
+      setSearchQuery("");
+      setSearchInput("");
+      return;
+    }
+
+    setSearchQuery(searchInput);
+
+    const updatedHistory = [
+      searchInput,
+      ...searchHistory.filter((item) => item !== searchInput),
+    ];
+    setSearchHistory(updatedHistory);
+    localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
+  };
+
+  const handleHistorySearch = (item) => {
+    setSearchQuery(item);
+  };
+
+  const handleDeleteHistory = (item) => {
+    const updatedHistory = searchHistory.filter((history) => history !== item);
+    setSearchHistory(updatedHistory);
+    localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
+  };
 
   return (
     <Container fluid className="bg-light">
@@ -89,7 +132,7 @@ function PageHeader() {
                     padding: "5px 15px",
                     marginRight: "0.5rem",
                   }}
-                  onClick={handleShowDate} // Tampilkan modal
+                  onClick={handleShowDate}
                 >
                   <VscFilter className="me-2" size={20} /> Filter
                 </Button>
@@ -128,8 +171,16 @@ function PageHeader() {
             >
               <Form.Control
                 type="text"
-                placeholder="Masukkan Nomor Penerbangan"
+                placeholder="Masukkan Booking Code"
                 style={{ paddingRight: "40px" }}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)} // Update state input
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch(); // Jalankan pencarian saat Enter ditekan
+                    e.preventDefault();
+                  }
+                }}
               />
 
               <VscSearch
@@ -142,27 +193,33 @@ function PageHeader() {
                   cursor: "pointer",
                 }}
                 size={20}
+                onClick={handleSearch}
               />
             </Form.Group>
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ height: "20rem" }}>
+        <Modal.Body style={{ maxHeight: "20rem", overflowY: "auto" }}>
           <Form>
             <div className="mt-3">
               <h6>Pencarian Terkini</h6>
               <ListGroup>
-                <ListGroup.Item className="d-flex justify-content-between align-items-center">
-                  1234ABC
-                  <Button variant="link" size="sm">
-                    <VscChromeClose style={{ color: "#8A8A8A" }} />
-                  </Button>
-                </ListGroup.Item>
-                <ListGroup.Item className="d-flex justify-content-between align-items-center">
-                  7UY7192
-                  <Button variant="link" size="sm">
-                    <VscChromeClose style={{ color: "#8A8A8A" }} />
-                  </Button>
-                </ListGroup.Item>
+                {searchHistory.map((item, index) => (
+                  <ListGroup.Item
+                    key={index}
+                    className="d-flex justify-content-between align-items-center"
+                    onClick={() => handleHistorySearch(item)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    {item}
+                    <Button
+                      variant="link"
+                      size="sm"
+                      onClick={() => handleDeleteHistory(item)}
+                    >
+                      <VscChromeClose style={{ color: "#8A8A8A" }} />
+                    </Button>
+                  </ListGroup.Item>
+                ))}
               </ListGroup>
             </div>
           </Form>
@@ -203,7 +260,12 @@ function PageHeader() {
           </LocalizationProvider>
         </Modal.Body>
         <Modal.Footer>
-          <Button style={{ backgroundColor: "#4B1979" }} variant="primary">
+          <Button
+            style={{ backgroundColor: "#4B1979" }}
+            variant="none"
+            className="text-white"
+            onClick={handleSaveDate}
+          >
             Simpan
           </Button>
         </Modal.Footer>

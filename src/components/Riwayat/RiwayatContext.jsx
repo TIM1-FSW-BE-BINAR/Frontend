@@ -1,22 +1,22 @@
 import React, { createContext, useContext, useState } from "react";
 
 // Create Context
-const NotificationContext = createContext();
+const RiwayatContext = createContext();
 
-export const NotificationProvider = ({ children }) => {
+export const RiwayatProvider = ({ children }) => {
   const [filterDate, setFilterDate] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <NotificationContext.Provider
+    <RiwayatContext.Provider
       value={{ filterDate, setFilterDate, searchQuery, setSearchQuery }}
     >
       {children}
-    </NotificationContext.Provider>
+    </RiwayatContext.Provider>
   );
 };
 
 // Custom hook to use Notification Context
-export const useNotificationContext = () => {
-  return useContext(NotificationContext);
+export const useRiwayatContext = () => {
+  return useContext(RiwayatContext);
 };
