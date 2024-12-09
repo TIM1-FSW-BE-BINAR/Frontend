@@ -7,7 +7,7 @@ export const getAirlines = async (filters = {}) => {
     }
   });
 
-  let url = `${import.meta.env.VITE_API_URL}/airline?${params.toString()}`;
+  let url = `${import.meta.env.VITE_API_URL}/api/v1/airline?${params.toString()}`;
 
   const response = await fetch(url, {
     method: "GET",

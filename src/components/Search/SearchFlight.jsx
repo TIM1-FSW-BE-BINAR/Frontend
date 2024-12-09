@@ -25,7 +25,7 @@ import {
 import { id } from "date-fns/locale";
 import { Navigate, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { getFlights } from "../../service/flight/flightService";
+import { getFlights, getFlightId } from "../../service/flight/flightService";
 
 const SearchFlight = ({
   fromInput,
@@ -33,6 +33,9 @@ const SearchFlight = ({
   departureDate,
   returnDate,
   passengers,
+  adultInput,
+  childInput,
+  babyInput,
   classInput,
   departureAirportId,
   returnAirportId,
@@ -92,6 +95,7 @@ const SearchFlight = ({
   const handleDateBtnActive = (index, date) => {
     setDateBtnActive(index);
     setDepartureDateActive(date);
+    setTicketSoldOut(false);
   };
 
   const handleFilterClose = () => {
@@ -175,6 +179,27 @@ const SearchFlight = ({
     const year = date.getUTCFullYear(); // Menggunakan getUTCFullYear untuk tahun UTC
     return `${day} ${month} ${year}`;
   };
+
+  const handleBookingPage = async(flight) => {
+    const flightDataById = await getFlightId(flight?.id);
+    if(flightDataById.error?.message){
+      // tiket nya habis
+      setTicketSoldOut(true);
+    }else{
+      // tiket tersedia, kirim flight nya ke booking
+      const queryParams = new URLSearchParams({
+        flightId: flight.id,
+        totalPassengers: passengers,
+        adultInput,
+        childInput,
+        babyInput
+      }).toString();
+
+      navigate({
+        to: `/booking?${queryParams}`,
+      });
+    }
+  }
 
   return (
     <>
@@ -392,7 +417,11 @@ const SearchFlight = ({
                 <span className="fw-bold">
                   Maaf, pencarian Anda tidak ditemukan
                 </span>
-                <span className="text-primary" style={{ cursor: "pointer" }}>
+                <span
+                  className="text-primary"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => navigate({ to: "/" })}
+                >
                   Coba cari perjalanan lainnya!
                 </span>
               </div>
@@ -400,7 +429,11 @@ const SearchFlight = ({
               <div className="d-flex flex-column justify-content-center align-items-center">
                 <img src={ticketSoldOutImage} className="img-fluid w-25" />
                 <span className="fw-bold">Maaf, Tiket terjual habis!</span>
-                <span className="text-primary" style={{ cursor: "pointer" }}>
+                <span
+                  className="text-primary"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => navigate({ to: "/" })}
+                >
                   Coba cari perjalanan lainnya!
                 </span>
               </div>
@@ -553,9 +586,7 @@ const SearchFlight = ({
                               }}
                               onClick={(event) => {
                                 event.stopPropagation(); // Prevent Accordion from toggling
-                                console.log(
-                                  `Flight selected: ${flight?.flightNumber}`
-                                );
+                                handleBookingPage(flight);
                               }}
                             >
                               Pilih
@@ -656,8 +687,6 @@ const SearchFlight = ({
                               }}
                             >
                               <h6 className="fw-bold">Informasi</h6>
-                              <span>Baggage 20 kg</span>
-                              <span>Cabin baggage 7 kg</span>
                               <span>{flight?.information}</span>
                             </div>
                           </Col>

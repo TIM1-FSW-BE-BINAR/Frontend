@@ -7,7 +7,7 @@ export const getFlights = async (filters = {}) => {
      }
    });
 
-  let url = `${import.meta.env.VITE_API_URL}/flights?${params.toString()}`;
+  let url = `${import.meta.env.VITE_API_URL}/api/v1/flights?${params.toString()}`;
    console.log("url: ", url);
 
   const response = await fetch(url, {
@@ -18,9 +18,21 @@ export const getFlights = async (filters = {}) => {
   // get data
   const result = await response.json();
   if (!result) {
-    throw new Error(result?.message);
+    throw new Error(result?.error?.message);
   }
   return result?.data;
+};
+
+export const getFlightId = async (id) => {
+  let url = `${import.meta.env.VITE_API_URL}/api/v1/flights/${id}`;
+
+  const response = await fetch(url, {
+    method: "GET",
+  });
+
+  // get data
+  const result = await response.json();
+  return result;
 };
 
 // Daftar Params untuk data flights
