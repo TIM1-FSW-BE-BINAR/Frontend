@@ -69,10 +69,6 @@ const Homepage = () => {
     setDepartureDate("");
   }, [checkedSwitch]);
 
-  useEffect(() => {
-    setDepartureDate("");
-  }, [checkedSwitch]);
-
   const handleButtonCardClick = (index) => {
     setActiveButton(index); // Set the active button index
   };
@@ -155,6 +151,9 @@ const Homepage = () => {
         departureDate,
         returnDate: returnDate || "", // Kirim kosong jika null
         totalPassengers,
+        adultInput,
+        childInput,
+        babyInput,
         classInput,
       }).toString();
 
