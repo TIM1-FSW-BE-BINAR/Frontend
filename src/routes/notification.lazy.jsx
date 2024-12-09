@@ -3,6 +3,7 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 import NotifikasiLayout from "../layouts/Notifikasi/NotifikasiLayout";
 import ScreenNotifikasi from "../components/Notifikasi/ScreenNotifikasi";
 import NotFoundNotifikasi from "../components/Notifikasi/NotFound/NotFoundNotifikasi";
+import { NotificationProvider } from "../components/Notifikasi/NotificationContext";
 import { useState } from "react";
 import { getUserNotifications } from "../service/notification";
 import Protected from "../components/Auth/Protected";
@@ -38,15 +39,17 @@ function Notification() {
   }, [isSuccess, data]);
   return (
     <>
-      <NotifikasiLayout
-        openNotifikasi={openNotifikasi}
-        setOpenNotifikasi={setOpenNotifikasi}
-        openNotFoundNotifikasi={openNotFoundNotifikasi}
-        setOpenNotFoundNotifikasi={setOpenNotFoundNotifikasi}
-      >
-        {openNotifikasi && <ScreenNotifikasi />}
-        {openNotFoundNotifikasi && <NotFoundNotifikasi />}
-      </NotifikasiLayout>
+      <NotificationProvider>
+        <NotifikasiLayout
+          openNotifikasi={openNotifikasi}
+          setOpenNotifikasi={setOpenNotifikasi}
+          openNotFoundNotifikasi={openNotFoundNotifikasi}
+          setOpenNotFoundNotifikasi={setOpenNotFoundNotifikasi}
+        >
+          {openNotifikasi && <ScreenNotifikasi />}
+          {openNotFoundNotifikasi && <NotFoundNotifikasi />}
+        </NotifikasiLayout>
+      </NotificationProvider>
     </>
   );
 }

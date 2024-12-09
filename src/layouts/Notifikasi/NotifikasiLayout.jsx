@@ -18,16 +18,25 @@ import {
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "./NotifikasiLayout.css";
+import { useNotificationContext } from "../../components/Notifikasi/NotificationContext";
 
 function PageHeader() {
   const [showFilterDate, setShowFilterDate] = useState(false);
+  const { setFilterDate } = useNotificationContext();
   const [showSearch, setShowSearch] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [confirmedDate, setConfirmedDate] = useState(new Date());
 
   const handleShowDate = () => setShowFilterDate(true);
   const handleCloseDate = () => setShowFilterDate(false);
   const handleShowSearch = () => setShowSearch(true);
   const handleCloseSearch = () => setShowSearch(false);
+
+  const handleSaveDate = () => {
+    setFilterDate(selectedDate); // Perbarui tanggal di context
+    setConfirmedDate(selectedDate); // Perbarui tanggal yang dikonfirmasi
+    setShowFilterDate(false); // Tutup modal
+  };
 
   return (
     <Container fluid className="bg-light">
@@ -227,7 +236,7 @@ function PageHeader() {
         onHide={handleCloseDate}
         className="modal-calendar"
       >
-        <Modal.Header closeButton></Modal.Header>
+        <Modal.Header closeButton />
         <Modal.Body>
           <DatePicker
             selected={selectedDate}
@@ -254,10 +263,24 @@ function PageHeader() {
           />
         </Modal.Body>
         <Modal.Footer>
+          {/* Tombol Reset */}
+          <Button
+            variant="outline-secondary"
+            onClick={() => {
+              setSelectedDate(null); // Reset tanggal yang dipilih
+              setFilterDate(null); // Reset filter di context
+              handleCloseDate(); // Tutup modal
+            }}
+          >
+            Reset
+          </Button>
+
+          {/* Tombol Simpan */}
           <Button
             className="text-white button-calendar"
             style={{ backgroundColor: "#4B1979" }}
             variant="none"
+            onClick={handleSaveDate}
           >
             Simpan
           </Button>

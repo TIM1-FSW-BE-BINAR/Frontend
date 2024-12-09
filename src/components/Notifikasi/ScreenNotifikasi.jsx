@@ -6,18 +6,42 @@ import {
   readNotification,
   getUserNotifications,
 } from "../../service/notification";
+import { useNotificationContext } from "./NotificationContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 
 const ScreenNotifikasi = () => {
   const { token } = useSelector((state) => state.auth);
   const queryClient = useQueryClient();
+  const { filterDate } = useNotificationContext();
 
   const { data, isLoading } = useQuery({
     queryKey: ["getUserNotification"],
     queryFn: getUserNotifications,
     enabled: !!token, // Enable only when token exists
   });
+
+  const formatDateTime = (dateString) => {
+    const options = {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false, // Gunakan format 24 jam
+    };
+    return format(new Date(dateString), "dd MMMM yyyy, HH:mm", { locale: id });
+  };
+
+  const filteredNotifications = filterDate
+    ? data.filter((notif) => {
+        const notifDate = new Date(notif.createdAt).setHours(0, 0, 0, 0);
+        const selectedDate = new Date(filterDate).setHours(0, 0, 0, 0);
+        return notifDate === selectedDate;
+      })
+    : data;
 
   // Mutation to mark notification as read
   const mutation = useMutation({
@@ -54,7 +78,7 @@ const ScreenNotifikasi = () => {
     <Container fluid className="bg-light py-3">
       <Row className="align-items-center">
         <Col md={8} className="offset-md-2">
-          {data?.map((notif, index) => (
+          {filteredNotifications?.map((notif, index) => (
             <Card
               key={index}
               className="mb-2"
@@ -98,7 +122,8 @@ const ScreenNotifikasi = () => {
                       fontWeight: "400",
                     }}
                   >
-                    <span>{notif.date}</span>
+                    <span>{formatDateTime(notif.createdAt)}</span>
+
                     <IoEllipse
                       style={{ color: notif.isRead ? "#198754" : "#dc3545" }}
                     />
