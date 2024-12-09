@@ -175,23 +175,6 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchLazyImport
-<<<<<<< HEAD
-      parentRoute: typeof rootRoute
-    }
-    '/Bayar/': {
-      id: '/Bayar/'
-      path: '/Bayar'
-      fullPath: '/Bayar'
-      preLoaderRoute: typeof BayarIndexLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/Pemesanan/': {
-      id: '/Pemesanan/'
-      path: '/Pemesanan'
-      fullPath: '/Pemesanan'
-      preLoaderRoute: typeof PemesananIndexLazyImport
-=======
->>>>>>> b2da5b75fc80298b068d8fa6492f6576339aa165
       parentRoute: typeof rootRoute
     }
   }
@@ -211,11 +194,6 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterLazyRoute
   '/resetPassword': typeof ResetPasswordLazyRoute
   '/search': typeof SearchLazyRoute
-<<<<<<< HEAD
-  '/Bayar': typeof BayarIndexLazyRoute
-  '/Pemesanan': typeof PemesananIndexLazyRoute
-=======
->>>>>>> b2da5b75fc80298b068d8fa6492f6576339aa165
 }
 
 export interface FileRoutesByTo {
@@ -230,11 +208,6 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterLazyRoute
   '/resetPassword': typeof ResetPasswordLazyRoute
   '/search': typeof SearchLazyRoute
-<<<<<<< HEAD
-  '/Bayar': typeof BayarIndexLazyRoute
-  '/Pemesanan': typeof PemesananIndexLazyRoute
-=======
->>>>>>> b2da5b75fc80298b068d8fa6492f6576339aa165
 }
 
 export interface FileRoutesById {
@@ -250,11 +223,6 @@ export interface FileRoutesById {
   '/register': typeof RegisterLazyRoute
   '/resetPassword': typeof ResetPasswordLazyRoute
   '/search': typeof SearchLazyRoute
-<<<<<<< HEAD
-  '/Bayar/': typeof BayarIndexLazyRoute
-  '/Pemesanan/': typeof PemesananIndexLazyRoute
-=======
->>>>>>> b2da5b75fc80298b068d8fa6492f6576339aa165
 }
 
 export interface FileRouteTypes {
@@ -271,11 +239,6 @@ export interface FileRouteTypes {
     | '/register'
     | '/resetPassword'
     | '/search'
-<<<<<<< HEAD
-    | '/Bayar'
-    | '/Pemesanan'
-=======
->>>>>>> b2da5b75fc80298b068d8fa6492f6576339aa165
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -289,11 +252,6 @@ export interface FileRouteTypes {
     | '/register'
     | '/resetPassword'
     | '/search'
-<<<<<<< HEAD
-    | '/Bayar'
-    | '/Pemesanan'
-=======
->>>>>>> b2da5b75fc80298b068d8fa6492f6576339aa165
   id:
     | '__root__'
     | '/'
@@ -307,11 +265,6 @@ export interface FileRouteTypes {
     | '/register'
     | '/resetPassword'
     | '/search'
-<<<<<<< HEAD
-    | '/Bayar/'
-    | '/Pemesanan/'
-=======
->>>>>>> b2da5b75fc80298b068d8fa6492f6576339aa165
   fileRoutesById: FileRoutesById
 }
 
@@ -327,11 +280,6 @@ export interface RootRouteChildren {
   RegisterLazyRoute: typeof RegisterLazyRoute
   ResetPasswordLazyRoute: typeof ResetPasswordLazyRoute
   SearchLazyRoute: typeof SearchLazyRoute
-<<<<<<< HEAD
-  BayarIndexLazyRoute: typeof BayarIndexLazyRoute
-  PemesananIndexLazyRoute: typeof PemesananIndexLazyRoute
-=======
->>>>>>> b2da5b75fc80298b068d8fa6492f6576339aa165
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -346,11 +294,6 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterLazyRoute: RegisterLazyRoute,
   ResetPasswordLazyRoute: ResetPasswordLazyRoute,
   SearchLazyRoute: SearchLazyRoute,
-<<<<<<< HEAD
-  BayarIndexLazyRoute: BayarIndexLazyRoute,
-  PemesananIndexLazyRoute: PemesananIndexLazyRoute,
-=======
->>>>>>> b2da5b75fc80298b068d8fa6492f6576339aa165
 }
 
 export const routeTree = rootRoute
@@ -373,13 +316,7 @@ export const routeTree = rootRoute
         "/payment",
         "/register",
         "/resetPassword",
-<<<<<<< HEAD
-        "/search",
-        "/Bayar/",
-        "/Pemesanan/"
-=======
         "/search"
->>>>>>> b2da5b75fc80298b068d8fa6492f6576339aa165
       ]
     },
     "/": {
@@ -414,15 +351,6 @@ export const routeTree = rootRoute
     },
     "/search": {
       "filePath": "search.lazy.jsx"
-<<<<<<< HEAD
-    },
-    "/Bayar/": {
-      "filePath": "Bayar/index.lazy.jsx"
-    },
-    "/Pemesanan/": {
-      "filePath": "Pemesanan/index.lazy.jsx"
-=======
->>>>>>> b2da5b75fc80298b068d8fa6492f6576339aa165
     }
   }
 }
