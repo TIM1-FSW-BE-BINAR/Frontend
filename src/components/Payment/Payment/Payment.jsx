@@ -80,6 +80,9 @@ const PaymentOptions = () => {
                 id="snap-container"
                 className="rounded w-100"
                 style={{ height: "70vh" }}
+                xs={12}
+                md={12}
+                lg={12}
               >
                 {!snapLoaded && (
                   <div className="text-center mt-4">

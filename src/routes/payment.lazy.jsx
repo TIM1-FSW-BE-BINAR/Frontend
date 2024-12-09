@@ -3,8 +3,8 @@ import "../styles/variables.scss";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useSelector } from "react-redux";
 import PaymentLayout from "../layouts/paymentLayout";
-import  PaymentOptions  from "../components/Payment/Payment/Payment";
-import  SuccessPayment  from "../components/Payment/Payment/SuccessPayment";
+import PaymentOptions from "../components/Payment/Payment/Payment";
+import SuccessPayment from "../components/Payment/Payment/SuccessPayment";
 
 export const Route = createLazyFileRoute("/payment")({
   component: payment,
@@ -13,7 +13,6 @@ export const Route = createLazyFileRoute("/payment")({
 function payment() {
   const { token } = useSelector((state) => state.auth);
   const [openPayment, setOpenPayment] = useState(true);
-  const [openDetailBooking, setOpenDetailBooking] = useState(false);
   const [openSuccess, setOpenSuccess] = useState(false);
 
   // const { data, isSuccess, isLoading } = useQuery({
@@ -37,13 +36,10 @@ function payment() {
       <PaymentLayout
         openPayment={openPayment}
         setOpenPayment={setOpenPayment}
-        // openDetailBooking={openDetailBooking}
-        // setOpenDetailBooking={setOpenDetailBooking}
         openSuccess={openSuccess}
         setOpenSuccess={setOpenSuccess}
       >
         {openPayment && <PaymentOptions />}
-        {/* {openDetailBooking && <DetailPesanan />} */}
         {openSuccess && <SuccessPayment />}
       </PaymentLayout>
     </>
