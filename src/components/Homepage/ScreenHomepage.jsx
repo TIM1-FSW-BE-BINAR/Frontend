@@ -28,18 +28,25 @@ import { FaSearch } from "react-icons/fa";
 import HomepageModal from "./HomepageModal";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
+<<<<<<< HEAD
+=======
+import SearchFlight from "../Search/SearchFlight";
+>>>>>>> 8d126daf8c12d6adc45adc364ad87776d6308a06
 
 import { LocalizationProvider } from "@mui/x-date-pickers-pro/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import toast, { Toaster } from "react-hot-toast";
 
+<<<<<<< HEAD
 import { useQuery } from "@tanstack/react-query";
 import { getFlights } from "../../service/flight/flightService";
 import { getAirlines } from "../../service/airline/airlineService";
 import { getAirports } from "../../service/airport/airportService";
 import { useNavigate } from "@tanstack/react-router";
 
+=======
+>>>>>>> 8d126daf8c12d6adc45adc364ad87776d6308a06
 const ScreenHomepage = () => {
   return <Homepage />;
 };
@@ -64,6 +71,10 @@ const Homepage = () => {
   const [classInput, setClassInput] = useState("");
   const [checkedSwitch, setCheckedSwitch] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
+
+  useEffect(() => {
+    setDepartureDate("");
+  }, [checkedSwitch]);
 
   useEffect(() => {
     setDepartureDate("");
@@ -335,7 +346,10 @@ const Homepage = () => {
                             setActiveModal("from");
                             setModalShow(true);
                           }}
+<<<<<<< HEAD
                           readOnly
+=======
+>>>>>>> 8d126daf8c12d6adc45adc364ad87776d6308a06
                         />
                       </Col>
                     </Form.Group>
@@ -376,7 +390,10 @@ const Homepage = () => {
                             setActiveModal("to");
                             setModalShow(true);
                           }}
+<<<<<<< HEAD
                           readOnly
+=======
+>>>>>>> 8d126daf8c12d6adc45adc364ad87776d6308a06
                         />
                       </Col>
                     </Form.Group>
@@ -486,7 +503,10 @@ const Homepage = () => {
                               : ""
                           }
                           onClick={() => setPassengerModalShow(true)}
+<<<<<<< HEAD
                           readOnly
+=======
+>>>>>>> 8d126daf8c12d6adc45adc364ad87776d6308a06
                         />
                       </Col>
                       <Col className="mt-2">
@@ -497,7 +517,10 @@ const Homepage = () => {
                           className="custom-placeholder form-input"
                           onClick={() => setClassModalShow(true)}
                           value={classInput}
+<<<<<<< HEAD
                           readOnly
+=======
+>>>>>>> 8d126daf8c12d6adc45adc364ad87776d6308a06
                         />
                       </Col>
                     </Form.Group>
@@ -970,6 +993,7 @@ const Homepage = () => {
                       {index % 2 === 0 ? "Limited!" : "50% OFF"}
                     </span>
                   </div>
+<<<<<<< HEAD
                   <Card.Img variant="top" src={flight?.arrival.imageUrl} className="img-fluid" />
                   <Card.Body className="custom-card-body">
                     <Card.Title
@@ -979,6 +1003,19 @@ const Homepage = () => {
                       }}
                     >
                       {flight?.departure.city} -{`>`} {flight?.arrival.city}
+=======
+                  <Card.Img variant="top" src={cardImg} />
+                  <Card.Body>
+                    <Card.Title
+                      className="card-title"
+                      style={{
+                        fontSize: "16px",
+                      }}
+                    >
+                      {index % 2 === 0
+                        ? "Jakarta -> Bangkok"
+                        : "Jakarta -> Sydney"}
+>>>>>>> 8d126daf8c12d6adc45adc364ad87776d6308a06
                     </Card.Title>
                     <p
                       className="text-primary mb-1"
@@ -1036,6 +1073,18 @@ const Homepage = () => {
         />
       </div>
     </>
+<<<<<<< HEAD
+=======
+  ) : (
+    <SearchFlight
+      fromInput={fromInput}
+      toInput={toInput}
+      departureDate={departureDate}
+      returnDate={returnDate ? returnDate : null}
+      passengers={totalPassengers}
+      classInput={classInput}
+    />
+>>>>>>> 8d126daf8c12d6adc45adc364ad87776d6308a06
   );
 };
 
