@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import NavigationBar from "../components/Navbar";
 import NavbarPayment from "../components/Payment/NavbarPayment";
 
-export default function PaymentLayout({ children }) {
+export default function PaymentLayout({ openPayment, openSuccess, children }) {
   return (
     <>
       <NavigationBar />
-      <NavbarPayment />
+      <NavbarPayment openPayment={openPayment} openSuccess={openSuccess} />
       {children}
     </>
   );

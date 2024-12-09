@@ -1,4 +1,3 @@
-// components/Detail/DetailPesanan.jsx
 
 import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
