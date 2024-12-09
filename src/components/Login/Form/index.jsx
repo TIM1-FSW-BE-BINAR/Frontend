@@ -3,11 +3,13 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Button, Form, Image } from "react-bootstrap";
 import { IoEyeOutline, IoEyeOffOutline, IoArrowBack } from "react-icons/io5";
+import { FcGoogle } from "react-icons/fc";
 import ForgetPasswordForm from "./forgetPasswordForm";
-import { login } from "../../../service/auth";
+import { login, googleLogin } from "../../../service/auth";
 import { setToken } from "../../../redux/slices/auth";
 import { useMutation } from "@tanstack/react-query";
 import toast, { Toaster } from "react-hot-toast";
+import { useGoogleLogin } from "@react-oauth/google";
 
 const loginForm = () => {
   const dispatch = useDispatch();
@@ -53,6 +55,17 @@ const loginForm = () => {
     },
   });
 
+  const { mutate: googleLoginUser } = useMutation({
+    mutationFn: (accessToken) => googleLogin(accessToken),
+    onSuccess: (result) => {
+      dispatch(setToken(result?.data?.token));
+      navigate({ to: "/" });
+    },
+    onError: (err) => {
+      toast.error(err.message || "Google login failed");
+    },
+  });
+
   const handleApiError = (errorMessage) => {
     const message = errorMessage?.toLowerCase() || "";
 
@@ -85,10 +98,20 @@ const loginForm = () => {
 
     loginUser({ email: email.trim(), password });
   };
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      googleLoginUser(tokenResponse.access_token);
+    },
+    onError: (err) => {
+      toast.error("Google login error");
+    },
+  });
+
   const handleForgotPassword = () => {
     setForgotPassword(true);
   };
-  
+
   const handleEyeToggle = () => {
     if (type === "password") {
       setType("text");
@@ -185,7 +208,6 @@ const loginForm = () => {
                 </Button>
               </div>
             </Form.Group>
-
             <Button
               variant="primary"
               type="submit"
@@ -207,6 +229,22 @@ const loginForm = () => {
               Masuk
             </Button>
           </Form>
+          <h6 className="text-muted text-center mb-3"> atau </h6>
+          <Button
+            variant=""
+            type="submit"
+            className="w-100 mb-3 text-light d-flex align-items-center justify-content-center"
+            onClick={handleGoogleLogin}
+            style={{
+              backgroundColor: "#000000",
+              transition: "opacity 0.3s ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+          >
+            <FcGoogle style={{ marginRight: "8px", fontSize: "20px" }} />
+            Masuk menggunakan Google
+          </Button>
 
           <div
             className="text-center"

@@ -4,8 +4,8 @@ import { VscEdit, VscGear, VscSignOut } from "react-icons/vsc";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { setToken, setUser } from "../../redux/slices/auth";
-import { useCallback, useEffect } from "react";
-import { profile } from "../../service/auth";
+import { useCallback, useEffect, useState } from "react";
+import { profileMe } from "../../service/auth";
 import { useQuery } from "@tanstack/react-query";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -21,6 +21,8 @@ export default function SidebarAkun({
   const navigate = useNavigate();
   const { user, token } = useSelector((state) => state.auth);
 
+  const [overlayVisible, setOverlayVisible] = useState(false);
+
   const handleClick = (setterFunction) => {
     setOpenUbahProfil(false);
     setOpenPengaturanAkun(false);
@@ -34,8 +36,8 @@ export default function SidebarAkun({
   }, [dispatch, navigate]);
 
   const { data, isSuccess, isError } = useQuery({
-    queryKey: ["profile"],
-    queryFn: profile,
+    queryKey: ["profileMe"],
+    queryFn: profileMe,
     enabled: token ? true : false,
   });
 
@@ -49,6 +51,7 @@ export default function SidebarAkun({
 
   const logoutConfirmation = (event) => {
     event.preventDefault();
+    setOverlayVisible(true); // Show the overlay when toast is triggered
     toast.warn(
       <div style={{ textAlign: "center" }}>
         <p>Apakah Anda yakin ingin keluar?</p>
@@ -56,6 +59,7 @@ export default function SidebarAkun({
           <button
             onClick={() => {
               toast.dismiss();
+              setOverlayVisible(false); // Hide overlay after toast is dismissed
               handleLogout();
             }}
             style={{
@@ -71,7 +75,10 @@ export default function SidebarAkun({
             Ya
           </button>
           <button
-            onClick={() => toast.dismiss()}
+            onClick={() => {
+              toast.dismiss();
+              setOverlayVisible(false); // Hide overlay when user dismisses the toast
+            }}
             style={{
               background: "#ccc",
               border: "none",
@@ -86,8 +93,9 @@ export default function SidebarAkun({
       </div>,
       {
         autoClose: false,
-        className: "custom-toast-center", // Tambahkan kelas khusus
-        bodyClassName: "custom-toast-body", // Opsional: untuk gaya konten
+        closeButton: false,
+        className: "custom-toast-center",
+        bodyClassName: "custom-toast-body",
       }
     );
   };
@@ -122,6 +130,7 @@ export default function SidebarAkun({
                     href="#"
                     className="align-middle text-black py-2 d-flex justify-content-center align-items-center m-0 p-0 w-100"
                     onClick={() => handleClick(setOpenUbahProfil)}
+                    style={{ cursor: "pointer" }}
                   >
                     <VscEdit
                       style={{
@@ -152,9 +161,8 @@ export default function SidebarAkun({
                 >
                   <Nav.Link
                     as={Col}
-                    href="#"
                     className="text-black py-2 d-flex  align-items-center m-0 p-0"
-                    style={{ width: "15rem" }}
+                    style={{ width: "15rem", cursor: "pointer" }}
                     onClick={() => handleClick(setOpenPengaturanAkun)}
                   >
                     <VscGear
@@ -184,7 +192,7 @@ export default function SidebarAkun({
                     xl={10}
                     href="#"
                     className="align-middle text-black py-2 d-flex justify-content-center align-items-center m-0 p-0 w-100"
-                    onClick={logoutConfirmation} // Menggunakan fungsi logout dengan konfirmasi
+                    onClick={logoutConfirmation}
                   >
                     <VscSignOut
                       style={{
@@ -212,6 +220,11 @@ export default function SidebarAkun({
           </Col>
         </Row>
 
+        {/* Overlay for Toast */}
+        {overlayVisible && <div className="custom-toast-overlay" />}
+
+        <ToastContainer />
+
         {/* Custom Style */}
         <style jsx>{`
           .custom-toast-center {
@@ -230,6 +243,17 @@ export default function SidebarAkun({
 
           .custom-toast-body {
             text-align: center; /* Konten toast rata tengah */
+          }
+
+          .custom-toast-overlay {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Latar belakang transparan */
+            z-index: 9998; /* Di bawah toast, tetapi tetap di atas konten */
+            pointer-events: none; /* Agar elemen lain masih bisa di-interact */
           }
         `}</style>
       </Container>
