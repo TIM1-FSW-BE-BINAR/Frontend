@@ -1,4 +1,4 @@
-import {Card, Button, Col, Row } from "react-bootstrap";
+import { Card, Button, Col, Row } from "react-bootstrap";
 import PropTypes from "prop-types";
 
 const TicketDetails = ({ flight, airline }) => {
@@ -167,7 +167,7 @@ const TicketDetails = ({ flight, airline }) => {
             </div>
 
             <Button
-              href={`/flights/${flight?.id}`}
+              href={`/payment`}
               variant="danger"
               id="box-timer"
               style={{ zIndex: "1" }}
