@@ -43,6 +43,7 @@ function Register() {
           backgroundColor: "white",
           padding: "20px",
           height: "100%",
+          overflowY: "scroll",
         }}
       >
         <RegisterForm />

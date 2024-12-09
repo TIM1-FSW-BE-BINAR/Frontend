@@ -13,7 +13,6 @@ import { useQuery } from "@tanstack/react-query";
 import { IoIosNotificationsOutline, IoIosList } from "react-icons/io";
 import { LuLogIn } from "react-icons/lu";
 import { RxPerson } from "react-icons/rx";
-import { LuSearch } from "react-icons/lu";
 
 const NavigationBar = () => {
   const dispatch = useDispatch();
@@ -23,7 +22,7 @@ const NavigationBar = () => {
   const { data, isSuccess, isError } = useQuery({
     queryKey: ["profile"],
     queryFn: profile,
-    enabled: token ? true : false,
+    enabled: !!token,
   });
 
   useEffect(() => {
@@ -43,7 +42,7 @@ const NavigationBar = () => {
           }}
           key={expand}
           expand={expand}
-          className="mb-0 "
+          className="mb-0"
         >
           <Container>
             <Navbar.Brand
@@ -68,17 +67,15 @@ const NavigationBar = () => {
               </Offcanvas.Header>
               <Offcanvas.Body>
                 <Nav className="justify-content-end flex-grow-1 pe-3 text-black align-items-center">
-                  {token ? (
+                  {user ? (
                     <>
-                      <Nav.Link as={Link} to="/">
-                        <IoIosList />
-                      </Nav.Link>{" "}
-                      History
-                      <Nav.Link as={Link} to="/">
-                        <IoIosNotificationsOutline />
-                      </Nav.Link>{" "}
-                      Notification
-                      <Nav.Link as={Link} to="/">
+                      <Nav.Link as={Link} to="/history">
+                        <IoIosList /> History
+                      </Nav.Link>
+                      <Nav.Link as={Link} to="/notification">
+                        <IoIosNotificationsOutline /> Notification
+                      </Nav.Link>
+                      <Nav.Link as={Link} to="/account">
                         <RxPerson /> Account
                       </Nav.Link>
                     </>

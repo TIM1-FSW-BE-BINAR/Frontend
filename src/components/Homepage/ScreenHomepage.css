@@ -1,0 +1,315 @@
+body{
+  overflow-x: hidden;
+}
+
+.form-section {
+  position: relative;
+  padding: 20px;
+  /* margin-top: -50px; */
+}
+
+.form-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  /* transform: translateY(-50%); */
+  margin: 0 auto;
+}
+
+@media (max-width: 1200px) and (min-width: 750px) {
+  .form-section {
+    padding: 50px 30px;
+    margin-top: 0px;
+  }
+
+  .form-container {
+    max-width: 90%;
+    margin: 0 auto;
+    transform: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .form-section { 
+    margin-top: 50px; 
+  }
+
+  .form-container {
+    margin: 0 auto;
+    transform: none; 
+  }
+}
+
+.form-container-content {
+  position: relative;
+}
+
+.form-input {
+  border: none;
+  border-bottom: 1px solid black;
+  outline: none;
+  box-shadow: none;
+  border-radius: 0;
+  font-weight: 700;
+  padding-left: 0;
+}
+
+.form-input:focus {
+  border-bottom: 2px solid #007bff;
+  outline: none;
+  box-shadow: none;
+}
+
+.custom-placeholder::placeholder {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.form-icon {
+  max-width: 30px;
+  max-height: 30px;
+}
+
+.return-icon {
+  max-width: 36px;
+  max-height: 36px;
+}
+
+.custom-switch .form-check-input {
+  width: 50px;
+  height: 25px;
+  background-size: 60%;
+}
+
+.custom-switch .form-check-input:checked {
+  background-color: #7126b5;
+}
+
+.class-modal-content p {
+  color: #007bff;
+}
+
+.class-modal-content .row:hover {
+  background-color: #4b1979;
+  color: white !important;
+}
+
+.class-modal-content .selected {
+  background-color: #4b1979;
+  color: white !important;
+}
+
+.modal-x-icon {
+  width: 20px;
+  height: 20px;
+  max-width: 30px;
+  max-height: 30px;
+}
+
+.selected-icon {
+  width: 40px;
+  height: 40px;
+  max-width: 50px;
+  max-height: 50px;
+}
+
+/* Styling Card */
+.custom-card {
+  width: 18rem;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out;
+}
+
+.custom-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Styling untuk Badge */
+.badge-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+}
+
+.badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 20px;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.badge-limited {
+  background-color: #aa6bff;
+}
+
+.badge-discount {
+  background-color: #ff69b4;
+}
+
+/* Styling Card Title */
+.card-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Styling Card Image */
+.custom-card img {
+  height: 150px;
+  object-fit: cover;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Styling Card Text */
+.custom-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.custom-card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;  /* Untuk membuat teks terpisah dengan jarak */
+  align-items: flex-start;         /* Posisi sejajar di kiri */
+  gap: 2px; 
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .custom-card {
+    width: 100%;
+  }
+}
+
+/* Styling tombol default */
+.responsive-button {
+  background: #e2d4f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  text-align: center;
+  cursor: pointer;
+  min-width: 120px; /* Pastikan tombol memiliki lebar minimum */
+  max-width: 180px;
+  transition: all 0.3s ease; /* Animasi transisi */
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* Ukuran ikon yang konsisten */
+.responsive-button .icon {
+  font-size: 18px; /* Ukuran tetap */
+  margin-right: 6px;
+  width: 18px; /* Konsisten */
+  height: 18px; /* Konsisten */
+  flex-shrink: 0; /* Ikon tidak mengecil */
+  display: inline-block; /* Pastikan sebagai blok untuk mencegah distorsi */
+}
+
+/* Styling teks */
+.responsive-button .button-label {
+  font-size: 0.9rem;
+  color: #000; /* Warna teks default */
+  white-space: nowrap; /* Hindari teks terpotong */
+  margin: 0; /* Hindari margin default */
+}
+
+/* Hover efek */
+.responsive-button:hover {
+  background: #7126b5;
+}
+
+.responsive-button:hover .icon,
+.responsive-button:hover .button-label {
+  color: #fff; 
+}
+
+/* Warna tombol saat aktif (clicked) */
+.responsive-button.active {
+  background: #7126b5 !important;
+}
+
+.responsive-button.active .icon,
+.responsive-button.active .button-label {
+  color: #fff !important; 
+}
+
+/* Media Query untuk layar kecil */
+@media (max-width: 576px) {
+  .responsive-button {
+    padding: 8px;
+    min-width: 100px; /* Lebar minimum lebih kecil untuk layar kecil */
+    max-width: 150px;
+  }
+
+  .responsive-button .icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+  }
+
+  .responsive-button .button-label {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .responsive-button {
+    padding: 9px;
+  }
+
+  .responsive-button .icon {
+    font-size: 17px;
+    width: 17px;
+    height: 17px;
+  }
+
+  .responsive-button .button-label {
+    font-size: 0.85rem;
+  }
+}
+
+
+
+@media (max-width: 768px) {
+  .responsive-button {
+    padding: 12px;
+  }
+
+  .responsive-button .icon {
+    font-size: 17px;
+     width: 15px;
+    height: 15px;
+  }
+
+  .responsive-button .button-label {
+    font-size: 0.85rem;
+  }
+}
+
+.animated-button {
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+
+.animated-button:active {
+  transform: scale(0.9);
+}
+
+.list-item-city-modal:hover{
+  background-color: #f1f1f1;
+  transition: background-color 0.2s ease;
+}
+
+

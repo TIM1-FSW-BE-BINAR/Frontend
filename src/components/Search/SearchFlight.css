@@ -1,0 +1,100 @@
+.back-btn:hover {
+  background-color: #a988c9 !important;
+}
+
+.ubah-btn:hover {
+  background-color: #86da6f !important;
+}
+
+.date-btn {
+  background: white;
+  color: black;
+  border: 1px solid #d0d0d0;
+  transition: all 0.3s ease;
+}
+
+.date-btn:hover {
+  background-color: #7126b5;
+  color: white;
+}
+
+.date-active {
+  background-color: #7126b5;
+  color: white;
+}
+
+.filter-btn {
+  border: 2px solid #a06ece;
+  color: #7126b5;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.filter-btn:hover {
+  background-color: #7126b5 !important;
+  color: white !important;
+}
+
+.up-down-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.flight-box {
+  margin-bottom: 20px;
+  border: 1px solid #d0d0d0 !important;
+}
+
+.flight-box:hover {
+  border: 2px solid #7126b5 !important;
+}
+
+.accordion-button::after {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.long-arrow-icon {
+  max-width: 433px;
+}
+
+@media (max-width: 768px) {
+  .long-arrow-icon {
+    max-width: 250px;
+  }
+}
+
+@media (max-width: 576px) {
+  .long-arrow-icon {
+    max-width: 150px;
+  }
+}
+
+.class-modal-content p {
+  color: #007bff;
+}
+
+.class-modal-content .row:hover {
+  background-color: #4b1979;
+  color: white !important;
+}
+
+.class-modal-content .selected {
+  background-color: #4b1979;
+  color: white !important;
+}
+
+.modal-x-icon {
+  width: 20px;
+  height: 20px;
+  max-width: 30px;
+  max-height: 30px;
+}
+
+.selected-icon {
+  width: 40px;
+  height: 40px;
+  max-width: 50px;
+  max-height: 50px;
+}
