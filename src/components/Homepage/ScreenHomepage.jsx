@@ -151,6 +151,9 @@ const Homepage = () => {
         departureDate,
         returnDate: returnDate || "", // Kirim kosong jika null
         totalPassengers,
+        adultInput,
+        childInput,
+        babyInput,
         classInput,
       }).toString();
 
