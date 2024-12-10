@@ -1,5 +1,6 @@
 import {Card, Button, Col, Row } from "react-bootstrap";
 import PropTypes from "prop-types";
+import { getFlights } from "../../service/flight/flightService";
 
 const TicketDetails = ({ flight, airline }) => {
   const parseDateAndTime = (isoString) => {
@@ -72,7 +73,7 @@ const TicketDetails = ({ flight, airline }) => {
                   <img src="../../public/img/logokkecil.png"></img>
                   {/* {airline?.imageUrl} */}
                 </Col>
-                <Col className="col-lg-10" >
+                <Col className="col-lg-10">
                   <b>Informasi: </b> <br></br>
                   {flight?.information}
                   Baggage 20 kg
@@ -167,7 +168,8 @@ const TicketDetails = ({ flight, airline }) => {
             </div>
 
             <Button
-              href={`/flights/${flight?.id}`}
+              //href={`/flights/${flight?.id}`}
+              href={`/payment`}
               variant="danger"
               id="box-timer"
               style={{ zIndex: "1" }}

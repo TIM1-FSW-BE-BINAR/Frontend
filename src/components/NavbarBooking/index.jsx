@@ -12,7 +12,7 @@ import {  useSelector } from "react-redux";
 import { useState } from "react";
 import "./NavbarBooking.css";
 
-const NavbarBooking = () => {
+const NavbarBooking = (isSaved) => {
   //const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -22,7 +22,7 @@ const NavbarBooking = () => {
   // State untuk melacak penyelesaian
   const [isDataDiriCompleted, setIsDataDiriCompleted] = useState(false);
   const [isBayarCompleted, setIsBayarCompleted] = useState(false);
-const [isSaved, setisSaved] = useState(false);
+  //const [isSaved, setisSaved] = useState(false);
   // Logika untuk menentukan apakah path aktif
   const isActive = (path) => location.pathname === path;
 
@@ -181,7 +181,7 @@ const [isSaved, setisSaved] = useState(false);
                         </button>
                       </div>
                     </div>
-                ) : isSaved ?  (
+                ) : !isSaved ?  (
                   <Row>
                     <div id="box-timer" style={{ backgroundColor: "#73CA5C" }}>
                       <div style={{ justifyContent: "center" }}>

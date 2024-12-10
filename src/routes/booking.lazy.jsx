@@ -23,6 +23,7 @@ import {createBooking} from "../service/booking";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useMutation } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
 
 
 export const Route = createLazyFileRoute("/booking")({
@@ -32,17 +33,19 @@ export const Route = createLazyFileRoute("/booking")({
 function Booking() {
   const [hasFamilyName, setHasFamilyName] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
-  const [isFormValid, setIsFormValid] = useState(false);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [passagerId, setPassagerId] = useState("KTP");
   const [passengerCount, setPassengerCount] = useState(3);
 
+  const { user } = useSelector((state) => state.auth); 
+  
   const [orderData, setOrderData] = useState({
-    name: "",
-    familyName: "",
-    phoneNumber: "",
-    email: "",
+    name: user?.name || "",
+    familyName: user?.familyName || "",
+    phoneNumber: user?.phoneNumber || "",
+    email: user?.email || "",
   });
+  console.log(orderData);
 
   const [passengerData, setPassengerData] = useState({
     title: "",
@@ -56,24 +59,20 @@ function Booking() {
     type: null,
   });
 
-  const handleOrderChange = (event) => {
-    const { name, value } = event.target;
-    setOrderData((prev) => ({ ...prev, [name]: value }));
-  };
   const handlePassengerChange = (event) => {
     const { name, value } = event.target;
     setPassengerData((prev) => ({ ...prev, [name]: value }));
   };
-const handleDateChange = (field, value) => {
-  if (value) {
-    const formattedDate =
-      field === "expiredDate"
-        ? dayjs(value).endOf("day").toISOString() 
-        : dayjs(value).startOf("day").toISOString(); 
+  const handleDateChange = (field, value) => {
+    if (value) {
+      const formattedDate =
+        field === "expiredDate"
+          ? dayjs(value).endOf("day").toISOString()
+          : dayjs(value).startOf("day").toISOString();
 
-    setPassengerData((prev) => ({ ...prev, [field]: formattedDate }));
-  }
-};
+      setPassengerData((prev) => ({ ...prev, [field]: formattedDate }));
+    }
+  };
   const handleSwitchChange = (e) => {
     setHasFamilyName(e.target.checked);
   };
@@ -82,26 +81,20 @@ const handleDateChange = (field, value) => {
   };
 
   const validateForm = () => {
-    const requiredFields = [
-      "name",
-      "phoneNumber",
-      "email",
-      "title",
-      "dob",
-    ];
+    const requiredFields = ["name", "title", "dob"];
     if (hasFamilyName) {
       requiredFields.push("familyName");
     }
     if (passagerId === "KTP") {
-      requiredFields.push("identityNumber"); 
+      requiredFields.push("identityNumber");
     } else if (passagerId === "Paspor") {
-      requiredFields.push("identityNumber", "countryOfIssue", "expiredDate"); 
+      requiredFields.push("identityNumber", "countryOfIssue", "expiredDate");
     }
     if (selectedSeats.length !== passengerCount) {
       toast.error(`Anda harus memilih ${passengerCount} kursi!`);
       return false;
     }
-    
+
     const emptyFields = requiredFields.filter((field) => {
       return !orderData[field] && !passengerData[field];
     });
@@ -110,13 +103,10 @@ const handleDateChange = (field, value) => {
       emptyFields.forEach((field) =>
         toast.error(`Field ${field} tidak boleh kosong!`)
       );
-      setIsFormValid(false);
       return false;
     }
-    setIsFormValid(true);
     return true;
   };
-
 
   const { mutate: booking } = useMutation({
     mutationFn: (booking) => createBooking(booking),
@@ -145,7 +135,7 @@ const handleDateChange = (field, value) => {
     console.log("Order Data:", orderData);
     console.log("Passenger Data:", passengerData);
     console.log("Kursi yang dipilih:", selectedSeats);
-    
+    3;
 
     setIsSaved(true);
 
@@ -230,7 +220,7 @@ const handleDateChange = (field, value) => {
     <>
       <ToastContainer />
       <NavigationBar />
-      <NavbarBooking />
+      <NavbarBooking isSaved={isSaved} />
       <div className="container my-4">
         <div className="row">
           <div className="col-sm-12 col-md-12 col-lg-7 col-xl-6 d-flex align-items-center flex-column">
@@ -267,64 +257,29 @@ const handleDateChange = (field, value) => {
                           <Form.Group>
                             <Form.Label>Nama Lengkap</Form.Label>
                             <Form.Control
-                              required
-                              type="text"
-                              placeholder="Nama Lengkap"
-                              name="name"
-                              value={orderData.name}
-                              onChange={handleOrderChange}
+                              value={user?.name}
                               className="custom-input"
-                              disabled={isSaved}
+                              disabled={!!user?.name}
                             />
                           </Form.Group>
                         </Row>
-                        <Row className="mb-3 align-items-center">
-                          <Form.Group
-                            as={Col}
-                            controlId="switchFamilyName"
-                            className="d-flex justify-content-between"
-                          >
-                            <Form.Label
-                              style={{ color: "black", fontWeight: "normal" }}
-                            >
-                              Punya nama keluarga?
-                            </Form.Label>
-                            <IOSSwitch
-                              checked={hasFamilyName}
-                              onChange={handleSwitchChange}
-                              disabled={isSaved}
+                        <Row className="mb-3">
+                          <Form.Group>
+                            <Form.Label>Nama Keluarga</Form.Label>
+                            <Form.Control
+                              value={user?.familyName}
+                              className="custom-input"
+                              disabled={!!user?.familyName}
                             />
                           </Form.Group>
                         </Row>
-                        {hasFamilyName && (
-                          <Row className="mb-3">
-                            <Form.Group>
-                              <Form.Label>Nama Keluarga</Form.Label>
-                              <Form.Control
-                                required
-                                type="text"
-                                placeholder="Nama Keluarga"
-                                name="familyName"
-                                value={orderData.familyName}
-                                onChange={handleOrderChange}
-                                disabled={isSaved}
-                                className="custom-input"
-                              />
-                            </Form.Group>
-                          </Row>
-                        )}
                         <Row className="mb-3">
                           <Form.Group>
                             <Form.Label>Nomor Telepon</Form.Label>
                             <Form.Control
-                              required
-                              type="text"
-                              placeholder="Nomor Telepon"
-                              name="phoneNumber"
-                              value={orderData.phoneNumber}
-                              onChange={handleOrderChange}
+                              value={user?.phoneNumber}
                               className="custom-input"
-                              disabled={isSaved}
+                              disabled={!!user?.phoneNumber}
                             />
                           </Form.Group>
                         </Row>
@@ -332,14 +287,9 @@ const handleDateChange = (field, value) => {
                           <Form.Group as={Col} controlId="validationCustom01">
                             <Form.Label>Email</Form.Label>
                             <Form.Control
-                              required
-                              type="email"
-                              placeholder="Email"
-                              name="email"
-                              value={orderData.email}
-                              onChange={handleOrderChange}
+                              value={user?.email}
                               className="custom-input"
-                              disabled={isSaved}
+                              disabled={!!user?.email}
                             />
                           </Form.Group>
                         </Row>
@@ -350,6 +300,7 @@ const handleDateChange = (field, value) => {
               </div>
 
               {/* Card penumpang */}
+            {/* <form className="p-3" onSubmit={onSubmit}>*/}
               <div className="mb-3 shadow-sm">
                 <Card style={{ width: "" }}>
                   <Card.Body>
