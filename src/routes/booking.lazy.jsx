@@ -1,7 +1,7 @@
-import * as React from "react";
+//import * as React from "react";
 import { useState } from "react";
-import { createLazyFileRoute } from "@tanstack/react-router";
-import { Card, Button, Col, Form, Row } from "react-bootstrap";
+import { createLazyFileRoute, useLocation } from "@tanstack/react-router";
+import { Container,Card, Button, Col, Form, Row } from "react-bootstrap";
 import "font-awesome/css/font-awesome.min.css";
 import NavbarBooking from "../components/NavbarBooking";
 import Footer from "../components/Footer";
@@ -15,39 +15,54 @@ import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import TicketDetails from "../components/TicketDetails";
-//import Seatpicker from "../components/Seat-Picker";
 import SeatMap from "../components/SeatMap";
-//import { FormControl } from "@mui/material";
-//import { useNavigate, useLocation } from "@tanstack/react-router";
-import {createBooking} from "../service/booking";
-import { toast, ToastContainer } from "react-toastify";
+import { createBooking } from "../service/booking";
+import toast, { Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
-import { useMutation } from "@tanstack/react-query";
-
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import { getFlightId } from "../service/flight/flightService";
 
 export const Route = createLazyFileRoute("/booking")({
   component: Booking,
 });
 
 function Booking() {
-  const [hasFamilyName, setHasFamilyName] = useState(true);
-  const [isSaved, setIsSaved] = useState(false);
-  const [isFormValid, setIsFormValid] = useState(false);
   const [selectedSeats, setSelectedSeats] = useState([]);
-  const [passagerId, setPassagerId] = useState("KTP");
-  const [passengerCount, setPassengerCount] = useState(3);
+  // const [hasFamilyName, setHasFamilyName] = useState(true);
+  // const [passagerId, setPassagerId] = useState("KTP");
+  const [isSaved, setIsSaved] = useState(false);
+  const { user } = useSelector((state) => state.auth);
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
 
-  const [orderData, setOrderData] = useState({
-    name: "",
-    familyName: "",
-    phoneNumber: "",
-    email: "",
+  const flightId = parseInt(searchParams.get("flightId"), 10) || 0;
+  const totalPassengers = parseInt(searchParams.get("totalPassengers"), 10) || 0;
+  const adultInput = parseInt(searchParams.get("adultInput"), 10) || 0;
+  const childInput = parseInt(searchParams.get("childInput"), 10) || 0;
+  const babyInput = parseInt(searchParams.get("babyInput"), 10) || 0;
+  const totalSeat = adultInput + childInput;
+
+  const passengers = Array.from({ length: totalPassengers }, (_, index) => {
+    let passengerType = "ADULT";
+    if (index < adultInput) {
+      passengerType = "ADULT";
+    } else if (index < adultInput + childInput) {
+      passengerType = "CHILD";
+    } else if (index < adultInput + childInput + babyInput) {
+      passengerType = "BABY";
+    }
+    return {
+      index,
+      type: passengerType,
+    };
   });
 
   const [passengerData, setPassengerData] = useState({
     title: "",
     name: "",
     familyName: "",
+    gender: "",
     dob: null,
     citizenship: "Indonesia",
     identityNumber: "",
@@ -56,109 +71,171 @@ function Booking() {
     type: null,
   });
 
-  const handleOrderChange = (event) => {
-    const { name, value } = event.target;
-    setOrderData((prev) => ({ ...prev, [name]: value }));
-  };
   const handlePassengerChange = (event) => {
     const { name, value } = event.target;
-    setPassengerData((prev) => ({ ...prev, [name]: value }));
-  };
-const handleDateChange = (field, value) => {
-  if (value) {
-    const formattedDate =
-      field === "expiredDate"
-        ? dayjs(value).endOf("day").toISOString() 
-        : dayjs(value).startOf("day").toISOString(); 
+    const passengerIndex = name.split("_")[1];
 
-    setPassengerData((prev) => ({ ...prev, [field]: formattedDate }));
-  }
-};
-  const handleSwitchChange = (e) => {
-    setHasFamilyName(e.target.checked);
+    // Mengonversi 'title' menjadi 'gender'
+    if (name.startsWith("title")) {
+      let gender = "";
+
+      // Menetapkan gender berdasarkan 'title'
+      if (value === "Mr.") {
+        gender = "MALE";
+      } else if (value === "Ms." || value === "Mrs.") {
+        gender = "FEMALE";
+      }
+
+      // Update state dengan nilai 'title' dan 'gender' berdasarkan index
+      setPassengerData((prev) => ({
+        ...prev,
+        [`${name.split("_")[0]}_${passengerIndex}`]: value,
+        [`gender_${passengerIndex}`]: gender, // Menyimpan gender berdasarkan index
+      }));
+    } else {
+      // Update field lain selain title
+      setPassengerData((prev) => ({
+        ...prev,
+        [`${name.split("_")[0]}_${passengerIndex}`]: value,
+      }));
+    }
   };
-  const handleChangePI = (event) => {
-    setPassagerId(event.target.value);
+
+  const handleTitleChange = (event, index) => {
+    const { value } = event.target;
+    const gender = value === "Mr" ? "MALE" : "FEMALE";
+
+    setPassengerData((prev) => ({
+      ...prev,
+      [`title_${index}`]: value,
+      [`gender_${index}`]: gender,
+    }));
+  };
+
+  const handleDateChange = (field, value, index) => {
+    if (value) {
+      const formattedDate =
+        field === "expiredDate"
+          ? dayjs(value).endOf("day").toISOString()
+          : dayjs(value).startOf("day").toISOString();
+
+      setPassengerData((prev) => ({
+        ...prev,
+        [`${field}_${index}`]: formattedDate,
+      }));
+    }
+  };
+
+  const handleSwitchChange = (e, index) => {
+    setPassengerData((prev) => ({
+      ...prev,
+      [`hasFamilyName_${index}`]: e.target.checked,
+    }));
+  };
+
+  const handleChangePI = (event, index) => {
+    const { value } = event.target;
+
+    setPassengerData((prev) => ({
+      ...prev,
+      [`passagerId_${index}`]: value,
+    }));
   };
 
   const validateForm = () => {
-    const requiredFields = [
-      "name",
-      "phoneNumber",
-      "email",
-      "title",
-      "dob",
-    ];
-    if (hasFamilyName) {
-      requiredFields.push("familyName");
-    }
-    if (passagerId === "KTP") {
-      requiredFields.push("identityNumber"); 
-    } else if (passagerId === "Paspor") {
-      requiredFields.push("identityNumber", "countryOfIssue", "expiredDate"); 
-    }
-    if (selectedSeats.length !== passengerCount) {
-      toast.error(`Anda harus memilih ${passengerCount} kursi!`);
-      return false;
-    }
-    
-    const emptyFields = requiredFields.filter((field) => {
-      return !orderData[field] && !passengerData[field];
-    });
+    for (let { index } of passengers) {
+      let requiredFields = ["name", "title", "dob"];
 
-    if (emptyFields.length > 0) {
-      emptyFields.forEach((field) =>
-        toast.error(`Field ${field} tidak boleh kosong!`)
-      );
-      setIsFormValid(false);
+      if (passengerData[`hasFamilyName_${index}`]) {
+        requiredFields.push("familyName");
+      }
+      const passagerId = passengerData[`passagerId_${index}`];
+      if (passagerId === "KTP") {
+        requiredFields.push("identityNumber");
+      } else if (passagerId === "Paspor") {
+        requiredFields.push("identityNumber", "countryOfIssue", "expiredDate");
+      }
+
+      const passengerRequiredFields = requiredFields
+        .map((field) => (passengerData[`${field}_${index}`] ? null : field))
+        .filter(Boolean);
+
+      if (passengerRequiredFields.length > 0) {
+        passengerRequiredFields.forEach((field) =>
+          toast.error(
+            `Field ${field} untuk Penumpang ${index +1} tidak boleh kosong!`
+          )
+        );
+        return false; 
+    }
+
+    if (selectedSeats.length !== totalSeat) {
+      toast.error(`Anda harus memilih ${totalSeat} kursi!`);
       return false;
     }
-    setIsFormValid(true);
+
     return true;
-  };
+  }};
 
+  const { data: flight } = useQuery({
+    queryKey: ["flight", flightId],
+    queryFn: () => getFlightId(flightId),
+    enabled: !!flightId,
+  });
 
   const { mutate: booking } = useMutation({
-    mutationFn: (booking) => createBooking(booking),
+    mutationFn: (request) => createBooking(request),
     onSuccess: () => {
-      toast.success("Data berhasil disimpan.", {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      toast.success("Data berhasil disimpan.");
       setIsSaved(true);
       //merubah boxtimer menjadi hijau dan "data berhasil dirubah"
     },
     onError: (error) => {
-      toast.error(`Terjadi kesalahan: ${error.message}`, {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      toast.error(`Terjadi kesalahan: ${error.message}`);
       setIsSaved(false);
     },
   });
 
   const onSubmit = async (event) => {
     event.preventDefault();
+    const bookingDate = new Date().toISOString();
+
     if (!validateForm()) {
       return;
     }
-    console.log("Order Data:", orderData);
+
     console.log("Passenger Data:", passengerData);
     console.log("Kursi yang dipilih:", selectedSeats);
-    
 
     setIsSaved(true);
 
-    toast.info("Form berhasil divalidasi, mengirim data...", {
-      position: "top-right",
-      autoClose: 3000,
-    });
+    const bookingDetail = passengers.map(({ index, type }, seatIndex) => ({
+      seatId: selectedSeats[seatIndex] || 0,
+      price: flight?.data?.price || 0,
+      passenger: {
+        name: passengerData[`name_${index}`] || "",
+        familyName: passengerData[`familyName_${index}`] || "",
+        gender: passengerData[`gender_${index}`] || "",
+        identityNumber: passengerData[`identityNumber_${index}`] || 0,
+        citizenship: passengerData[`citizenship_${index}`] || "Indonesia",
+        countryOfIssue: passengerData[`countryOfIssue_${index}`] || "Indonesia",
+        title: passengerData[`title_${index}`] || "",
+        dob: passengerData[`dob_${index}`] || "",
+        expiredDate: passengerData[`expiredDate_${index}`] || "0",
+        type,
+      },
+    }));
 
     const request = {
-      orderData,
-      passengerData,
-      selectedSeats,
+      flightId,
+      returnFlightId: null,
+      bookingDate,
+      bookingDetail,
     };
+
+    console.log(request);
+    console.log("Request dalam format JSON:", JSON.stringify(request, null, 2));
+
     booking(request);
   };
 
@@ -228,13 +305,18 @@ const handleDateChange = (field, value) => {
 
   return (
     <>
-      <ToastContainer />
+      <Toaster position="top-right" />
       <NavigationBar />
-      <NavbarBooking />
-      <div className="container my-4">
-        <div className="row">
-          <div className="col-sm-12 col-md-12 col-lg-7 col-xl-6 d-flex align-items-center flex-column">
-            <form className="p-3" onSubmit={onSubmit}>
+      <NavbarBooking isSaved={isSaved} />
+      <Container className="py-4">
+        <Row className="justify-content-center">
+          <Col
+            sm={12}
+            md={12}
+            lg={7}
+            xl={6}
+          >
+            <form onSubmit={onSubmit}>
               {/* Card Pemesan */}
               <div className="mb-3 shadow-sm">
                 <Card style={{ width: "" }}>
@@ -267,64 +349,29 @@ const handleDateChange = (field, value) => {
                           <Form.Group>
                             <Form.Label>Nama Lengkap</Form.Label>
                             <Form.Control
-                              required
-                              type="text"
-                              placeholder="Nama Lengkap"
-                              name="name"
-                              value={orderData.name}
-                              onChange={handleOrderChange}
+                              value={user?.firstName}
                               className="custom-input"
-                              disabled={isSaved}
+                              disabled={!!user?.firstName}
                             />
                           </Form.Group>
                         </Row>
-                        <Row className="mb-3 align-items-center">
-                          <Form.Group
-                            as={Col}
-                            controlId="switchFamilyName"
-                            className="d-flex justify-content-between"
-                          >
-                            <Form.Label
-                              style={{ color: "black", fontWeight: "normal" }}
-                            >
-                              Punya nama keluarga?
-                            </Form.Label>
-                            <IOSSwitch
-                              checked={hasFamilyName}
-                              onChange={handleSwitchChange}
-                              disabled={isSaved}
+                        <Row className="mb-3">
+                          <Form.Group>
+                            <Form.Label>Nama Belakang</Form.Label>
+                            <Form.Control
+                              value={user?.lastName}
+                              className="custom-input"
+                              disabled={!!user?.lastName}
                             />
                           </Form.Group>
                         </Row>
-                        {hasFamilyName && (
-                          <Row className="mb-3">
-                            <Form.Group>
-                              <Form.Label>Nama Keluarga</Form.Label>
-                              <Form.Control
-                                required
-                                type="text"
-                                placeholder="Nama Keluarga"
-                                name="familyName"
-                                value={orderData.familyName}
-                                onChange={handleOrderChange}
-                                disabled={isSaved}
-                                className="custom-input"
-                              />
-                            </Form.Group>
-                          </Row>
-                        )}
                         <Row className="mb-3">
                           <Form.Group>
                             <Form.Label>Nomor Telepon</Form.Label>
                             <Form.Control
-                              required
-                              type="text"
-                              placeholder="Nomor Telepon"
-                              name="phoneNumber"
-                              value={orderData.phoneNumber}
-                              onChange={handleOrderChange}
+                              value={user?.phone}
                               className="custom-input"
-                              disabled={isSaved}
+                              disabled={!!user?.phone}
                             />
                           </Form.Group>
                         </Row>
@@ -332,14 +379,9 @@ const handleDateChange = (field, value) => {
                           <Form.Group as={Col} controlId="validationCustom01">
                             <Form.Label>Email</Form.Label>
                             <Form.Control
-                              required
-                              type="email"
-                              placeholder="Email"
-                              name="email"
-                              value={orderData.email}
-                              onChange={handleOrderChange}
+                              value={user?.email}
                               className="custom-input"
-                              disabled={isSaved}
+                              disabled={!!user?.email}
                             />
                           </Form.Group>
                         </Row>
@@ -356,203 +398,172 @@ const handleDateChange = (field, value) => {
                     <Card.Title>
                       <b>Isi Data Penumpang</b>
                     </Card.Title>
-                    {/* {passengers?.length !== 0 && passengers.map(passengers, index)=>(
-            <div key={index}> 
-
-            masukin card
-            Data Diri Pemesan {index + 1} - {passanger.type}
-
-            </div>
-          )} */}
-                    <Card style={{ border: "none" }}>
-                      <Card.Header
-                        className="text-white"
-                        style={{ background: "#3C3C3C" }}
-                      >
-                        Data Diri Pemesan 1 -Adult
-                        {isSaved && (
-                          <div
-                            className="fa fa-check-circle"
-                            style={{
-                              color: "#73CA5C",
-                              fontSize: "20px",
-                              position: "absolute",
-                              right: "10px",
-                            }}
-                          ></div>
-                        )}
-                      </Card.Header>
-                      <Card.Body
-                        style={{ color: "purple", fontWeight: "bold" }}
-                      >
-                        <Row className="mb-3">
-                          <Form.Group>
-                            <Form.Label>Title</Form.Label>
-                            <Col>
-                              <Select
-                                name="title"
-                                value={passengerData.title}
-                                onChange={(event) =>
-                                  setPassengerData((prev) => ({
-                                    ...prev,
-                                    title: event.target.value,
-                                  }))
-                                }
-                                fullWidth
-                                sx={{
-                                  width: "100%",
-                                  height: "40px",
-                                  border: "none",
-                                }}
-                                disabled={isSaved}
-                              >
-                                <MenuItem value="Mr.">Mr.</MenuItem>
-                                <MenuItem value="Ms.">Ms.</MenuItem>
-                                <MenuItem value="Mrs.">Mrs.</MenuItem>
-                              </Select>
-                            </Col>
-                          </Form.Group>
-                        </Row>
-                        <Row className="mb-3">
-                          <Form.Group>
-                            <Form.Label>Nama Lengkap</Form.Label>
-                            <Form.Control
-                              required
-                              type="text"
-                              placeholder="Nama Lengkap"
-                              name="name"
-                              value={passengerData.name}
-                              onChange={handlePassengerChange}
-                              className="custom-input"
-                              disabled={isSaved}
-                            />
-                          </Form.Group>
-                        </Row>
-                        <Row className="mb-3 align-items-center">
-                          <Form.Group
-                            as={Col}
-                            controlId="switchFamilyName"
-                            className="d-flex justify-content-between"
+                    {passengers.map(({ index, type }) => (
+                      <div key={index}>
+                        <Card style={{ border: "none" }}>
+                          <Card.Header
+                            className="text-white"
+                            style={{ background: "#3C3C3C" }}
                           >
-                            <Form.Label
-                              style={{ color: "black", fontWeight: "normal" }}
-                            >
-                              Punya nama keluarga?
-                            </Form.Label>
-                            <IOSSwitch
-                              checked={hasFamilyName}
-                              onChange={handleSwitchChange}
-                              disabled={isSaved}
-                            />
-                          </Form.Group>
-                        </Row>
-                        {hasFamilyName && (
-                          <Row className="mb-3">
-                            <Form.Group as={Col} controlId="validationCustom01">
-                              <Form.Label>Nama Keluarga</Form.Label>
-                              <Form.Control
-                                required
-                                type="text"
-                                placeholder="Nama Keluarga"
-                                name="familyName"
-                                value={passengerData.familyName}
-                                onChange={handlePassengerChange}
-                                disabled={isSaved}
-                                className="custom-input"
-                              />
-                            </Form.Group>
-                          </Row>
-                        )}
-                        <Row className="mb-3">
-                          <Form.Group as={Col} controlId="validationCustom01">
-                            <Form.Label>Tanggal Lahir</Form.Label>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                              <DatePicker
-                                sx={{ width: "100%" }}
-                                value={
-                                  passengerData.dob
-                                    ? dayjs(passengerData.dob)
-                                    : null
-                                }
-                                onChange={(value) =>
-                                  handleDateChange("dob", value)
-                                }
-                                disabled={isSaved}
-                              />
-                            </LocalizationProvider>
-                          </Form.Group>
-                        </Row>
-                        <Row className="mb-3">
-                          <Form.Group as={Col} controlId="validationCustom01">
-                            <Form.Label>Kewarganegaraan</Form.Label>
-                            <Form.Control
-                              required
-                              type="text"
-                              name="citizenship"
-                              value={passengerData.citizenship}
-                              onChange={handlePassengerChange}
-                              className="custom-input"
-                              disabled={isSaved}
-                            />
-                          </Form.Group>
-                        </Row>
-                        <Row className="mb-3">
-                          <Form.Group>
-                            <Form.Label>KTP/Paspor</Form.Label>
-                            <Col>
-                              <Select
-                                value={passagerId}
-                                onChange={handleChangePI}
-                                fullWidth
-                                defaultValue="KTP"
-                                sx={{
-                                  width: "100%",
-                                  height: "40px",
-                                  border: "none",
-                                  borderRadius: "7px",
+                            Data Diri Pemesan {index + 1} - {type}
+                            {isSaved && (
+                              <div
+                                className="fa fa-check-circle"
+                                style={{
+                                  color: "#73CA5C",
+                                  fontSize: "20px",
+                                  position: "absolute",
+                                  right: "10px",
                                 }}
-                                disabled={isSaved}
+                              ></div>
+                            )}
+                          </Card.Header>
+                          <Card.Body
+                            style={{ color: "purple", fontWeight: "bold" }}
+                          >
+                            <Row className="mb-3">
+                              <Form.Group>
+                                <Form.Label>Title</Form.Label>
+                                <Col>
+                                  <Select
+                                    name={`title_${index}`}
+                                    value={
+                                      passengerData[`title_${index}`] || ""
+                                    }
+                                    onChange={(event) =>
+                                      handleTitleChange(event, index)
+                                    }
+                                    fullWidth
+                                    sx={{
+                                      width: "100%",
+                                      height: "40px",
+                                      border: "none",
+                                    }}
+                                    disabled={isSaved}
+                                  >
+                                    <MenuItem value="Mr">Mr</MenuItem>
+                                    <MenuItem value="Mrs">Mrs</MenuItem>
+                                  </Select>
+                                </Col>
+                              </Form.Group>
+                            </Row>
+                            <Row className="mb-3">
+                              <Form.Group>
+                                <Form.Label>Nama Lengkap</Form.Label>
+                                <Form.Control
+                                  required
+                                  type="text"
+                                  placeholder="Nama Lengkap"
+                                  name={`name_${index}`}
+                                  value={passengerData[`name_${index}`] || ""}
+                                  onChange={handlePassengerChange}
+                                  className="custom-input"
+                                  disabled={isSaved}
+                                />
+                              </Form.Group>
+                            </Row>
+                            <Row className="mb-3 align-items-center">
+                              <Form.Group
+                                as={Col}
+                                controlId="switchFamilyName"
+                                className="d-flex justify-content-between"
                               >
-                                <MenuItem value="KTP">KTP</MenuItem>
-                                <MenuItem value="Paspor">Paspor</MenuItem>
-                              </Select>
-                            </Col>
-                          </Form.Group>
-                        </Row>
-                        <Row className="mb-3">
-                          <Form.Group>
-                            <Form.Label>Nomor ID</Form.Label>
-                            <Form.Control
-                              required
-                              type="text"
-                              placeholder="Nomor ID"
-                              name="identityNumber"
-                              value={passengerData.identityNumber}
-                              onChange={handlePassengerChange}
-                              className="custom-input"
-                              disabled={isSaved}
-                            />
-                          </Form.Group>
-                        </Row>
-                        {passagerId === "Paspor" && (
-                          <>
-                            <Row className="mb-3 ">
+                                <Form.Label
+                                  style={{
+                                    color: "black",
+                                    fontWeight: "normal",
+                                  }}
+                                >
+                                  Punya nama keluarga?
+                                </Form.Label>
+                                <IOSSwitch
+                                  checked={
+                                    passengerData[`hasFamilyName_${index}`] ||
+                                    false
+                                  }
+                                  onChange={(e) => handleSwitchChange(e, index)}
+                                  disabled={isSaved}
+                                />
+                              </Form.Group>
+                            </Row>
+                            {passengerData[`hasFamilyName_${index}`] && (
+                              <Row className="mb-3">
+                                <Form.Group
+                                  as={Col}
+                                  controlId="validationCustom01"
+                                >
+                                  <Form.Label>Nama Keluarga</Form.Label>
+                                  <Form.Control
+                                    required
+                                    type="text"
+                                    placeholder="Nama Keluarga"
+                                    name={`familyName_${index}`}
+                                    value={
+                                      passengerData[`familyName_${index}`] || ""
+                                    }
+                                    onChange={handlePassengerChange}
+                                    disabled={isSaved}
+                                    className="custom-input"
+                                  />
+                                </Form.Group>
+                              </Row>
+                            )}
+                            <Row className="mb-3">
                               <Form.Group
                                 as={Col}
                                 controlId="validationCustom01"
                               >
-                                <Form.Label>Negara Penerbit</Form.Label>
+                                <Form.Label>Tanggal Lahir</Form.Label>
+                                <LocalizationProvider
+                                  dateAdapter={AdapterDayjs}
+                                >
+                                  <DatePicker
+                                    sx={{ width: "100%" }}
+                                    value={
+                                      dayjs(passengerData[`dob_${index}`]) ||
+                                      null
+                                    }
+                                    onChange={(value) =>
+                                      handleDateChange("dob", value, index)
+                                    }
+                                    disabled={isSaved}
+                                  />
+                                </LocalizationProvider>
+                              </Form.Group>
+                            </Row>
+                            <Row className="mb-3">
+                              <Form.Group
+                                as={Col}
+                                controlId="validationCustom01"
+                              >
+                                <Form.Label>Kewarganegaraan</Form.Label>
+                                <Form.Control
+                                  required
+                                  type="text"
+                                  name={`citizenship_${index}`}
+                                  value={
+                                    passengerData[`citizenship_${index}`] || ""
+                                  }
+                                  onChange={handlePassengerChange}
+                                  className="custom-input"
+                                  disabled={isSaved}
+                                />
+                              </Form.Group>
+                            </Row>
+                            <Row className="mb-3">
+                              <Form.Group>
+                                <Form.Label>KTP/Paspor</Form.Label>
                                 <Col>
                                   <Select
-                                    name="countryOfIssue"
-                                    value={passengerData.countryOfIssue}
+                                    value={
+                                      passengerData[`passagerId_${index}`] ||
+                                      "KTP"
+                                    }
                                     onChange={(event) =>
-                                      setPassengerData((prev) => ({
-                                        ...prev,
-                                        countryOfIssue: event.target.value,
-                                      }))
+                                      handleChangePI(event, index)
                                     }
                                     fullWidth
+                                    defaultValue="KTP"
                                     sx={{
                                       width: "100%",
                                       height: "40px",
@@ -561,143 +572,242 @@ const handleDateChange = (field, value) => {
                                     }}
                                     disabled={isSaved}
                                   >
-                                    <MenuItem value="Afghanistan">
-                                      Afghanistan
-                                    </MenuItem>
-                                    <MenuItem value="Argentina">
-                                      Argentina
-                                    </MenuItem>
-                                    <MenuItem value="Australia">
-                                      Australia
-                                    </MenuItem>
-                                    <MenuItem value="Austria">Austria</MenuItem>
-                                    <MenuItem value="Bahrain">Bahrain</MenuItem>
-                                    <MenuItem value="Bangladesh">
-                                      Bangladesh
-                                    </MenuItem>
-                                    <MenuItem value="Bhutan">Bhutan</MenuItem>
-                                    <MenuItem value="Bolivia">Bolivia</MenuItem>
-                                    <MenuItem value="Brazil">Brazil</MenuItem>
-                                    <MenuItem value="Brunei">Brunei</MenuItem>
-                                    <MenuItem value="Bulgaria">
-                                      Bulgaria
-                                    </MenuItem>
-                                    <MenuItem value="Cambodia">
-                                      Cambodia
-                                    </MenuItem>
-                                    <MenuItem value="Canada">Canada</MenuItem>
-                                    <MenuItem value="China">China</MenuItem>
-                                    <MenuItem value="Colombia">
-                                      Colombia
-                                    </MenuItem>
-                                    <MenuItem value="Denmark">Denmark</MenuItem>
-                                    <MenuItem value="Egypt">Egypt</MenuItem>
-                                    <MenuItem value="Finland">Finland</MenuItem>
-                                    <MenuItem value="France">France</MenuItem>
-                                    <MenuItem value="Germany">Germany</MenuItem>
-                                    <MenuItem value="India">India</MenuItem>
-                                    <MenuItem value="Indonesia">
-                                      Indonesia
-                                    </MenuItem>
-                                    <MenuItem value="Iran">Iran</MenuItem>
-                                    <MenuItem value="Iraq">Iraq</MenuItem>
-                                    <MenuItem value="Italy">Italy</MenuItem>
-                                    <MenuItem value="Japan">Japan</MenuItem>
-                                    <MenuItem value="Jordan">Jordan</MenuItem>
-                                    <MenuItem value="Kazakhstan">
-                                      Kazakhstan
-                                    </MenuItem>
-                                    <MenuItem value="Korea (North)">
-                                      Korea (North)
-                                    </MenuItem>
-                                    <MenuItem value="Korea (South)">
-                                      Korea (South)
-                                    </MenuItem>
-                                    <MenuItem value="Kuwait">Kuwait</MenuItem>
-                                    <MenuItem value="Laos">Laos</MenuItem>
-                                    <MenuItem value="Malaysia">
-                                      Malaysia
-                                    </MenuItem>
-                                    <MenuItem value="Maldives">
-                                      Maldives
-                                    </MenuItem>
-                                    <MenuItem value="Mexico">Mexico</MenuItem>
-                                    <MenuItem value="Monaco">Monaco</MenuItem>
-                                    <MenuItem value="Myanmar (Burma)">
-                                      Myanmar (Burma)
-                                    </MenuItem>
-                                    <MenuItem value="Nepal">Nepal</MenuItem>
-                                    <MenuItem value="Oman">Oman</MenuItem>
-                                    <MenuItem value="Pakistan">
-                                      Pakistan
-                                    </MenuItem>
-                                    <MenuItem value="Philippines">
-                                      Philippines
-                                    </MenuItem>
-                                    <MenuItem value="Qatar">Qatar</MenuItem>
-                                    <MenuItem value="Russia">Russia</MenuItem>
-                                    <MenuItem value="Saudi Arabia">
-                                      Saudi Arabia
-                                    </MenuItem>
-                                    <MenuItem value="Singapore">
-                                      Singapore
-                                    </MenuItem>
-                                    <MenuItem value="Spain">Spain</MenuItem>
-                                    <MenuItem value="Sri Lanka">
-                                      Sri Lanka
-                                    </MenuItem>
-                                    <MenuItem value="Thailand">
-                                      Thailand
-                                    </MenuItem>
-                                    <MenuItem value="Turkey">Turkey</MenuItem>
-                                    <MenuItem value="United Arab Emirates">
-                                      United Arab Emirates
-                                    </MenuItem>
-                                    <MenuItem value="United Kingdom">
-                                      United Kingdom
-                                    </MenuItem>
-                                    <MenuItem value="United States">
-                                      United States
-                                    </MenuItem>
-                                    <MenuItem value="Uzbekistan">
-                                      Uzbekistan
-                                    </MenuItem>
-                                    <MenuItem value="Vietnam">Vietnam</MenuItem>
-                                    <MenuItem value="Yemen">Yemen</MenuItem>
-                                    <MenuItem value="Zambia">Zambia</MenuItem>
-                                    <MenuItem value="Zimbabwe">
-                                      Zimbabwe
-                                    </MenuItem>
+                                    <MenuItem value="KTP">KTP</MenuItem>
+                                    <MenuItem value="Paspor">Paspor</MenuItem>
                                   </Select>
                                 </Col>
                               </Form.Group>
                             </Row>
-
                             <Row className="mb-3">
                               <Form.Group>
-                                <Form.Label>Berlaku Sampai</Form.Label>
-                                <LocalizationProvider
-                                  dateAdapter={AdapterDayjs}
-                                >
-                                  <DatePicker
-                                    sx={{ width: "100%" }}
-                                    value={
-                                      passengerData.expiredDate
-                                        ? dayjs(passengerData.expiredDate)
-                                        : null
-                                    }
-                                    onChange={(value) =>
-                                      handleDateChange("expiredDate", value)
-                                    }
-                                    disabled={isSaved}
-                                  />
-                                </LocalizationProvider>
+                                <Form.Label>Nomor ID</Form.Label>
+                                <Form.Control
+                                  required
+                                  type="text"
+                                  placeholder="Nomor ID"
+                                  name={`identityNumber_${index}`}
+                                  value={
+                                    passengerData[`identityNumber_${index}`] ||
+                                    ""
+                                  }
+                                  onChange={handlePassengerChange}
+                                  className="custom-input"
+                                  disabled={isSaved}
+                                />
                               </Form.Group>
                             </Row>
-                          </>
-                        )}
-                      </Card.Body>
-                    </Card>
+                            {passengerData[`passagerId_${index}`] ===
+                              "Paspor" && (
+                              <>
+                                <Row className="mb-3 ">
+                                  <Form.Group>
+                                    <Form.Label>Negara Penerbit</Form.Label>
+                                    <Col>
+                                      <Select
+                                        name={`countryOfIssue_${index}`}
+                                        value={
+                                          passengerData[
+                                            `countryOfIssue_${index}`
+                                          ] || ""
+                                        }
+                                        onChange={(event) =>
+                                          setPassengerData((prev) => ({
+                                            ...prev,
+                                            [`countryOfIssue_${index}`]:
+                                              event.target.value,
+                                          }))
+                                        }
+                                        fullWidth
+                                        sx={{
+                                          width: "100%",
+                                          height: "40px",
+                                          border: "none",
+                                          borderRadius: "7px",
+                                        }}
+                                        disabled={isSaved}
+                                      >
+                                        <MenuItem value="Afghanistan">
+                                          Afghanistan
+                                        </MenuItem>
+                                        <MenuItem value="Argentina">
+                                          Argentina
+                                        </MenuItem>
+                                        <MenuItem value="Australia">
+                                          Australia
+                                        </MenuItem>
+                                        <MenuItem value="Austria">
+                                          Austria
+                                        </MenuItem>
+                                        <MenuItem value="Bahrain">
+                                          Bahrain
+                                        </MenuItem>
+                                        <MenuItem value="Bangladesh">
+                                          Bangladesh
+                                        </MenuItem>
+                                        <MenuItem value="Bhutan">
+                                          Bhutan
+                                        </MenuItem>
+                                        <MenuItem value="Bolivia">
+                                          Bolivia
+                                        </MenuItem>
+                                        <MenuItem value="Brazil">
+                                          Brazil
+                                        </MenuItem>
+                                        <MenuItem value="Brunei">
+                                          Brunei
+                                        </MenuItem>
+                                        <MenuItem value="Bulgaria">
+                                          Bulgaria
+                                        </MenuItem>
+                                        <MenuItem value="Cambodia">
+                                          Cambodia
+                                        </MenuItem>
+                                        <MenuItem value="Canada">
+                                          Canada
+                                        </MenuItem>
+                                        <MenuItem value="China">China</MenuItem>
+                                        <MenuItem value="Colombia">
+                                          Colombia
+                                        </MenuItem>
+                                        <MenuItem value="Denmark">
+                                          Denmark
+                                        </MenuItem>
+                                        <MenuItem value="Egypt">Egypt</MenuItem>
+                                        <MenuItem value="Finland">
+                                          Finland
+                                        </MenuItem>
+                                        <MenuItem value="France">
+                                          France
+                                        </MenuItem>
+                                        <MenuItem value="Germany">
+                                          Germany
+                                        </MenuItem>
+                                        <MenuItem value="India">India</MenuItem>
+                                        <MenuItem value="Indonesia">
+                                          Indonesia
+                                        </MenuItem>
+                                        <MenuItem value="Iran">Iran</MenuItem>
+                                        <MenuItem value="Iraq">Iraq</MenuItem>
+                                        <MenuItem value="Italy">Italy</MenuItem>
+                                        <MenuItem value="Japan">Japan</MenuItem>
+                                        <MenuItem value="Jordan">
+                                          Jordan
+                                        </MenuItem>
+                                        <MenuItem value="Kazakhstan">
+                                          Kazakhstan
+                                        </MenuItem>
+                                        <MenuItem value="Korea (North)">
+                                          Korea (North)
+                                        </MenuItem>
+                                        <MenuItem value="Korea (South)">
+                                          Korea (South)
+                                        </MenuItem>
+                                        <MenuItem value="Kuwait">
+                                          Kuwait
+                                        </MenuItem>
+                                        <MenuItem value="Laos">Laos</MenuItem>
+                                        <MenuItem value="Malaysia">
+                                          Malaysia
+                                        </MenuItem>
+                                        <MenuItem value="Maldives">
+                                          Maldives
+                                        </MenuItem>
+                                        <MenuItem value="Mexico">
+                                          Mexico
+                                        </MenuItem>
+                                        <MenuItem value="Monaco">
+                                          Monaco
+                                        </MenuItem>
+                                        <MenuItem value="Myanmar (Burma)">
+                                          Myanmar (Burma)
+                                        </MenuItem>
+                                        <MenuItem value="Nepal">Nepal</MenuItem>
+                                        <MenuItem value="Oman">Oman</MenuItem>
+                                        <MenuItem value="Pakistan">
+                                          Pakistan
+                                        </MenuItem>
+                                        <MenuItem value="Philippines">
+                                          Philippines
+                                        </MenuItem>
+                                        <MenuItem value="Qatar">Qatar</MenuItem>
+                                        <MenuItem value="Russia">
+                                          Russia
+                                        </MenuItem>
+                                        <MenuItem value="Saudi Arabia">
+                                          Saudi Arabia
+                                        </MenuItem>
+                                        <MenuItem value="Singapore">
+                                          Singapore
+                                        </MenuItem>
+                                        <MenuItem value="Spain">Spain</MenuItem>
+                                        <MenuItem value="Sri Lanka">
+                                          Sri Lanka
+                                        </MenuItem>
+                                        <MenuItem value="Thailand">
+                                          Thailand
+                                        </MenuItem>
+                                        <MenuItem value="Turkey">
+                                          Turkey
+                                        </MenuItem>
+                                        <MenuItem value="United Arab Emirates">
+                                          United Arab Emirates
+                                        </MenuItem>
+                                        <MenuItem value="United Kingdom">
+                                          United Kingdom
+                                        </MenuItem>
+                                        <MenuItem value="United States">
+                                          United States
+                                        </MenuItem>
+                                        <MenuItem value="Uzbekistan">
+                                          Uzbekistan
+                                        </MenuItem>
+                                        <MenuItem value="Vietnam">
+                                          Vietnam
+                                        </MenuItem>
+                                        <MenuItem value="Yemen">Yemen</MenuItem>
+                                        <MenuItem value="Zambia">
+                                          Zambia
+                                        </MenuItem>
+                                        <MenuItem value="Zimbabwe">
+                                          Zimbabwe
+                                        </MenuItem>
+                                      </Select>
+                                    </Col>
+                                  </Form.Group>
+                                </Row>
+                                <Row className="mb-3">
+                                  <Form.Group>
+                                    <Form.Label>Berlaku Sampai</Form.Label>
+                                    <LocalizationProvider
+                                      dateAdapter={AdapterDayjs}
+                                    >
+                                      <DatePicker
+                                        sx={{ width: "100%" }}
+                                        value={
+                                          dayjs(
+                                            passengerData[
+                                              `expiredDate_${index}`
+                                            ]
+                                          ) || null
+                                        }
+                                        onChange={(value) =>
+                                          handleDateChange(
+                                            "expiredDate",
+                                            value,
+                                            index
+                                          )
+                                        }
+                                        disabled={isSaved}
+                                      />
+                                    </LocalizationProvider>
+                                  </Form.Group>
+                                </Row>
+                              </>
+                            )}
+                          </Card.Body>
+                        </Card>
+                      </div>
+                    ))}
                   </Card.Body>
                 </Card>
               </div>
@@ -729,14 +839,14 @@ const handleDateChange = (field, value) => {
                     <SeatMap
                       selectedSeats={selectedSeats}
                       setSelectedSeats={setSelectedSeats}
-                      passengerCount={passengerCount}
+                      totalSeat={totalSeat}
                     />
                   </Card.Body>
                 </Card>
               </div>
 
               {/* Button save */}
-              <div className="mb-3 shadow-sm">
+              <div className="shadow-sm">
                 <div className="d-flex justify-content-center">
                   <Button
                     type="submit"
@@ -756,15 +866,23 @@ const handleDateChange = (field, value) => {
                 </div>
               </div>
             </form>
-          </div>
+          </Col>
 
           {/* Card detail booking */}
-          <div className="col-sm-12 col-md-12 col-lg-5 col-xl-4 d-flex align-items-center flex-column">
-            {/* <FlightDetailCard /> */}
-            <TicketDetails />
-          </div>
-        </div>
-      </div>
+          <Col
+            sm={12}
+            md={12}
+            lg={5}
+            xl={4}
+          >
+            <Card className="shadow-sm ">
+              <Card.Body>
+                <TicketDetails />
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
       <Footer />
     </>
   );
