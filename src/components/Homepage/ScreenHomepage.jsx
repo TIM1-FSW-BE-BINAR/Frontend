@@ -23,7 +23,6 @@ import babyIcon from "../../assets/homepage/icon/baby-icon.png";
 import plusIcon from "../../assets/homepage/icon/plus-icon.png";
 import minusIcon from "../../assets/homepage/icon/minus-icon.png";
 import selectedIcon from "../../assets/homepage/icon/selected-icon.png";
-import cardImg from "../../assets/homepage/card-img.png";
 import { FaSearch } from "react-icons/fa";
 import HomepageModal from "./HomepageModal";
 import { useEffect, useState } from "react";
@@ -36,8 +35,6 @@ import toast, { Toaster } from "react-hot-toast";
 
 import { useQuery } from "@tanstack/react-query";
 import { getFlights } from "../../service/flight/flightService";
-import { getAirlines } from "../../service/airline/airlineService";
-import { getAirports } from "../../service/airport/airportService";
 import { useNavigate } from "@tanstack/react-router";
 
 const ScreenHomepage = () => {
@@ -227,6 +224,33 @@ const Homepage = () => {
     const year = date.getFullYear(); // Mendapatkan tahun (2024)
     return `${day} ${month} ${year}`;
   };
+
+  const departureDateFormat = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0];
+  };
+  const classInputFormat = (flightClass) => {
+    if(flightClass === "FIRST"){
+      flightClass = "First Class";
+    }else if(flightClass === "PREMIUM_ECONOMY"){
+      flightClass = "Premium Economy";
+    }
+    return flightClass;
+  }
+
+  const handleFlightSelect = (flightSelect) => {
+    const fromInputSelect = `${flightSelect.departure.city}-${flightSelect.departure.code}`;
+    const toInputSelect = `${flightSelect.arrival.city}-${flightSelect.arrival.code}`;
+    const departureDateSelect = departureDateFormat(flightSelect.departureTime);
+    const classInputSelect = classInputFormat(flightSelect.class);
+    setFromInput(fromInputSelect);
+    setToInput(toInputSelect);
+    setDepartureDate(departureDateSelect);
+    setClassInput(classInputSelect);
+    toast("Form updated!", {
+      icon: "✈️",
+    });
+  }
 
   return (
     <>
@@ -431,7 +455,6 @@ const Homepage = () => {
                             <FormLabel>Departure</FormLabel>
                             <Form.Control
                               type="date"
-                              placeholder="1 Maret 2023"
                               className="custom-placeholder form-input"
                               value={departureDate}
                               onChange={(e) => setDepartureDate(e.target.value)}
@@ -965,7 +988,7 @@ const Homepage = () => {
           <Row className="g-3 mb-5">
             {flightsData?.map((flight, index) => (
               <Col key={index} xs={12} sm={6} md={4} lg={2} className="d-flex">
-                <Card className="custom-card">
+                <Card className="custom-card" onClick={() => handleFlightSelect(flight)}>
                   <div className="badge-container">
                     <span
                       className={`badge ${index % 2 === 0 ? "badge-limited" : "badge-discount"}`}
