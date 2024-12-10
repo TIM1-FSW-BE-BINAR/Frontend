@@ -5,6 +5,7 @@ import {
   Col,
   Row,
   Breadcrumb,
+  Stack,
 } from "react-bootstrap";
 import { useEffect } from "react";
 import {  useSelector } from "react-redux";
@@ -12,7 +13,7 @@ import {  useSelector } from "react-redux";
 import { useState } from "react";
 import "./NavbarBooking.css";
 
-const NavbarBooking = () => {
+const NavbarBooking = (isSaved) => {
   //const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -22,7 +23,7 @@ const NavbarBooking = () => {
   // State untuk melacak penyelesaian
   const [isDataDiriCompleted, setIsDataDiriCompleted] = useState(false);
   const [isBayarCompleted, setIsBayarCompleted] = useState(false);
-const [isSaved, setisSaved] = useState(false);
+  //const [isSaved, setisSaved] = useState(false);
   // Logika untuk menentukan apakah path aktif
   const isActive = (path) => location.pathname === path;
 
@@ -37,7 +38,6 @@ const [isSaved, setisSaved] = useState(false);
     }
   };
 
-  // Simulasikan penyelesaian tahap (di halaman lain, ini bisa diatur melalui props atau Redux)
   const completeDataDiri = () => setIsDataDiriCompleted(true);
   const completeBayar = () => setIsBayarCompleted(true);
 
@@ -96,7 +96,7 @@ const [isSaved, setisSaved] = useState(false);
         }}
       >
         <Container>
-          <Col>
+          <Stack gap={0}>
             <Row>
               <Breadcrumb>
                 <Breadcrumb.Item
@@ -163,25 +163,26 @@ const [isSaved, setisSaved] = useState(false);
                 </Breadcrumb.Item>
               </Breadcrumb>
             </Row>
+            
             <Row>
               <div>
                 {!token ? (
-                    <div
-                      style={{
-                        textAlign: "center",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <div id="black-overlay" className="vh-100"></div>
-                      <div id="box-timer">
-                        {"Anda harus login terlebih dahulu!"}
-                        <button onClick={handleOverlayClose} id="close-button">
-                          X
-                        </button>
-                      </div>
+                  <div
+                    style={{
+                      textAlign: "center",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <div id="black-overlay" className="vh-100"></div>
+                    <div id="box-timer">
+                      {"Anda harus login terlebih dahulu!"}
+                      <button onClick={handleOverlayClose} id="close-button">
+                        X
+                      </button>
                     </div>
-                ) : isSaved ?  (
+                  </div>
+                ) : !isSaved ? (
                   <Row>
                     <div id="box-timer" style={{ backgroundColor: "#73CA5C" }}>
                       <div style={{ justifyContent: "center" }}>
@@ -189,7 +190,7 @@ const [isSaved, setisSaved] = useState(false);
                       </div>
                     </div>
                   </Row>
-                ): (
+                ) : (
                   <div>
                     {timeLeft > 0 ? (
                       <div id="box-timer">
@@ -216,7 +217,7 @@ const [isSaved, setisSaved] = useState(false);
                 )}
               </div>
             </Row>
-          </Col>
+          </Stack>
         </Container>
       </Navbar>
     </>
