@@ -24,9 +24,9 @@ const OtpLazyImport = createFileRoute('/otp')()
 const NotificationLazyImport = createFileRoute('/notification')()
 const LoginLazyImport = createFileRoute('/login')()
 const HistoryLazyImport = createFileRoute('/history')()
+const BookingLazyImport = createFileRoute('/booking')()
 const AccountLazyImport = createFileRoute('/account')()
 const IndexLazyImport = createFileRoute('/')()
-const PemesananIndexLazyImport = createFileRoute('/Pemesanan/')()
 
 // Create/Update Routes
 
@@ -78,6 +78,12 @@ const HistoryLazyRoute = HistoryLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/history.lazy').then((d) => d.Route))
 
+const BookingLazyRoute = BookingLazyImport.update({
+  id: '/booking',
+  path: '/booking',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/booking.lazy').then((d) => d.Route))
+
 const AccountLazyRoute = AccountLazyImport.update({
   id: '/account',
   path: '/account',
@@ -89,14 +95,6 @@ const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
-
-const PemesananIndexLazyRoute = PemesananIndexLazyImport.update({
-  id: '/Pemesanan/',
-  path: '/Pemesanan/',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() =>
-  import('./routes/Pemesanan/index.lazy').then((d) => d.Route),
-)
 
 // Populate the FileRoutesByPath interface
 
@@ -114,6 +112,13 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/account'
       preLoaderRoute: typeof AccountLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/booking': {
+      id: '/booking'
+      path: '/booking'
+      fullPath: '/booking'
+      preLoaderRoute: typeof BookingLazyImport
       parentRoute: typeof rootRoute
     }
     '/history': {
@@ -172,13 +177,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchLazyImport
       parentRoute: typeof rootRoute
     }
-    '/Pemesanan/': {
-      id: '/Pemesanan/'
-      path: '/Pemesanan'
-      fullPath: '/Pemesanan'
-      preLoaderRoute: typeof PemesananIndexLazyImport
-      parentRoute: typeof rootRoute
-    }
   }
 }
 
@@ -187,6 +185,7 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/account': typeof AccountLazyRoute
+  '/booking': typeof BookingLazyRoute
   '/history': typeof HistoryLazyRoute
   '/login': typeof LoginLazyRoute
   '/notification': typeof NotificationLazyRoute
@@ -195,12 +194,12 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterLazyRoute
   '/resetPassword': typeof ResetPasswordLazyRoute
   '/search': typeof SearchLazyRoute
-  '/Pemesanan': typeof PemesananIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '/account': typeof AccountLazyRoute
+  '/booking': typeof BookingLazyRoute
   '/history': typeof HistoryLazyRoute
   '/login': typeof LoginLazyRoute
   '/notification': typeof NotificationLazyRoute
@@ -209,13 +208,13 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterLazyRoute
   '/resetPassword': typeof ResetPasswordLazyRoute
   '/search': typeof SearchLazyRoute
-  '/Pemesanan': typeof PemesananIndexLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
   '/account': typeof AccountLazyRoute
+  '/booking': typeof BookingLazyRoute
   '/history': typeof HistoryLazyRoute
   '/login': typeof LoginLazyRoute
   '/notification': typeof NotificationLazyRoute
@@ -224,7 +223,6 @@ export interface FileRoutesById {
   '/register': typeof RegisterLazyRoute
   '/resetPassword': typeof ResetPasswordLazyRoute
   '/search': typeof SearchLazyRoute
-  '/Pemesanan/': typeof PemesananIndexLazyRoute
 }
 
 export interface FileRouteTypes {
@@ -232,6 +230,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/account'
+    | '/booking'
     | '/history'
     | '/login'
     | '/notification'
@@ -240,11 +239,11 @@ export interface FileRouteTypes {
     | '/register'
     | '/resetPassword'
     | '/search'
-    | '/Pemesanan'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/account'
+    | '/booking'
     | '/history'
     | '/login'
     | '/notification'
@@ -253,11 +252,11 @@ export interface FileRouteTypes {
     | '/register'
     | '/resetPassword'
     | '/search'
-    | '/Pemesanan'
   id:
     | '__root__'
     | '/'
     | '/account'
+    | '/booking'
     | '/history'
     | '/login'
     | '/notification'
@@ -266,13 +265,13 @@ export interface FileRouteTypes {
     | '/register'
     | '/resetPassword'
     | '/search'
-    | '/Pemesanan/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   AccountLazyRoute: typeof AccountLazyRoute
+  BookingLazyRoute: typeof BookingLazyRoute
   HistoryLazyRoute: typeof HistoryLazyRoute
   LoginLazyRoute: typeof LoginLazyRoute
   NotificationLazyRoute: typeof NotificationLazyRoute
@@ -281,12 +280,12 @@ export interface RootRouteChildren {
   RegisterLazyRoute: typeof RegisterLazyRoute
   ResetPasswordLazyRoute: typeof ResetPasswordLazyRoute
   SearchLazyRoute: typeof SearchLazyRoute
-  PemesananIndexLazyRoute: typeof PemesananIndexLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   AccountLazyRoute: AccountLazyRoute,
+  BookingLazyRoute: BookingLazyRoute,
   HistoryLazyRoute: HistoryLazyRoute,
   LoginLazyRoute: LoginLazyRoute,
   NotificationLazyRoute: NotificationLazyRoute,
@@ -295,7 +294,6 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterLazyRoute: RegisterLazyRoute,
   ResetPasswordLazyRoute: ResetPasswordLazyRoute,
   SearchLazyRoute: SearchLazyRoute,
-  PemesananIndexLazyRoute: PemesananIndexLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -310,6 +308,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/account",
+        "/booking",
         "/history",
         "/login",
         "/notification",
@@ -317,8 +316,7 @@ export const routeTree = rootRoute
         "/payment",
         "/register",
         "/resetPassword",
-        "/search",
-        "/Pemesanan/"
+        "/search"
       ]
     },
     "/": {
@@ -326,6 +324,9 @@ export const routeTree = rootRoute
     },
     "/account": {
       "filePath": "account.lazy.jsx"
+    },
+    "/booking": {
+      "filePath": "booking.lazy.jsx"
     },
     "/history": {
       "filePath": "history.lazy.jsx"
@@ -350,9 +351,6 @@ export const routeTree = rootRoute
     },
     "/search": {
       "filePath": "search.lazy.jsx"
-    },
-    "/Pemesanan/": {
-      "filePath": "Pemesanan/index.lazy.jsx"
     }
   }
 }

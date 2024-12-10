@@ -97,6 +97,10 @@ const PaymentOptions = () => {
         <Col lg={5}>
           <Card className="shadow-sm ">
             <Card.Body>
+              <Card.Title className="text-secondary text-center">
+                Ticket Details
+              </Card.Title>
+              {/* Tambahkan detail tiket di sini */}
               <DetailPesanan />
             </Card.Body>
           </Card>
