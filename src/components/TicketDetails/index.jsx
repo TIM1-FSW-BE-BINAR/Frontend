@@ -1,8 +1,20 @@
-import {Card, Button, Col, Row } from "react-bootstrap";
+import { Card, Button } from "react-bootstrap";
 import PropTypes from "prop-types";
-import { getFlights } from "../../service/flight/flightService";
+import { getFlightId } from "../../service/flight/flightService";
+import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "@tanstack/react-router";
 
-const TicketDetails = ({ flight, airline }) => {
+const TicketDetails = () => {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+
+  const flightId = parseInt(searchParams.get("flightId"), 10) || 0;
+  const { data: flight } = useQuery({
+    queryKey: ["flight", flightId],
+    queryFn: () => getFlightId(flightId),
+    enabled: !!flightId,
+  });
+
   const parseDateAndTime = (isoString) => {
     if (!isoString) return { date: "", time: "" };
 
@@ -15,171 +27,151 @@ const TicketDetails = ({ flight, airline }) => {
     const formattedTime = date.toLocaleTimeString("id-ID", {
       hour: "2-digit",
       minute: "2-digit",
+      hour12: false,
     });
 
     return { date: formattedDate, time: formattedTime };
   };
-  const { dDate, dTime } = parseDateAndTime(flight?.departureTime);
-  const { aDate, aTime } = parseDateAndTime(flight?.arrivalTime);
+  const { date: departureDate, time: departureTime } = parseDateAndTime(
+    flight?.data?.departureTime
+  );
+  const { date: arrivalDate, time: arrivalTime } = parseDateAndTime(
+    flight?.data?.arrivalTime
+  );
+
   return (
-    <>
-      <div className="mt-3">
-        <Card style={{ border: "none" }} className="card ">
-          <Card.Body>
-            <div>
-              <Card.Title style={{ fontSize: "18px", marginBottom: "1px" }}>
-                <b>Detail Penerbangan</b>
-              </Card.Title>
-              <div className="d-flex justify-content-between">
-                <span>
-                  <b>07:00{dTime}</b>
-                </span>
-                <span
-                  style={{
-                    color: "#A06ECE",
-                    fontWeight: "bold",
-                    fontSize: "14px",
-                  }}
-                >
-                  Keberangkatan
-                </span>
-              </div>
-              <h6> 3 Maret 2023 {dDate}</h6>
-              <h6>
-                Soekarno Hatta - Terminal 1A Domestik
-                {flight?.departureAirport && flight?.terminal
-                  ? ` - ${flight.terminal}`
-                  : ""}
-              </h6>
-            </div>
-
-            <hr></hr>
-
-            <div>
-              <Row>
-                <div style={{ marginLeft: "26%" }}>
-                  <b>Jet Air-Economy{airline?.name}</b>
-                  <br></br>
-                  <b>
-                    JT-203
-                    {flight?.flightNumber}
-                    <br></br>
-                  </b>
-                  <br></br>
-                </div>
-              </Row>
-              <Row>
-                <Col className=" col-md-1" style={{ size: "10%" }}>
-                  <img src="../../public/img/logokkecil.png"></img>
-                  {/* {airline?.imageUrl} */}
-                </Col>
-                <Col className="col-lg-10">
-                  <b>Informasi: </b> <br></br>
-                  {flight?.information}
-                  Baggage 20 kg
-                  <br></br>
-                  {"Cabin Baggage 20 kg"}
-                  <br></br>
-                  {"in flight entertaiment"}
-                </Col>
-              </Row>
-            </div>
-
-            <hr></hr>
-
-            <div>
-              <div className="d-flex justify-content-between">
-                <span>
-                  <b>07:00{aTime}</b>
-                </span>
-                <span
-                  style={{
-                    color: "#A06ECE",
-                    fontWeight: "bold",
-                    fontSize: "14px",
-                  }}
-                >
-                  Kedatangan
-                </span>
-              </div>
-              <h6> 3 Maret 2023 {aDate}</h6>
-              <h6>Melbourne International Airport</h6>
-            </div>
-
-            <hr></hr>
-
-            <div>
-              <b>Rincian Harga</b>
-              <div className="d-flex justify-content-between">
-                <span>
-                  <h6>2 Adults{flight?.nick_name}</h6>
-                </span>
-                <span
-                  style={{
-                    fontSize: "16px",
-                  }}
-                >
-                  IDR 9.550.000
-                </span>
-              </div>
-              <div className="d-flex justify-content-between">
-                <span>
-                  <h6>1 Baby{flight?.nick_name}</h6>
-                </span>
-                <span
-                  style={{
-                    fontSize: "16px",
-                  }}
-                >
-                  IDR 0
-                </span>
-              </div>
-              <div className="d-flex justify-content-between">
-                <span>
-                  <h6>Tax{flight?.nick_name}</h6>
-                </span>
-                <span
-                  style={{
-                    fontSize: "16px",
-                  }}
-                >
-                  IDR 3.000.000
-                </span>
-              </div>
-            </div>
-
-            <hr></hr>
-
-            <div className="d-flex justify-content-between">
-              <span>
-                <h4>
-                  <b>Total{flight?.nick_name}</b>
-                </h4>
-              </span>
-              <span
-                style={{
-                  color: "#7126B5",
-                  fontWeight: "bold",
-                  fontSize: "20px",
-                }}
-              >
-                IDR 9.850.000
-              </span>
-            </div>
-
-            <Button
-              //href={`/flights/${flight?.id}`}
-              href={`/payment`}
-              variant="danger"
-              id="box-timer"
-              style={{ zIndex: "1" }}
-            >
-              Lanjut Bayar
-            </Button>
-          </Card.Body>
-        </Card>
+    <Card.Body>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h4 className="fw-bold">Detail Penerbangan</h4>
       </div>
-    </>
+
+      <div className="mb-3 d-flex align-items-start justify-content-between">
+        <div>
+          <p className="m-0 fw-bold">{departureTime}</p>
+          <p className="m-0 fw-bold">{departureDate}</p>
+          <p className="m-0">
+            {`${flight?.data?.departure?.name} - Terminal ${flight?.data?.terminal}`}
+          </p>
+        </div>
+        <span
+          className="fw-bold"
+          style={{
+            color: "#A06ECE",
+            fontWeight: "bold",
+            fontSize: "14px",
+          }}
+        >
+          Keberangkatan
+        </span>
+      </div>
+
+      <hr />
+
+      <div className="mb-3 d-flex align-items-center">
+        <img
+          className="me-4"
+          src={flight?.data?.airline?.imageUrl}
+          style={{ width: "40px", height: "40px" }}
+        ></img>
+        <div>
+          <h6 className="m-0 fw-bold">{flight?.data?.airline?.name}</h6>
+          <p className="m-0 fw-bold">{flight?.data?.flightNumber}</p>
+          <div className="mt-4">
+            <h6 className="fw-bolder mb-0">Informasi</h6>
+            {flight?.data?.information}
+          </div>
+        </div>
+      </div>
+
+      <hr />
+
+      <div className="mb-3 d-flex align-items-start justify-content-between">
+        <div>
+          <p className="m-0 fw-bold">{arrivalTime}</p>
+          <p className="m-0 ">{arrivalDate}</p>
+          <p className="m-0 ">{flight?.data?.arrival?.name}</p>
+        </div>
+        <span
+          style={{
+            color: "#A06ECE",
+            fontWeight: "bold",
+            fontSize: "14px",
+          }}
+        >
+          Kedatangan
+        </span>
+      </div>
+
+      <hr />
+
+      <div>
+        <b>Rincian Harga</b>
+        <div className="d-flex justify-content-between">
+          <span>
+            <h6>2 Adults{flight?.nick_name}</h6>
+          </span>
+          <span
+            style={{
+              fontSize: "16px",
+            }}
+          >
+            IDR 9.550.000
+          </span>
+        </div>
+        <div className="d-flex justify-content-between">
+          <span>
+            <h6>1 Baby{flight?.nick_name}</h6>
+          </span>
+          <span
+            style={{
+              fontSize: "16px",
+            }}
+          >
+            IDR 0
+          </span>
+        </div>
+        <div className="d-flex justify-content-between">
+          <span>
+            <h6>Tax{flight?.nick_name}</h6>
+          </span>
+          <span
+            style={{
+              fontSize: "16px",
+            }}
+          >
+            IDR 3.000.000
+          </span>
+        </div>
+      </div>
+
+      <hr></hr>
+
+      <div className="d-flex justify-content-between">
+        <span>
+          <h4>
+            <b>Total</b>
+          </h4>
+        </span>
+        <span
+          style={{
+            color: "#7126B5",
+            fontWeight: "bold",
+            fontSize: "20px",
+          }}
+        >
+          IDR 9.850.000
+        </span>
+      </div>
+
+      <Button
+        href={`/payment`}
+        variant="danger"
+        id="box-timer"
+        style={{ zIndex: "1", marginTop: "1rem" }}
+      >
+        Lanjut Bayar
+      </Button>
+    </Card.Body>
   );
 };
 

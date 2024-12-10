@@ -101,11 +101,7 @@ const PaymentOptions = () => {
                 Ticket Details
               </Card.Title>
               {/* Tambahkan detail tiket di sini */}
-<<<<<<< HEAD
-              <TicketDetails />
-=======
               <DetailPesanan />
->>>>>>> 6032e8e46c28f56d6de3c7d52b2820d3d333c766
             </Card.Body>
           </Card>
         </Col>
