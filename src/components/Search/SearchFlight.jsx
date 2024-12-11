@@ -116,7 +116,15 @@ const SearchFlight = ({
 
   // Logic search data flight (belum kelar)
   const [flightsData, setFlightsData] = useState([]);
-  const seatClassValue = classInput?.split(" ")[0];
+  const [seatClassValue, setSeatClassValue] = useState(classInput);
+  
+  useEffect(() => {
+    if (classInput === "Premium Economy") {
+      setSeatClassValue("PREMIUM_ECONOMY");
+    } else {
+      setSeatClassValue(classInput?.split(" ")[0]);
+    }
+  }, [classInput]);
 
   const [filterChange, setFilterChange] = useState({});
   const [saveFilter, setSaveFilter] = useState(true);
@@ -462,7 +470,8 @@ const SearchFlight = ({
                               className="ms-3 mb-0 fw-bold"
                               style={{ fontSize: "14px" }}
                             >
-                              {flight?.airline.name} - {flight?.class}
+                              {flight?.airline.name} -{" "}
+                              {flight?.class.replace("_", " ")}
                             </h6>
                           </Col>
                         </Row>
@@ -675,7 +684,8 @@ const SearchFlight = ({
                               }}
                             >
                               <span className="fw-bold">
-                                {flight?.airline.name} - {flight?.class}
+                                {flight?.airline.name} -{" "}
+                                {flight?.class.replace("_", " ")}
                               </span>
                               <span>{flight?.flightNumber}</span>
                             </div>
