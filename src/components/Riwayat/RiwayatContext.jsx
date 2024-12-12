@@ -16,7 +16,6 @@ export const RiwayatProvider = ({ children }) => {
   );
 };
 
-// Custom hook to use Notification Context
 export const useRiwayatContext = () => {
   return useContext(RiwayatContext);
 };

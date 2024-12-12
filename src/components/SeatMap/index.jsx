@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 import { getAllSeats } from "../../service/Seat";
 import PropTypes from "prop-types"; 
+import toast, { Toaster } from "react-hot-toast";
 
-const SeatMap = ({ selectedSeats, setSelectedSeats, passengerCount }) => {
+const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat }) => {
   const [seats, setSeats] = useState([]);
-  const kursiterpilih = selectedSeats;
 
   useEffect(() => {
     const fetchSeats = async () => {
       try {
         const params = {
-          flightId: 1,
-          departureTime: "2024-12-14T08:00:00.000Z",
+          flightId: 2,
+          departureTime: "2024-12-15T08:00:00.000Z",
           seatStatus: "AVAILABLE",
         };
 
@@ -25,43 +25,45 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, passengerCount }) => {
 
     fetchSeats();
   }, []);
+  useEffect(() => {
+    console.log("Selected seats updated:", selectedSeats);
+  }, [selectedSeats]);
 
   const handleSeatClick = (seat) => {
     if (seat.status === "UNAVAILABLE") return;
-    if (
-      kursiterpilih.length >= passengerCount &&
-      !kursiterpilih.includes(seat.id)
-    ) {
-      alert(`Anda hanya bisa memilih ${passengerCount} kursi.`);
+    if (selectedSeats.length >= totalSeat && !selectedSeats.includes(seat.id)) {
+      toast.error(`Anda hanya bisa memilih ${totalSeat} kursi.`);
       return;
     }
-    if (kursiterpilih.includes(seat.id)) {
-      setSelectedSeats(kursiterpilih.filter((id) => id !== seat.id));
+    if (selectedSeats.includes(seat.id)) {
+      setSelectedSeats(selectedSeats.filter((id) => id !== seat.id));
     } else {
       setSelectedSeats([...selectedSeats, seat.id]);
     }
   };
 
   return (
-    <div className="seat-map">
-      <h2>Seat Map</h2>
-      <div className="row">
-        {seats.data &&
-          seats.data.map((seat) => (
-            <div
-              key={seat.id}
-              className={`seat ${seat.status === "UNAVAILABLE" ? "booked" : ""} ${
-                kursiterpilih.includes(seat.id) ? "selected" : ""
-              }`}
-              onClick={() => handleSeatClick(seat)}
-            >
-              {seat.seatNumber}
-            </div>
-          ))}
-      </div>
+    <>
+      <Toaster position="top-right" />
+      <div className="seat-map">
+        <h2>Seat Map</h2>
+        <div className="row">
+          {seats.data &&
+            seats.data.map((seat) => (
+              <div
+                key={seat.id}
+                className={`seat ${seat.status === "UNAVAILABLE" ? "booked" : ""} ${
+                  selectedSeats.includes(seat.id) ? "selected" : ""
+                }`}
+                onClick={() => handleSeatClick(seat)}
+              >
+                {seat.seatNumber}
+              </div>
+            ))}
+        </div>
 
-      <style>
-        {`
+        <style>
+          {`
           .row {
             display: flex;
             gap: 5px;
@@ -106,13 +108,14 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, passengerCount }) => {
             background-color: #7126B5;
           }
         `}
-      </style>
-    </div>
+        </style>
+      </div>
+    </>
   );
 };
 SeatMap.propTypes = {
   selectedSeats: PropTypes.array,
-  setSelectedSeats: PropTypes.func, 
-  passengerCount: PropTypes.number,
+  setSelectedSeats: PropTypes.func,
+  totalSeat: PropTypes.number,
 };
 export default SeatMap;
