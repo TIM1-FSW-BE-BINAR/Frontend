@@ -31,6 +31,8 @@ import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers-pro/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
+import { Pagination } from "react-bootstrap";
+import { PaginationControl } from "react-bootstrap-pagination-control";
 import toast, { Toaster } from "react-hot-toast";
 
 import { useQuery } from "@tanstack/react-query";
@@ -61,6 +63,9 @@ const Homepage = () => {
   const [classInput, setClassInput] = useState("");
   const [checkedSwitch, setCheckedSwitch] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
+
+  // Pagination
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     setDepartureDate("");
@@ -160,62 +165,62 @@ const Homepage = () => {
     }
   };
 
-  const [flights, setFlights] = useState([]);
-  const [flightsData, setFlightsData] = useState([]);
+  const [flightsData, setFlightsData] = useState([]); // data hasil fetch per page
 
-  const [state, setState] = useState("");
+  const [state, setState] = useState(""); // state pilihan dari user
+  const [notFound, setNotFound] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (state === "Asia") {
-      const flightsDataFilter = flights.filter(
-        (flight) => flight.arrival.state === state
-      );
-      setFlightsData(flightsDataFilter);
-    } else if (state === "Amerika") {
-      const flightsDataFilter = flights.filter(
-        (flight) => flight.arrival.state === state
-      );
-      setFlightsData(flightsDataFilter);
-    } else if (state === "Australia") {
-      const flightsDataFilter = flights.filter(
-        (flight) => flight.arrival.state === state
-      );
-      setFlightsData(flightsDataFilter);
-    } else if (state === "Eropa") {
-      const flightsDataFilter = flights.filter(
-        (flight) => flight.arrival.state === state
-      );
-      setFlightsData(flightsDataFilter);
-    } else if (state === "Afrika") {
-      const flightsDataFilter = flights.filter(
-        (flight) => flight.arrival.state === state
-      );
-      setFlightsData(flightsDataFilter);
-    } else {
-      setFlightsData(flights);
-    }
-  }, [state, flights]);
-
-  // Menggunakan react query
+  // Menggunakan react query untuk mengambil data per page
   const {
     data: flightData,
     isSuccess: isSuccessFlight,
     isPending: isPendingFlight,
     isError: isErrorFlight,
   } = useQuery({
-    queryKey: ["flights"],
-    queryFn: () => getFlights(),
+    queryKey: ["flights", page, state],
+    queryFn: () =>
+      getFlights({
+        ...(state !== "Semua" && { state: state }),
+        page,
+        limit: 12,
+      }),
+    enabled: !!page,
+  });
+
+  useEffect(() => {
+    if (isSuccessFlight) {
+      console.log("sukses fetch flight");
+      setFlightsData(flightData);
+      setLoading(false);
+      if (flightData.length == 0) {
+        setNotFound(true);
+      } else {
+        setNotFound(false);
+      }
+    } else if (isErrorFlight) {
+      console.log("flight error");
+    } else if (isPendingFlight) {
+      setLoading(true);
+    }
+  }, [flightData, isSuccessFlight, isErrorFlight, isPendingFlight]);
+
+  // use query untuk mengambil seluruh data flight
+  const [flightsDataAll, setFlightsDataALl] = useState([]);
+  const { data: flightDataAll, isSuccess: isSuccessFlightDataAll } = useQuery({
+    queryKey: ["all-flights", state],
+    queryFn: () =>
+      getFlights({
+        ...(state !== "Semua" && { state: state }),
+      }),
     enabled: true,
   });
 
-  if (isErrorFlight) {
-    console.log("flight error");
-  }
   useEffect(() => {
-    if (isSuccessFlight) {
-      setFlights(flightData);
+    if (isSuccessFlightDataAll) {
+      setFlightsDataALl(flightDataAll);
     }
-  }, [flightData, isSuccessFlight]);
+  }, [flightDataAll, isSuccessFlightDataAll]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -230,13 +235,13 @@ const Homepage = () => {
     return date.toISOString().split("T")[0];
   };
   const classInputFormat = (flightClass) => {
-    if(flightClass === "FIRST"){
+    if (flightClass === "FIRST") {
       flightClass = "First Class";
-    }else if(flightClass === "PREMIUM_ECONOMY"){
+    } else if (flightClass === "PREMIUM_ECONOMY") {
       flightClass = "Premium Economy";
     }
     return flightClass;
-  }
+  };
 
   const handleFlightSelect = (flightSelect) => {
     const fromInputSelect = `${flightSelect.departure.city}-${flightSelect.departure.code}`;
@@ -250,7 +255,7 @@ const Homepage = () => {
     toast("Form updated!", {
       icon: "✈️",
     });
-  }
+  };
 
   return (
     <>
@@ -545,7 +550,7 @@ const Homepage = () => {
         <HomepageModal
           show={modalShow}
           activeModal={activeModal}
-          flights={flights}
+          flights={flightsDataAll}
           onHide={() => setModalShow(false)}
           inputValue={modalInputValue}
           setInputValue={setModalInputValue}
@@ -976,6 +981,7 @@ const Homepage = () => {
                   }`}
                   onClick={() => {
                     handleButtonCardClick(index);
+                    setNotFound(false);
                     setState(label);
                   }}
                 >
@@ -986,64 +992,114 @@ const Homepage = () => {
             )}
           </Row>
           <Row className="g-3 mb-5">
-            {flightsData?.map((flight, index) => (
-              <Col key={index} xs={12} sm={6} md={4} lg={2} className="d-flex">
-                <Card className="custom-card" onClick={() => handleFlightSelect(flight)}>
-                  <div className="badge-container">
-                    <span
-                      className={`badge ${index % 2 === 0 ? "badge-limited" : "badge-discount"}`}
-                    >
-                      {index % 2 === 0 ? "Limited!" : "50% OFF"}
-                    </span>
-                  </div>
-                  <Card.Img variant="top" src={flight?.arrival.imageUrl} className="img-fluid" />
-                  <Card.Body className="custom-card-body">
-                    <Card.Title
-                      className="card-title"
-                      style={{
-                        fontSize: "14px",
-                      }}
-                    >
-                      {flight?.departure.city} -{`>`} {flight?.arrival.city}
-                    </Card.Title>
-                    <p
-                      className="text-primary mb-1"
-                      style={{
-                        fontSize: "12px",
-                      }}
-                    >
-                      {flight?.airline.name}
-                    </p>
-                    <Card.Text>
-                      <p
-                        className="mb-1"
-                        style={{
-                          fontSize: "10px",
-                        }}
+            {loading ? (
+              <Col
+                className="text-center w-full mt-5"
+                style={{
+                  color: "#007bff",
+                  fontSize: "1.2rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Loading ...
+              </Col>
+            ) : notFound ? (
+              <Col
+                className="text-center w-full mt-5"
+                style={{
+                  color: "#ff4d4f",
+                  fontSize: "1.2rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Flight Not Found
+              </Col>
+            ) : (
+              flightsData?.map((flight, index) => (
+                <Col
+                  key={index}
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  lg={2}
+                  className="d-flex"
+                >
+                  <Card
+                    className="custom-card"
+                    onClick={() => handleFlightSelect(flight)}
+                  >
+                    <div className="badge-container">
+                      <span
+                        className={`badge ${index % 2 === 0 ? "badge-limited" : "badge-discount"}`}
                       >
-                        {formatDate(flight?.departureTime)}
-                      </p>
-                      <p
-                        className=""
+                        {index % 2 === 0 ? "Limited!" : "50% OFF"}
+                      </span>
+                    </div>
+                    <Card.Img
+                      variant="top"
+                      src={flight?.arrival.imageUrl}
+                      className="img-fluid"
+                    />
+                    <Card.Body className="custom-card-body">
+                      <Card.Title
+                        className="card-title"
                         style={{
                           fontSize: "14px",
                         }}
                       >
-                        Mulai dari{" "}
-                        <span
-                          className="text-danger"
+                        {flight?.departure.city} -{`>`} {flight?.arrival.city}
+                      </Card.Title>
+                      <p
+                        className="text-primary mb-1"
+                        style={{
+                          fontSize: "12px",
+                        }}
+                      >
+                        {flight?.airline.name}
+                      </p>
+                      <Card.Text>
+                        <p
+                          className="mb-1"
+                          style={{
+                            fontSize: "10px",
+                          }}
+                        >
+                          {formatDate(flight?.departureTime)}
+                        </p>
+                        <p
+                          className=""
                           style={{
                             fontSize: "14px",
                           }}
                         >
-                          IDR {flight?.price}
-                        </span>
-                      </p>
-                    </Card.Text>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
+                          Mulai dari{" "}
+                          <span
+                            className="text-danger"
+                            style={{
+                              fontSize: "14px",
+                            }}
+                          >
+                            IDR {flight?.price}
+                          </span>
+                        </p>
+                      </Card.Text>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))
+            )}
+          </Row>
+          <Row className="d-flex w-full justify-content-right align-items-right">
+            <PaginationControl
+              page={page}
+              between={4}
+              total={flightsDataAll.length}
+              limit={12}
+              changePage={(page) => {
+                setPage(page);
+              }}
+              ellipsis={1}
+            />
           </Row>
         </Container>
       </section>
