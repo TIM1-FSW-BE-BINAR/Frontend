@@ -2,12 +2,9 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import RiwayatLayout from "../layouts/Riwayat/RiwayatLayout";
 import ScreenRiwayat from "../components/Riwayat/ScreenRiwayat";
-import DetailPesanan from "../components/Riwayat/Detail/DetailPesananan";
+import DetailPesanan from "../components/Riwayat/Detail/DetailPesanan";
 import NotFound from "../components/Riwayat/Detail/NotFound";
-import {
-  RiwayatProvider,
-  useRiwayatContext,
-} from "../components/Riwayat/RiwayatContext";
+import { RiwayatProvider } from "../components/Riwayat/RiwayatContext";
 import { getAllBookings } from "../service/booking";
 import { useState } from "react";
 import Protected from "../components/Auth/Protected";
