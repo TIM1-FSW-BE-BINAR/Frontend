@@ -5,12 +5,15 @@ import "react-toastify/dist/ReactToastify.css";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { ToastContainer } from "react-toastify";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { HomepageProvider } from "../context/HomepageContext";
 export const Route = createRootRoute({
   component: () => (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID}>
-      <Outlet />
-      <TanStackRouterDevtools />
-      <ToastContainer theme="colored" />
+      <HomepageProvider>
+        <Outlet />
+        <TanStackRouterDevtools />
+        <ToastContainer theme="colored" />
+      </HomepageProvider>
     </GoogleOAuthProvider>
   ),
 });

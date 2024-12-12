@@ -84,15 +84,15 @@ function Search() {
     <>
       <NavigationBar />
       <ScreenSearch
-        fromInput={fromInput}
-        toInput={toInput}
+        fromInput={fromInput?.replace(/\+/g, " ")}
+        toInput={toInput?.replace(/\+/g, " ")}
         departureDate={departureDate}
         returnDate={returnDate}
         passengers={totalPassengers}
         adultInput={adultInput}
         childInput={childInput}
         babyInput={babyInput}
-        classInput={classInput?.replace("+", " ")}
+        classInput={classInput?.replace(/\+/g, " ")}
         departureAirportId={departureAirportId}
         returnAirportId={returnAirportId}
       />

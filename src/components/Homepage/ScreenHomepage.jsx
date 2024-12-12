@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Button,
   Card,
@@ -31,7 +31,6 @@ import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers-pro/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
-import { Pagination } from "react-bootstrap";
 import { PaginationControl } from "react-bootstrap-pagination-control";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -39,37 +38,47 @@ import { useQuery } from "@tanstack/react-query";
 import { getFlights } from "../../service/flight/flightService";
 import { useNavigate } from "@tanstack/react-router";
 
+// Context 
+import {HomepageContext} from "../../context/HomepageContext";
+
 const ScreenHomepage = () => {
   return <Homepage />;
 };
 
 const Homepage = () => {
   const [modalShow, setModalShow] = useState(false);
-  const [fromInput, setFromInput] = useState("");
-  const [toInput, setToInput] = useState("");
-  const [departureDate, setDepartureDate] = useState(""); // Untuk Departure
-  const [returnDate, setReturnDate] = useState("");
   const [activeModal, setActiveModal] = useState("");
   const [modalInputValue, setModalInputValue] = useState("");
   const [PassengerModalShow, setPassengerModalShow] = useState(false);
   const [classModalShow, setClassModalShow] = useState(false);
-  const [adultInput, setAdultInput] = useState(0);
-  const [childInput, setChildInput] = useState(0);
-  const [babyInput, setBabyInput] = useState(0);
-  const [totalPassengers, setTotalPassengers] = useState("");
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedElement, setSelectedElement] = useState(null);
   const [tempClassInput, setTempClassInput] = useState("");
-  const [classInput, setClassInput] = useState("");
   const [checkedSwitch, setCheckedSwitch] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
 
+  // State untuk form input ambil dari context
+  const { fromInput,
+    setFromInput,
+    toInput,
+    setToInput,
+    departureDate,
+    setDepartureDate,
+    returnDate,
+    setReturnDate,
+    adultInput,
+    setAdultInput,
+    childInput,
+    setChildInput,
+    babyInput,
+    setBabyInput,
+    totalPassengers,
+    setTotalPassengers,
+    classInput,
+    setClassInput,} = useContext(HomepageContext);
+
   // Pagination
   const [page, setPage] = useState(1);
-
-  useEffect(() => {
-    setDepartureDate("");
-  }, [checkedSwitch]);
 
   const handleButtonCardClick = (index) => {
     setActiveButton(index); // Set the active button index
@@ -190,7 +199,6 @@ const Homepage = () => {
 
   useEffect(() => {
     if (isSuccessFlight) {
-      console.log("sukses fetch flight");
       setFlightsData(flightData);
       setLoading(false);
       if (flightData.length == 0) {
@@ -442,6 +450,10 @@ const Homepage = () => {
                                   start: "Departure",
                                   end: "Return",
                                 }}
+                                value={[
+                                  departureDate ? dayjs(departureDate) : null,
+                                  returnDate ? dayjs(returnDate) : null,
+                                ]}
                                 onChange={(e) => {
                                   setDepartureDate(
                                     dayjs(e[0]).format("YYYY-MM-DD")
