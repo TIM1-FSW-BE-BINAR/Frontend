@@ -147,7 +147,7 @@ const NavbarPayment = ({ openPayment, openSuccess }) => {
                     style={{ background: "#FF0000", borderRadius: "14px" }}
                   >
                     <Card.Body>
-                      Selesaikan Pembayaran sampai {getDeadline()}
+                      Please complete your payment before {getDeadline()}
                     </Card.Body>
                   </Card>
                 </Col>
@@ -161,7 +161,7 @@ const NavbarPayment = ({ openPayment, openSuccess }) => {
                     className="text-white text-center mx-4"
                     style={{ background: "#73CA5C", borderRadius: "14px" }}
                   >
-                    <Card.Body>Terimakasih atas pembayaran transaksi</Card.Body>
+                    <Card.Body>Thank you for the transaction payment</Card.Body>
                   </Card>
                 </Col>
               </Row>
