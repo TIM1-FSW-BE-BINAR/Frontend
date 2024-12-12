@@ -7,6 +7,7 @@ import { profileMe } from "../../service/auth";
 import { updateUser } from "../../service/user";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+import { BeatLoader } from "react-spinners";
 
 const ScreenUbahProfil = () => {
   const { token } = useSelector((state) => state.auth);
@@ -71,6 +72,13 @@ const ScreenUbahProfil = () => {
     e.preventDefault();
     updateProfile(formData);
   };
+
+  if (isLoading)
+    return (
+      <div className="d-flex justify-content-center ">
+        <BeatLoader style={{ position: "relative", marginTop: "15rem" }} />
+      </div>
+    );
 
   return (
     <Container className="d-flex flex-column py-2">
