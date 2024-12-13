@@ -2,24 +2,23 @@ import React, { useState } from "react";
 import "../styles/variables.scss";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import PaymentLayout from "../layouts/paymentLayout";
-import PaymentOptions from "../components/Payment/Payment/Payment";
+import SuccessPayment from "../components/Payment/Payment/SuccessPayment";
 import Protected from "../components/Auth/Protected";
 
-
-export const Route = createLazyFileRoute("/payment")({
+export const Route = createLazyFileRoute("/complete")({
   component: () => (
     <Protected roles={[1]}>
-      <Payment />
+      <CompletePayment />
     </Protected>
   ),
 });
 
-function Payment() {
-  const [openPayment, setOpenPayment] = useState(true);
+function CompletePayment() {
+  const [openSuccess, setOpenSuccess] = useState(true);
   return (
     <>
-      <PaymentLayout openPayment={openPayment} setOpenPayment={setOpenPayment}>
-        {openPayment && <PaymentOptions />}
+      <PaymentLayout openSuccess={openSuccess} setOpenSuccess={setOpenSuccess}>
+        {openSuccess && <SuccessPayment />}
       </PaymentLayout>
     </>
   );

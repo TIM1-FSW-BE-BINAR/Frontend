@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, Button, Row, Col } from "react-bootstrap";
@@ -10,7 +9,6 @@ import { enUS } from "date-fns/locale";
 const DetailPesanan = ({ id }) => {
   const { token } = useSelector((state) => state.auth);
   const [booking, setBookingDetail] = useState(null);
-
   const { data, isLoading, isSuccess, isError, error } = useQuery({
     queryKey: ["getIdBooking", id],
     queryFn: () => getIdBooking(id),
