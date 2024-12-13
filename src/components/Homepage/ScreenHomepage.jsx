@@ -369,7 +369,7 @@ const Homepage = () => {
                         <Form.Control
                           type="text"
                           placeholder="Jakarta"
-                          className="custom-placeholder form-input"
+                          className="form-input"
                           value={fromInput}
                           onClick={() => {
                             setActiveModal("from");
@@ -410,7 +410,7 @@ const Homepage = () => {
                         <Form.Control
                           type="text"
                           placeholder="Dubai"
-                          className="custom-placeholder form-input"
+                          className="form-input"
                           value={toInput}
                           onClick={() => {
                             setActiveModal("to");
@@ -472,7 +472,7 @@ const Homepage = () => {
                             <FormLabel>Departure</FormLabel>
                             <Form.Control
                               type="date"
-                              className="custom-placeholder form-input"
+                              className="form-input"
                               value={departureDate}
                               onChange={(e) => setDepartureDate(e.target.value)}
                             />
@@ -514,7 +514,7 @@ const Homepage = () => {
                         <Form.Control
                           type="text"
                           placeholder="Add Passengers"
-                          className="custom-placeholder form-input"
+                          className="form-input"
                           value={
                             totalPassengers
                               ? `${adultInput > 0 ? `${adultInput} Adult` : ""}${
@@ -537,7 +537,7 @@ const Homepage = () => {
                         <Form.Control
                           type="text"
                           placeholder="Select Class"
-                          className="custom-placeholder form-input"
+                          className="form-input"
                           onClick={() => setClassModalShow(true)}
                           value={classInput}
                           readOnly

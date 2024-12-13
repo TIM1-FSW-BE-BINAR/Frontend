@@ -98,15 +98,19 @@ const SearchFlight = ({
     setTicketSoldOut(false);
   };
 
+    const [filterChange, setFilterChange] = useState({});
+    const [filterTempChange, setFilterTempChange] = useState({});
+    const [saveFilter, setSaveFilter] = useState(true);
+
   const handleFilterClose = () => {
     setFilterShowModal(false);
-    setSaveFilter(false);
   };
 
   const handleSaveFilter = () => {
     setFilter(tempFilter);
-    setFilterShowModal(false);
     setSaveFilter(true);
+    setFilterShowModal(false);
+    setFilterChange(filterTempChange);
   };
 
   const handleSelectFilter = (FilterName, elementId, label) => {
@@ -127,30 +131,28 @@ const SearchFlight = ({
     }
   }, [classInput]);
 
-  const [filterChange, setFilterChange] = useState({});
-  const [saveFilter, setSaveFilter] = useState(true);
-
-  const handleFilterChange = (newFilter) => {
-      setFilterChange(newFilter); // Update filter tambahan
+  const handleFilterTempChange = (newFilter) => {
+    setFilterTempChange(newFilter); // Update filter tambahan
   };
 
-  const { data, isSuccess, isError, isPending } = useQuery({
-    queryKey: ["search-flights", filterChange, departureDateActive],
-    queryFn: () =>
-      getFlights({
-        departureAirport: departureAirportId,
-        arrivalAirport: returnAirportId,
-        seatClass: seatClassValue,
-        departureTime: departureDateActive,
-        ...filterChange,
-      }),
-    enabled: !!departureAirportId && !!returnAirportId && !!saveFilter, // Fetch jika ID sudah ada
-  });
+ const { data, isSuccess, isError, isPending } = useQuery({
+   queryKey: ["search-flights", filterChange, departureDateActive],
+   queryFn: () =>
+     getFlights({
+       departureAirport: departureAirportId,
+       arrivalAirport: returnAirportId,
+       seatClass: seatClassValue,
+       departureTime: departureDateActive,
+       ...filterChange,
+     }),
+   enabled: !!departureAirportId && !!returnAirportId && saveFilter, // Trigger query hanya jika saveFilter true
+ });
 
   useEffect(() => {
     if (isSuccess) {
       setFlightsData(data);
       setLoading(false);
+      setSaveFilter(false);
       if (data.length === 0) {
         setNotFound(true);
       } else {
@@ -775,7 +777,7 @@ const SearchFlight = ({
                     "termurah",
                     "Price - Cheapest"
                   );
-                  handleFilterChange({ isCheapest: true });
+                  handleFilterTempChange({ isCheapest: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
@@ -802,7 +804,7 @@ const SearchFlight = ({
                     "terpendek",
                     "Duration - Shortest"
                   );
-                  handleFilterChange({ shortest: true });
+                  handleFilterTempChange({ shortest: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
@@ -829,7 +831,7 @@ const SearchFlight = ({
                     "keberangkatan-awal",
                     "Departure - Earliest"
                   );
-                  handleFilterChange({ earliestDeparture: true });
+                  handleFilterTempChange({ earliestDeparture: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
@@ -856,7 +858,7 @@ const SearchFlight = ({
                     "keberangkatan-akhir",
                     "Departure - Latest"
                   );
-                  handleFilterChange({ latestDeparture: true });
+                  handleFilterTempChange({ latestDeparture: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
@@ -883,7 +885,7 @@ const SearchFlight = ({
                     "kedatangan-awal",
                     "Arrival - Earliest"
                   );
-                  handleFilterChange({ earliestArrival: true });
+                  handleFilterTempChange({ earliestArrival: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
@@ -910,7 +912,7 @@ const SearchFlight = ({
                     "kedatangan-akhir",
                     "Arrival - Latest"
                   );
-                  handleFilterChange({ latestArrival: true });
+                  handleFilterTempChange({ latestArrival: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
