@@ -187,7 +187,10 @@ const RegisterForm = () => {
     <div
       style={{
         maxWidth: "450px",
+        marginTop: "4rem",
         width: "100%",
+        height: "100%",
+        
       }}
     >
       {" "}
