@@ -100,6 +100,7 @@ const SearchFlight = ({
 
   const handleFilterClose = () => {
     setFilterShowModal(false);
+    setSaveFilter(false);
   };
 
   const handleSaveFilter = () => {
@@ -130,7 +131,7 @@ const SearchFlight = ({
   const [saveFilter, setSaveFilter] = useState(true);
 
   const handleFilterChange = (newFilter) => {
-    setFilterChange(newFilter); // Update filter tambahan
+      setFilterChange(newFilter); // Update filter tambahan
   };
 
   const { data, isSuccess, isError, isPending } = useQuery({
@@ -241,7 +242,11 @@ const SearchFlight = ({
         </Row>
         <Row className="d-flex align-items-center justify-content-between pt-3">
           <Col>
-            <Button onClick={handlePreviousWeek} className="animated-button">
+            <Button
+              onClick={handlePreviousWeek}
+              className="animated-button"
+              style={{ backgroundColor: "#7126b5" }}
+            >
               <FaArrowLeft />
             </Button>
           </Col>
@@ -268,7 +273,11 @@ const SearchFlight = ({
             ))}
           </Col>
           <Col>
-            <Button onClick={handleNextWeek} className="animated-button">
+            <Button
+              onClick={handleNextWeek}
+              className="animated-button"
+              style={{ backgroundColor: "#7126b5" }}
+            >
               <FaArrowRight />
             </Button>
           </Col>

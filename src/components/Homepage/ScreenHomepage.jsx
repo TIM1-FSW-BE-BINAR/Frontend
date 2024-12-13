@@ -23,7 +23,7 @@ import babyIcon from "../../assets/homepage/icon/baby-icon.png";
 import plusIcon from "../../assets/homepage/icon/plus-icon.png";
 import minusIcon from "../../assets/homepage/icon/minus-icon.png";
 import selectedIcon from "../../assets/homepage/icon/selected-icon.png";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch,FaArrowRight } from "react-icons/fa";
 import HomepageModal from "./HomepageModal";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
@@ -549,7 +549,8 @@ const Homepage = () => {
                 {/* button */}
                 <Button
                   type="submit"
-                  className="btn btn-block btn-primary w-100 mt-2 mx-0 animated-button"
+                  className="btn btn-block w-100 mt-2 mx-0 animated-button"
+                  style={{ backgroundColor: "#7126b5" }}
                 >
                   Cari Penerbangan
                 </Button>
@@ -838,6 +839,7 @@ const Homepage = () => {
               variant="primary"
               onClick={handleSavePassengers}
               className="animated-button"
+              style={{ backgroundColor: "#7126b5" }}
             >
               Simpan
             </Button>
@@ -848,7 +850,6 @@ const Homepage = () => {
         <Modal
           show={classModalShow}
           onHide={handleClassClose}
-          size="lg"
           aria-labelledby="contained-modal-title-vcenter"
           centered
         >
@@ -866,9 +867,8 @@ const Homepage = () => {
                   handleSelectClass("economy", "economyBtn", "Economy")
                 }
               >
-                <Col xs={9} sm={10}>
+                <Col xs={9} sm={10} className="p-2">
                   <h6>Economy</h6>
-                  <p>IDR 4.950.000</p>
                 </Col>
 
                 {selectedClass === "economy" && (
@@ -891,9 +891,8 @@ const Homepage = () => {
                   )
                 }
               >
-                <Col xs={9} sm={10}>
+                <Col xs={9} sm={10} className="p-2">
                   <h6>Premium Economy</h6>
-                  <p>IDR 8.950.000</p>
                 </Col>
 
                 {selectedClass === "premiumEconomy" && (
@@ -912,9 +911,8 @@ const Homepage = () => {
                   handleSelectClass("business", "businessBtn", "Business")
                 }
               >
-                <Col xs={9} sm={10}>
+                <Col xs={9} sm={10} className="p-2">
                   <h6>Business</h6>
-                  <p>IDR 14.950.000</p>
                 </Col>
 
                 {selectedClass === "business" && (
@@ -937,9 +935,8 @@ const Homepage = () => {
                   )
                 }
               >
-                <Col xs={9} sm={10}>
+                <Col xs={9} sm={10} className="p-2">
                   <h6>First Class</h6>
-                  <p>IDR 24.950.000</p>
                 </Col>
 
                 {selectedClass === "firstClass" && (
@@ -966,6 +963,7 @@ const Homepage = () => {
               variant="primary"
               onClick={handleSaveClass}
               className="animated-button"
+              style={{ backgroundColor: "#7126b5" }}
             >
               Simpan
             </Button>
@@ -1059,7 +1057,7 @@ const Homepage = () => {
                           fontSize: "14px",
                         }}
                       >
-                        {flight?.departure.city} -{`>`} {flight?.arrival.city}
+                        {flight?.departure.city} <FaArrowRight /> {flight?.arrival.city}
                       </Card.Title>
                       <p
                         className="text-primary mb-1"
@@ -1121,9 +1119,6 @@ const Homepage = () => {
           position="top-right"
           containerStyle={{
             position: "fixed",
-            bottom: "20px",
-            left: "75%",
-            transform: "translateX(-50%)",
             zIndex: "9999",
           }}
           reverseOrder={false}

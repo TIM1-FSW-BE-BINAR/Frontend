@@ -302,6 +302,9 @@ body{
   transition: transform 0.2s ease, background-color 0.3s ease;
 }
 
+.animated-button:hover {
+  transform: scale(1.0009);
+}
 
 .animated-button:active {
   transform: scale(0.9);
@@ -311,5 +314,7 @@ body{
   background-color: #f1f1f1;
   transition: background-color 0.2s ease;
 }
+
+
 
 
