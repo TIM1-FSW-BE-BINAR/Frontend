@@ -12,7 +12,6 @@ import toast, { Toaster } from "react-hot-toast";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useSpring, animated } from "@react-spring/web";
 
-
 const loginForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -251,7 +250,7 @@ const loginForm = () => {
               onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
             >
               <FcGoogle style={{ marginRight: "8px", fontSize: "20px" }} />
-              login with Google
+              Login with Google
             </Button>
 
             <div
