@@ -26,7 +26,7 @@ export const login = async (request) => {
 
 export const googleLogin = async (accessToken) => {
   const response = await fetch(
-    `${import.meta.env.VITE_API_URL}/auth/google/login`,
+    `${import.meta.env.VITE_API_URL}/auth/login-google`,
     {
       body: JSON.stringify({ access_token: accessToken }),
       method: "POST",
