@@ -142,7 +142,7 @@ const PaymentOptions = (bookingId) => {
           </Card>
         </Col>
       </Row>
-      <Toaster position="bottom-right" reverseOrder={false} />
+      <Toaster position="top-right" reverseOrder={false} />
     </Container>
   );
 };
