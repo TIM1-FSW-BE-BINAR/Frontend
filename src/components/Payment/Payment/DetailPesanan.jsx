@@ -5,8 +5,9 @@ import { getIdBooking } from "../../../service/booking";
 import { useSelector } from "react-redux";
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale";
+import PaymentDetailsLoading from "../../Loading/paymentDetailsLoading";
 
-const DetailPesanan = ({ id }) => {
+const DetailPesanan = ({ id = "22" }) => {  // JANGAN LUPA MATIINN ID !!!!!!!!!
   const { token } = useSelector((state) => state.auth);
   const [booking, setBookingDetail] = useState(null);
   const { data, isLoading, isSuccess, isError, error } = useQuery({
@@ -36,26 +37,11 @@ const DetailPesanan = ({ id }) => {
     }
   }, [isSuccess, data, isError, error]);
 
-  if (isLoading) return <p>Loading details...</p>;
+  if (isLoading) return <PaymentDetailsLoading />;
   if (isError) return <p>Error fetching details: {error.message}</p>;
 
   return (
     <Card.Body>
-      {/* Status Pesanan */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h6 className="fw-bold">Detail Pesanan</h6>
-        <span
-          className="px-3 py-1 text-white"
-          style={{
-            backgroundColor: "#73CA5C",
-            borderRadius: "10px",
-            fontSize: "12px",
-          }}
-        >
-          {booking?.status}
-        </span>
-      </div>
-
       {/* Booking Code */}
       <div className="d-flex align-items-center mb-3">
         <span className="fw-bold me-2">Booking Code:</span>
@@ -86,7 +72,7 @@ const DetailPesanan = ({ id }) => {
           </p>
         </div>
         <span className="fw-bold" style={{ color: "#A06ECE" }}>
-          Keberangkatan
+          Departure
         </span>
       </div>
       <hr />
@@ -95,8 +81,13 @@ const DetailPesanan = ({ id }) => {
         {/* Logo Maskapai */}
         <img
           className="me-4"
-          src="img/airlane_logo1.svg"
-          alt="Airlane Logo"
+          src={
+            booking?.flight?.airline?.imageUrl ||
+            "imageUrl Airline not available"
+          }
+          alt={
+            booking?.flight?.airline?.imageId || "imageId Airline not available"
+          }
           style={{ width: "40px", height: "40px" }}
         />
 
@@ -111,14 +102,23 @@ const DetailPesanan = ({ id }) => {
           </p>
           {/* Informasi Penumpang */}
           <div className="mt-4">
-            <h6 className="fw-bolder mb-0">Informasi:</h6>
+            <h6 className="fw-bolder mb-0">Information:</h6>
+            <div>
+              <p className="m-0">
+                {" "}
+                {booking?.flight?.information || "Information N/A"}
+              </p>
+            </div>
+          </div>
+          <div className="mt-4">
+            <h6 className="fw-bolder mb-0">Pessenger Information:</h6>
             {booking?.bookingDetail?.map((detail, index) => (
               <div key={detail.id}>
                 <p
                   className="m-0"
                   style={{ color: "#4B1979", fontWeight: "500" }}
                 >
-                  {`Penumpang ${index + 1}: ${detail.passenger?.name} ${detail.passenger?.familyName} `}
+                  {`Pessenger ${index + 1}: ${detail.passenger?.name} ${detail.passenger?.familyName} `}
                 </p>
                 <p className="m-0">{`ID: ${detail.passenger?.identityNumber || "N/A"}`}</p>
               </div>
@@ -151,14 +151,14 @@ const DetailPesanan = ({ id }) => {
         </div>
 
         <span className="fw-bold" style={{ color: "#A06ECE" }}>
-          Kedatangan
+          Arrival
         </span>
       </div>
       <hr />
 
       {/* Rincian Harga */}
       <div className="mb-3">
-        <h6 className="fw-bold">Rincian Harga:</h6>
+        <h6 className="fw-bold">Price Details:</h6>
         <div>
           {groupedPassengers &&
             Object.entries(groupedPassengers).map(([type, data]) => (
@@ -175,7 +175,9 @@ const DetailPesanan = ({ id }) => {
         <hr />
         <div className="d-flex justify-content-between fw-bold">
           <p>Total</p>
-          <p>IDR {booking?.totalPrice || "N/A"}</p>
+          <h5 className="fw-bold" style={{ color: "#7126B5" }}>
+            IDR {booking?.totalPrice || "N/A"}
+          </h5>
         </div>
       </div>
     </Card.Body>
