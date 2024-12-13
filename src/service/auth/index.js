@@ -25,23 +25,27 @@ export const login = async (request) => {
 };
 
 export const googleLogin = async (accessToken) => {
-  const response = await fetch(
-    `${import.meta.env.VITE_API_URL}/auth/login-google`,
-    {
-      body: JSON.stringify({ access_token: accessToken }),
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/v1/auth/login-google`,
+      {
+        body: JSON.stringify({ access_token: accessToken }),
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const result = await response.json();
+    if (!result?.meta) {
+      throw new Error(result?.error?.message);
     }
-  );
-
-  const result = await response.json();
-  if (!result?.success) {
-    throw new Error(result?.message);
+    return result;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
   }
-
-  return result?.data;
 };
 
 export const register = async (request) => {
