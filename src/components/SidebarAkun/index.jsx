@@ -5,10 +5,12 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { setToken, setUser } from "../../redux/slices/auth";
 import { useCallback, useEffect, useState } from "react";
-import { profile } from "../../service/auth";
+import { profileMe } from "../../service/auth";
 import { useQuery } from "@tanstack/react-query";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+// import "./SidebarAkun.css";
+import { BeatLoader } from "react-spinners";
 
 export default function SidebarAkun({
   openUbahProfil,
@@ -35,9 +37,9 @@ export default function SidebarAkun({
     navigate({ to: "/" });
   }, [dispatch, navigate]);
 
-  const { data, isSuccess, isError } = useQuery({
-    queryKey: ["profile"],
-    queryFn: profile,
+  const { data, isSuccess, isError, isLoading } = useQuery({
+    queryKey: ["profileMe"],
+    queryFn: profileMe,
     enabled: token ? true : false,
   });
 
@@ -48,6 +50,13 @@ export default function SidebarAkun({
       handleLogout();
     }
   }, [isSuccess, isError, data, dispatch, handleLogout]);
+
+  if (isLoading)
+    return (
+      <div className="d-flex justify-content-center ">
+        <BeatLoader style={{ position: "relative", marginTop: "15rem" }} />
+      </div>
+    );
 
   const logoutConfirmation = (event) => {
     event.preventDefault();
@@ -130,6 +139,7 @@ export default function SidebarAkun({
                     href="#"
                     className="align-middle text-black py-2 d-flex justify-content-center align-items-center m-0 p-0 w-100"
                     onClick={() => handleClick(setOpenUbahProfil)}
+                    style={{ cursor: "pointer" }}
                   >
                     <VscEdit
                       style={{
@@ -161,7 +171,7 @@ export default function SidebarAkun({
                   <Nav.Link
                     as={Col}
                     className="text-black py-2 d-flex  align-items-center m-0 p-0"
-                    style={{ width: "15rem" }}
+                    style={{ width: "15rem", cursor: "pointer" }}
                     onClick={() => handleClick(setOpenPengaturanAkun)}
                   >
                     <VscGear
@@ -223,38 +233,6 @@ export default function SidebarAkun({
         {overlayVisible && <div className="custom-toast-overlay" />}
 
         <ToastContainer />
-
-        {/* Custom Style */}
-        <style jsx>{`
-          .custom-toast-center {
-            position: fixed !important; /* Memastikan posisi tetap */
-            top: 50%; /* Vertikal di tengah */
-            left: 50%; /* Horizontal di tengah */
-            transform: translate(
-              -50%,
-              -50%
-            ); /* Menyesuaikan dengan titik tengah */
-            margin: 0; /* Menghilangkan margin bawaan */
-            z-index: 9999; /* Pastikan di atas elemen lainnya */
-            max-width: 400px; /* Batas lebar maksimal */
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Bayangan */
-          }
-
-          .custom-toast-body {
-            text-align: center; /* Konten toast rata tengah */
-          }
-
-          .custom-toast-overlay {
-            position: fixed !important;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* Latar belakang transparan */
-            z-index: 9998; /* Di bawah toast, tetapi tetap di atas konten */
-            pointer-events: none; /* Agar elemen lain masih bisa di-interact */
-          }
-        `}</style>
       </Container>
     </>
   );

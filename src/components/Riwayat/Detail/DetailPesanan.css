@@ -1,0 +1,21 @@
+@media (max-width: 426px) {
+  .custom-card {
+    width: 90vw !important;
+  }
+}
+
+@media (min-width: 427px) and (max-width: 768px) {
+  .custom-card.customized-style {
+    width: 35vw !important;
+    position: relative !important;
+    left: -2rem !important;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .custom-card.customized-style {
+    width: 35vw !important;
+    position: relative !important;
+    left: -1rem !important;
+  }
+}

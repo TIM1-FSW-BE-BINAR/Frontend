@@ -1,16 +1,19 @@
 import {  useNavigate, useLocation } from "@tanstack/react-router";
-import Navbar from "react-bootstrap/Navbar";
-import Container from "react-bootstrap/Container";
+import {
+  Navbar,
+  Container,
+  Col,
+  Row,
+  Breadcrumb,
+  Stack,
+} from "react-bootstrap";
 import { useEffect } from "react";
 import {  useSelector } from "react-redux";
 //import { setToken, setUser } from "../../redux/slices/auth";
-import Col from "react-bootstrap/Col";
-import Row from "react-bootstrap/Row";
 import { useState } from "react";
-import Breadcrumb from "react-bootstrap/Breadcrumb";
-import "../../app.css";
+import "./NavbarBooking.css";
 
-const NavbarPemesanan = () => {
+const NavbarBooking = (isSaved) => {
   //const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -20,7 +23,7 @@ const NavbarPemesanan = () => {
   // State untuk melacak penyelesaian
   const [isDataDiriCompleted, setIsDataDiriCompleted] = useState(false);
   const [isBayarCompleted, setIsBayarCompleted] = useState(false);
-
+  //const [isSaved, setisSaved] = useState(false);
   // Logika untuk menentukan apakah path aktif
   const isActive = (path) => location.pathname === path;
 
@@ -35,7 +38,6 @@ const NavbarPemesanan = () => {
     }
   };
 
-  // Simulasikan penyelesaian tahap (di halaman lain, ini bisa diatur melalui props atau Redux)
   const completeDataDiri = () => setIsDataDiriCompleted(true);
   const completeBayar = () => setIsBayarCompleted(true);
 
@@ -94,14 +96,14 @@ const NavbarPemesanan = () => {
         }}
       >
         <Container>
-          <Col>
+          <Stack gap={0}>
             <Row>
               <Breadcrumb>
                 <Breadcrumb.Item
-                  active={isActive("/Pemesanan")}
-                  onClick={() => handleNavigation("/Pemesanan")}
+                  active={isActive("/Booking")}
+                  onClick={() => handleNavigation("/Booking")}
                   style={
-                    isActive("/Pemesanan")
+                    isActive("/Booking")
                       ? {
                           fontWeight: "bold",
                           color: "black",
@@ -118,10 +120,10 @@ const NavbarPemesanan = () => {
                   Isi Data Diri
                 </Breadcrumb.Item>
                 <Breadcrumb.Item
-                  active={isActive("/Bayar")}
-                  onClick={() => handleNavigation("/Bayar")}
+                  active={isActive("/payment")}
+                  onClick={() => handleNavigation("/payment")}
                   style={
-                    isActive("/Bayar")
+                    isActive("/payment")
                       ? {
                           fontWeight: "bold",
                           color: "black",
@@ -161,34 +163,33 @@ const NavbarPemesanan = () => {
                 </Breadcrumb.Item>
               </Breadcrumb>
             </Row>
+            
             <Row>
               <div>
                 {!token ? (
                   <div
                     style={{
                       textAlign: "center",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
-                    <div
-                      id="black-overlay"
-                      style={{
-                        justifyContent: "center",
-                      }}
-                      className="vh-100"
-                    ></div>
-                    <div
-                      id="box-timer"
-                      style={{
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
+                    <div id="black-overlay" className="vh-100"></div>
+                    <div id="box-timer">
                       {"Anda harus login terlebih dahulu!"}
                       <button onClick={handleOverlayClose} id="close-button">
                         X
                       </button>
                     </div>
                   </div>
+                ) : !isSaved ? (
+                  <Row>
+                    <div id="box-timer" style={{ backgroundColor: "#73CA5C" }}>
+                      <div style={{ justifyContent: "center" }}>
+                        {"Data anda berhasil tersimpan!"}
+                      </div>
+                    </div>
+                  </Row>
                 ) : (
                   <div>
                     {timeLeft > 0 ? (
@@ -205,7 +206,6 @@ const NavbarPemesanan = () => {
                                 "Maaf, waktu pemesanan habis, silahkan ulangi lagi."
                               }
                             </div>
-
                             <button onClick={resetTimer} id="close-button">
                               X
                             </button>
@@ -217,11 +217,11 @@ const NavbarPemesanan = () => {
                 )}
               </div>
             </Row>
-          </Col>
+          </Stack>
         </Container>
       </Navbar>
     </>
   );
 };
 
-export default NavbarPemesanan;
+export default NavbarBooking;

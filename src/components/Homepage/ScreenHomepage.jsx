@@ -28,12 +28,17 @@ import { FaSearch } from "react-icons/fa";
 import HomepageModal from "./HomepageModal";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
-import SearchFlight from "../Search/SearchFlight";
 
 import { LocalizationProvider } from "@mui/x-date-pickers-pro/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import toast, { Toaster } from "react-hot-toast";
+
+import { useQuery } from "@tanstack/react-query";
+import { getFlights } from "../../service/flight/flightService";
+import { getAirlines } from "../../service/airline/airlineService";
+import { getAirports } from "../../service/airport/airportService";
+import { useNavigate } from "@tanstack/react-router";
 
 const ScreenHomepage = () => {
   return <Homepage />;
@@ -59,7 +64,6 @@ const Homepage = () => {
   const [classInput, setClassInput] = useState("");
   const [checkedSwitch, setCheckedSwitch] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
-  const [searchPage, setSearchPage] = useState(false);
 
   useEffect(() => {
     setDepartureDate("");
@@ -128,19 +132,103 @@ const Homepage = () => {
     setClassModalShow(false);
   };
 
+  const navigate = useNavigate();
+
   const handleSearchPage = (e) => {
     e.preventDefault();
-    console.log(departureDate);
-    console.log(returnDate);
-    if(fromInput == '' || toInput == '' || departureDate == '' || totalPassengers == '' || classInput == ''){
+    if (
+      fromInput == "" ||
+      toInput == "" ||
+      departureDate == "" ||
+      totalPassengers == "" ||
+      classInput == ""
+    ) {
       toast.error("Please fill out all fields in the form!");
-      setSearchPage(false);
-    }else{
-      setSearchPage(true);
+    } else {
+      const queryParams = new URLSearchParams({
+        fromInput,
+        toInput,
+        departureDate,
+        returnDate: returnDate || "", // Kirim kosong jika null
+        totalPassengers,
+        adultInput,
+        childInput,
+        babyInput,
+        classInput,
+      }).toString();
+
+      navigate({
+        to: `/search?${queryParams}`,
+      });
     }
   };
 
-  return !searchPage ? (
+  const [flights, setFlights] = useState([]);
+  const [flightsData, setFlightsData] = useState([]);
+
+  const [state, setState] = useState("");
+
+  useEffect(() => {
+    if (state === "Asia") {
+      const flightsDataFilter = flights.filter(
+        (flight) => flight.arrival.state === state
+      );
+      setFlightsData(flightsDataFilter);
+    } else if (state === "Amerika") {
+      const flightsDataFilter = flights.filter(
+        (flight) => flight.arrival.state === state
+      );
+      setFlightsData(flightsDataFilter);
+    } else if (state === "Australia") {
+      const flightsDataFilter = flights.filter(
+        (flight) => flight.arrival.state === state
+      );
+      setFlightsData(flightsDataFilter);
+    } else if (state === "Eropa") {
+      const flightsDataFilter = flights.filter(
+        (flight) => flight.arrival.state === state
+      );
+      setFlightsData(flightsDataFilter);
+    } else if (state === "Afrika") {
+      const flightsDataFilter = flights.filter(
+        (flight) => flight.arrival.state === state
+      );
+      setFlightsData(flightsDataFilter);
+    } else {
+      setFlightsData(flights);
+    }
+  }, [state, flights]);
+
+  // Menggunakan react query
+  const {
+    data: flightData,
+    isSuccess: isSuccessFlight,
+    isPending: isPendingFlight,
+    isError: isErrorFlight,
+  } = useQuery({
+    queryKey: ["flights"],
+    queryFn: () => getFlights(),
+    enabled: true,
+  });
+
+  if (isErrorFlight) {
+    console.log("flight error");
+  }
+  useEffect(() => {
+    if (isSuccessFlight) {
+      setFlights(flightData);
+    }
+  }, [flightData, isSuccessFlight]);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate(); // Mendapatkan hari (15)
+    const month = date.toLocaleString("en-US", { month: "long" }); // Mendapatkan bulan dalam bentuk teks (July)
+    const year = date.getFullYear(); // Mendapatkan tahun (2024)
+    return `${day} ${month} ${year}`;
+  };
+
+  return (
     <>
       <section id="hero">
         <Container fluid className="p-0 mt-4 ">
@@ -250,18 +338,26 @@ const Homepage = () => {
                             setActiveModal("from");
                             setModalShow(true);
                           }}
+                          readOnly
                         />
                       </Col>
                     </Form.Group>
                   </Col>
                   <Col sm={12} md={1} className="d-flex justify-content-center">
-                    <img
-                      src={returnIcon}
-                      className="mt-2 return-icon"
-                      alt=""
-                      style={{ cursor: "pointer" }}
-                      onClick={handleSwitch}
-                    />
+                    <Button
+                      style={{
+                        border: "none",
+                        backgroundColor: "transparent",
+                        padding: "0",
+                      }}
+                    >
+                      <img
+                        src={returnIcon}
+                        className="mt-2 return-icon animated-button"
+                        alt=""
+                        onClick={handleSwitch}
+                      />
+                    </Button>
                   </Col>
                   <Col sm={12} md={6}>
                     <Form.Group as={Row} className="mb-3">
@@ -283,6 +379,7 @@ const Homepage = () => {
                             setActiveModal("to");
                             setModalShow(true);
                           }}
+                          readOnly
                         />
                       </Col>
                     </Form.Group>
@@ -392,6 +489,7 @@ const Homepage = () => {
                               : ""
                           }
                           onClick={() => setPassengerModalShow(true)}
+                          readOnly
                         />
                       </Col>
                       <Col className="mt-2">
@@ -402,6 +500,7 @@ const Homepage = () => {
                           className="custom-placeholder form-input"
                           onClick={() => setClassModalShow(true)}
                           value={classInput}
+                          readOnly
                         />
                       </Col>
                     </Form.Group>
@@ -410,7 +509,7 @@ const Homepage = () => {
                 {/* button */}
                 <Button
                   type="submit"
-                  className="btn btn-block btn-primary w-100 mt-2 mx-0"
+                  className="btn btn-block btn-primary w-100 mt-2 mx-0 animated-button"
                 >
                   Cari Penerbangan
                 </Button>
@@ -422,6 +521,8 @@ const Homepage = () => {
         {/* Memanggil from to modal */}
         <HomepageModal
           show={modalShow}
+          activeModal={activeModal}
+          flights={flights}
           onHide={() => setModalShow(false)}
           inputValue={modalInputValue}
           setInputValue={setModalInputValue}
@@ -463,19 +564,28 @@ const Homepage = () => {
                 {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
                 <Col className="p-0 d-flex justify-content-end align-items-center">
                   {/* Tombol Minus */}
-                  <img
-                    src={minusIcon}
-                    className="img-fluid"
-                    alt=""
+                  <Button
+                    className="animated-button"
                     style={{
-                      maxWidth: "40px",
-                      maxHeight: "40px",
-                      cursor: "pointer",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      padding: "0",
                     }}
-                    onClick={() => {
-                      decrementInputPassengers("adult");
-                    }}
-                  />
+                  >
+                    <img
+                      src={minusIcon}
+                      className="img-fluid"
+                      alt=""
+                      style={{
+                        maxWidth: "40px",
+                        maxHeight: "40px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        decrementInputPassengers("adult");
+                      }}
+                    />
+                  </Button>
 
                   {/* Input Field */}
                   <input
@@ -489,22 +599,32 @@ const Homepage = () => {
                       marginRight: "10px",
                     }}
                     value={adultInput}
+                    readOnly
                   />
 
                   {/* Tombol Plus */}
-                  <img
-                    src={plusIcon}
-                    className="img-fluid"
-                    alt=""
+                  <Button
+                    className="animated-button"
                     style={{
-                      maxWidth: "40px",
-                      maxHeight: "40px",
-                      cursor: "pointer",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      padding: "0",
                     }}
-                    onClick={() => {
-                      incrementInputPassengers("adult");
-                    }}
-                  />
+                  >
+                    <img
+                      src={plusIcon}
+                      className="img-fluid"
+                      alt=""
+                      style={{
+                        maxWidth: "40px",
+                        maxHeight: "40px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        incrementInputPassengers("adult");
+                      }}
+                    />
+                  </Button>
                 </Col>
               </Row>
               <Row className="d-flex justify-content-between align-items-center">
@@ -526,19 +646,28 @@ const Homepage = () => {
                 {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
                 <Col className="p-0 d-flex justify-content-end align-items-center">
                   {/* Tombol Minus */}
-                  <img
-                    src={minusIcon}
-                    className="img-fluid"
-                    alt=""
+                  <Button
+                    className="animated-button"
                     style={{
-                      maxWidth: "40px",
-                      maxHeight: "40px",
-                      cursor: "pointer",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      padding: "0",
                     }}
-                    onClick={() => {
-                      decrementInputPassengers("child");
-                    }}
-                  />
+                  >
+                    <img
+                      src={minusIcon}
+                      className="img-fluid"
+                      alt=""
+                      style={{
+                        maxWidth: "40px",
+                        maxHeight: "40px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        decrementInputPassengers("child");
+                      }}
+                    />
+                  </Button>
 
                   {/* Input Field */}
                   <input
@@ -552,22 +681,32 @@ const Homepage = () => {
                       marginRight: "10px",
                     }}
                     value={childInput}
+                    readOnly
                   />
 
                   {/* Tombol Plus */}
-                  <img
-                    src={plusIcon}
-                    className="img-fluid"
-                    alt=""
+                  <Button
+                    className="animated-button"
                     style={{
-                      maxWidth: "40px",
-                      maxHeight: "40px",
-                      cursor: "pointer",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      padding: "0",
                     }}
-                    onClick={() => {
-                      incrementInputPassengers("child");
-                    }}
-                  />
+                  >
+                    <img
+                      src={plusIcon}
+                      className="img-fluid"
+                      alt=""
+                      style={{
+                        maxWidth: "40px",
+                        maxHeight: "40px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        incrementInputPassengers("child");
+                      }}
+                    />
+                  </Button>
                 </Col>
               </Row>
               <Row className="d-flex justify-content-between align-items-center">
@@ -589,19 +728,28 @@ const Homepage = () => {
                 {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
                 <Col className="p-0 d-flex justify-content-end align-items-center">
                   {/* Tombol Minus */}
-                  <img
-                    src={minusIcon}
-                    className="img-fluid"
-                    alt=""
+                  <Button
+                    className="animated-button"
                     style={{
-                      maxWidth: "40px",
-                      maxHeight: "40px",
-                      cursor: "pointer",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      padding: "0",
                     }}
-                    onClick={() => {
-                      decrementInputPassengers("baby");
-                    }}
-                  />
+                  >
+                    <img
+                      src={minusIcon}
+                      className="img-fluid"
+                      alt=""
+                      style={{
+                        maxWidth: "40px",
+                        maxHeight: "40px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        decrementInputPassengers("baby");
+                      }}
+                    />
+                  </Button>
 
                   {/* Input Field */}
                   <input
@@ -615,28 +763,42 @@ const Homepage = () => {
                       marginRight: "10px",
                     }}
                     value={babyInput}
+                    readOnly
                   />
 
                   {/* Tombol Plus */}
-                  <img
-                    src={plusIcon}
-                    className="img-fluid"
-                    alt=""
+                  <Button
+                    className="animated-button"
                     style={{
-                      maxWidth: "40px",
-                      maxHeight: "40px",
-                      cursor: "pointer",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      padding: "0",
                     }}
-                    onClick={() => {
-                      incrementInputPassengers("baby");
-                    }}
-                  />
+                  >
+                    <img
+                      src={plusIcon}
+                      className="img-fluid"
+                      alt=""
+                      style={{
+                        maxWidth: "40px",
+                        maxHeight: "40px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        incrementInputPassengers("baby");
+                      }}
+                    />
+                  </Button>
                 </Col>
               </Row>
             </Container>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="primary" onClick={handleSavePassengers}>
+            <Button
+              variant="primary"
+              onClick={handleSavePassengers}
+              className="animated-button"
+            >
               Simpan
             </Button>
           </Modal.Footer>
@@ -753,10 +915,18 @@ const Homepage = () => {
             </Container>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={handleClassClose}>
+            <Button
+              variant="secondary"
+              onClick={handleClassClose}
+              className="animated-button"
+            >
               Tutup
             </Button>
-            <Button variant="primary" onClick={handleSaveClass}>
+            <Button
+              variant="primary"
+              onClick={handleSaveClass}
+              className="animated-button"
+            >
               Simpan
             </Button>
           </Modal.Footer>
@@ -778,10 +948,13 @@ const Homepage = () => {
                   sm={3}
                   md={2}
                   lg={1}
-                  className={`d-flex align-items-center justify-content-center p-2 m-2 rounded responsive-button ${
+                  className={`d-flex align-items-center justify-content-center m-2 rounded responsive-button ${
                     activeButton === index ? "active" : ""
                   }`}
-                  onClick={() => handleButtonCardClick(index)}
+                  onClick={() => {
+                    handleButtonCardClick(index);
+                    setState(label);
+                  }}
                 >
                   <FaSearch className="icon" />
                   <span className="button-label">{label}</span>
@@ -789,8 +962,8 @@ const Homepage = () => {
               )
             )}
           </Row>
-          <Row className="g-3">
-            {[...Array(7)].map((_, index) => (
+          <Row className="g-3 mb-5">
+            {flightsData?.map((flight, index) => (
               <Col key={index} xs={12} sm={6} md={4} lg={2} className="d-flex">
                 <Card className="custom-card">
                   <div className="badge-container">
@@ -800,29 +973,47 @@ const Homepage = () => {
                       {index % 2 === 0 ? "Limited!" : "50% OFF"}
                     </span>
                   </div>
-                  <Card.Img variant="top" src={cardImg} />
-                  <Card.Body>
+                  <Card.Img variant="top" src={flight?.arrival.imageUrl} className="img-fluid" />
+                  <Card.Body className="custom-card-body">
                     <Card.Title
                       className="card-title"
                       style={{
-                        fontSize: "16px",
+                        fontSize: "14px",
                       }}
                     >
-                      {index % 2 === 0
-                        ? "Jakarta -> Bangkok"
-                        : "Jakarta -> Sydney"}
+                      {flight?.departure.city} -{`>`} {flight?.arrival.city}
                     </Card.Title>
-                    <p className="text-primary fs-6 mb-1">AirAsia</p>
+                    <p
+                      className="text-primary mb-1"
+                      style={{
+                        fontSize: "12px",
+                      }}
+                    >
+                      {flight?.airline.name}
+                    </p>
                     <Card.Text>
-                      <p className="fs-6 mb-1">
-                        {index % 2 === 0
-                          ? "20 - 30 Maret 2023"
-                          : "5 - 25 Maret 2023"}
+                      <p
+                        className="mb-1"
+                        style={{
+                          fontSize: "10px",
+                        }}
+                      >
+                        {formatDate(flight?.departureTime)}
                       </p>
-                      <p className="fs-6">
+                      <p
+                        className=""
+                        style={{
+                          fontSize: "14px",
+                        }}
+                      >
                         Mulai dari{" "}
-                        <span className="text-danger">
-                          {index % 2 === 0 ? "IDR 950.000" : "IDR 3.650.000"}
+                        <span
+                          className="text-danger"
+                          style={{
+                            fontSize: "14px",
+                          }}
+                        >
+                          IDR {flight?.price}
                         </span>
                       </p>
                     </Card.Text>
@@ -848,15 +1039,6 @@ const Homepage = () => {
         />
       </div>
     </>
-  ) : (
-    <SearchFlight
-      fromInput={fromInput}
-      toInput={toInput}
-      departureDate={departureDate}
-      returnDate={returnDate ? returnDate : null}
-      passengers={totalPassengers}
-      classInput={classInput}
-    />
   );
 };
 

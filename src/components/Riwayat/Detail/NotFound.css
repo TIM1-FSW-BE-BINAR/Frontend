@@ -1,0 +1,14 @@
+@media (max-width: 768px) {
+  .not-found {
+    margin-top: 5rem !important;
+  }
+
+  .not-found-img {
+    width: 8rem !important;
+  }
+
+  .h5-not-found,
+  .p-not-found {
+    font-size: 2.5vmax;
+  }
+}

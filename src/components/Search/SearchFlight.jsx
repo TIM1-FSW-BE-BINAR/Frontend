@@ -1,14 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./SearchFlight.css";
-import {
-  Accordion,
-  Button,
-  Col,
-  Container,
-  Dropdown,
-  Modal,
-  Row,
-} from "react-bootstrap";
+import { Accordion, Button, Col, Container, Modal, Row } from "react-bootstrap";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaArrowRight } from "react-icons/fa";
 import { FiBox } from "react-icons/fi";
@@ -22,46 +14,72 @@ import baggageDelay from "../../assets/homepage/icon/baggage-delay-icon.png";
 import loadingImage from "../../assets/homepage/loading.png";
 import notFoundImage from "../../assets/homepage/not-found.png";
 import ticketSoldOutImage from "../../assets/homepage/tickets-sold-out.png";
-import {format, addWeeks, subWeeks, startOfWeek, addDays, isSameDay} from "date-fns";
+import {
+  format,
+  addWeeks,
+  subWeeks,
+  startOfWeek,
+  addDays,
+  isSameDay,
+} from "date-fns";
 import { id } from "date-fns/locale";
+import { Navigate, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { getFlights, getFlightId } from "../../service/flight/flightService";
 
-import HomePageScreen from "../Homepage/ScreenHomepage"
+const SearchFlight = ({
+  fromInput,
+  toInput,
+  departureDate,
+  returnDate,
+  passengers,
+  adultInput,
+  childInput,
+  babyInput,
+  classInput,
+  departureAirportId,
+  returnAirportId,
+}) => {
+  const navigate = useNavigate();
 
-const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers, classInput}) => {
   const [filterShowModal, setFilterShowModal] = useState(false);
-  const [filter, setFilter] = useState("Harga - Termurah");
+  const [filter, setFilter] = useState("Pilih Filter");
   const [tempFilter, setTempFilter] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("");
   const [selectedElement, setSelectedElement] = useState("");
   const [dateBtnActive, setDateBtnActive] = useState(null);
-  const [homePage, setHomePage] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [ticketSoldOut, setTicketSoldOut] = useState(false);
   const departureDateObj = new Date(departureDate);
-   const [currentWeek, setCurrentWeek] = useState(departureDateObj); // Tanggal acuan untuk 1 minggu
-  const [weekDates, setWeekDates] = useState([]); // Menyimpan daftar tanggal dalam 1 minggu 
+  const [currentWeek, setCurrentWeek] = useState(departureDateObj); // Tanggal acuan untuk 1 minggu
+  const [weekDates, setWeekDates] = useState([]); // Menyimpan daftar tanggal dalam 1 minggu
 
-   const calculateWeekDates = (baseDate) => {
-     const startDate = startOfWeek(baseDate, { weekStartsOn: 1 }); // Mulai dari hari Senin
-     return Array.from({ length: 7 }, (_, i) => addDays(startDate, i));
-   };
+  const calculateWeekDates = (baseDate) => {
+    const startDate = startOfWeek(baseDate, { weekStartsOn: 1 }); // Mulai dari hari Senin
+    return Array.from({ length: 7 }, (_, i) => addDays(startDate, i));
+  };
 
   // update tanggal saat minggu berubah
   useEffect(() => {
     const week = calculateWeekDates(currentWeek);
-    setWeekDates(week);
 
-    // Tentukan tombol aktif default berdasarkan departureDate
-    // Set tombol aktif hanya saat aplikasi pertama kali dimuat
+    // Update hanya jika weekDates berubah
+    setWeekDates((prevWeekDates) => {
+      if (JSON.stringify(prevWeekDates) !== JSON.stringify(week)) {
+        return week;
+      }
+      return prevWeekDates;
+    });
+
     if (dateBtnActive === null) {
       const activeIndex = week.findIndex((date) =>
         isSameDay(date, departureDateObj)
       );
       setDateBtnActive(activeIndex);
-    } 
-  }, [currentWeek, departureDateObj]);
+    }
+  }, [currentWeek, departureDateObj, dateBtnActive]);
 
   const handleNextWeek = () => {
     setCurrentWeek((prevDate) => addWeeks(prevDate, 1)); // Tambah 1 Minggu
@@ -69,12 +87,16 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
 
   const handlePreviousWeek = () => {
     setCurrentWeek((prevDate) => subWeeks(prevDate, 1)); // Kurangi 1 Minggu
-  }
+  };
 
- const handleDateBtnActive = (index) => {
-   setDateBtnActive(index);
- };
+  // handle search saat date active nya diganti
+  const [departureDateActive, setDepartureDateActive] = useState(departureDate);
 
+  const handleDateBtnActive = (index, date) => {
+    setDateBtnActive(index);
+    setDepartureDateActive(date);
+    setTicketSoldOut(false);
+  };
 
   const handleFilterClose = () => {
     setFilterShowModal(false);
@@ -83,6 +105,7 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
   const handleSaveFilter = () => {
     setFilter(tempFilter);
     setFilterShowModal(false);
+    setSaveFilter(true);
   };
 
   const handleSelectFilter = (FilterName, elementId, label) => {
@@ -91,7 +114,94 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
     setTempFilter(label); // Simpan nilai sementara dari pilihan
   };
 
-  return !homePage ? (
+  // Logic search data flight (belum kelar)
+  const [flightsData, setFlightsData] = useState([]);
+  const seatClassValue = classInput?.split(" ")[0];
+
+  const [filterChange, setFilterChange] = useState({});
+  const [saveFilter, setSaveFilter] = useState(true);
+
+  const handleFilterChange = (newFilter) => {
+    setFilterChange(newFilter); // Update filter tambahan
+  };
+
+  const { data, isSuccess, isError, isPending } = useQuery({
+    queryKey: ["search-flights", filterChange, departureDateActive],
+    queryFn: () =>
+      getFlights({
+        departureAirport: departureAirportId,
+        arrivalAirport: returnAirportId,
+        seatClass: seatClassValue,
+        departureTime: departureDateActive,
+        ...filterChange,
+      }),
+    enabled: !!departureAirportId && !!returnAirportId && !!saveFilter, // Fetch jika ID sudah ada
+  });
+
+  useEffect(() => {
+    if (isSuccess) {
+      setFlightsData(data);
+      setLoading(false);
+      if (data.length === 0) {
+        setNotFound(true);
+      } else {
+        setNotFound(false);
+      }
+      console.log("fetch search berhasil ", data);
+    } else if (isError) {
+      console.log("fetch search nya error");
+    } else if (isPending) {
+      setLoading(true);
+    }
+  }, [
+    data,
+    isError,
+    isSuccess,
+    departureAirportId,
+    returnAirportId,
+    isPending,
+  ]);
+
+  const formatTime = (dateString) => {
+    const date = new Date(dateString);
+    const hours = String(date.getUTCHours()).padStart(2, "0"); // Menggunakan getUTCHours untuk waktu UTC
+    const minutes = String(date.getUTCMinutes()).padStart(2, "0"); // Menggunakan getUTCMinutes untuk waktu UTC
+    return `${hours}:${minutes}`;
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getUTCDate(); // Menggunakan getUTCDate untuk tanggal UTC
+    const month = date.toLocaleString("en-US", {
+      month: "long",
+      timeZone: "UTC",
+    }); // Menggunakan timeZone: "UTC" untuk mendapatkan bulan dalam UTC
+    const year = date.getUTCFullYear(); // Menggunakan getUTCFullYear untuk tahun UTC
+    return `${day} ${month} ${year}`;
+  };
+
+  const handleBookingPage = async (flight) => {
+    const flightDataById = await getFlightId(flight?.id);
+    if (flightDataById.error?.message) {
+      // tiket nya habis
+      setTicketSoldOut(true);
+    } else {
+      // tiket tersedia, kirim flight nya ke booking
+      const queryParams = new URLSearchParams({
+        flightId: flight.id,
+        totalPassengers: passengers,
+        adultInput,
+        childInput,
+        babyInput,
+      }).toString();
+
+      navigate({
+        to: `/booking?${queryParams}`,
+      });
+    }
+  };
+
+  return (
     <>
       <Container className="">
         <Row className="mt-5 mb-2">
@@ -102,18 +212,20 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
             <Button
               className="p-3 w-100 text-start back-btn"
               style={{ background: "#A06ECE" }}
-              onClick={() => setHomePage(true)}
+              onClick={() => navigate({ to: "/" })}
             >
               <FaArrowLeft className="me-2" />
-              {fromInput} > {toInput} - {passengers} Penumpang - {classInput}
+              {fromInput} {">"} {toInput} - {passengers} Penumpang -{" "}
+              {classInput}
             </Button>
           </Col>
           <Col>
             <Button
-              className="p-3 w-100 ubah-btn"
+              className="p-3 w-100 ubah-btn animated-button"
               style={{
                 background: "#73CA5C",
               }}
+              onClick={() => navigate({ to: "/" })}
             >
               Ubah Pencarian
             </Button>
@@ -121,7 +233,7 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
         </Row>
         <Row className="d-flex align-items-center justify-content-between pt-3">
           <Col>
-            <Button onClick={handlePreviousWeek}>
+            <Button onClick={handlePreviousWeek} className="animated-button">
               <FaArrowLeft />
             </Button>
           </Col>
@@ -137,7 +249,10 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
                 className={`${
                   dateBtnActive === index ? "date-active" : ""
                 } d-flex flex-column justify-content-center align-items-center w-full px-3 py-1 date-btn`}
-                onClick={() => handleDateBtnActive(index)}
+                onClick={() => {
+                  const dateSelect = format(date, "yyyy-MM-dd");
+                  handleDateBtnActive(index, dateSelect);
+                }}
               >
                 <h6>{format(date, "EEEE", { locale: id })}</h6>
                 <span>{format(date, "dd/MM/yyyy")}</span>
@@ -145,7 +260,7 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
             ))}
           </Col>
           <Col>
-            <Button onClick={handleNextWeek}>
+            <Button onClick={handleNextWeek} className="animated-button">
               <FaArrowRight />
             </Button>
           </Col>
@@ -158,7 +273,10 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
           <Col className="d-flex justify-content-end align-items-end">
             <Button
               className="d-flex align-items-center bg-white rounded-pill px-3 filter-btn"
-              onClick={() => setFilterShowModal(true)}
+              onClick={() => {
+                setFilterShowModal(true);
+                setSaveFilter(false);
+              }}
             >
               <LuArrowUpDown className="up-down-icon" />
               {filter}
@@ -299,7 +417,11 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
                 <span className="fw-bold">
                   Maaf, pencarian Anda tidak ditemukan
                 </span>
-                <span className="text-primary" style={{ cursor: "pointer" }}>
+                <span
+                  className="text-primary"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => navigate({ to: "/" })}
+                >
                   Coba cari perjalanan lainnya!
                 </span>
               </div>
@@ -307,1096 +429,304 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
               <div className="d-flex flex-column justify-content-center align-items-center">
                 <img src={ticketSoldOutImage} className="img-fluid w-25" />
                 <span className="fw-bold">Maaf, Tiket terjual habis!</span>
-                <span className="text-primary" style={{ cursor: "pointer" }}>
+                <span
+                  className="text-primary"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => navigate({ to: "/" })}
+                >
                   Coba cari perjalanan lainnya!
                 </span>
               </div>
             ) : (
               <Accordion flush>
-                <Accordion.Item eventKey="0" className="flight-box shadow-sm">
-                  <Accordion.Header className="p-0 position-relative">
-                    <Container>
-                      {/* Header */}
-                      <Row className="align-items-center">
-                        <Col className="d-flex align-items-center">
-                          <img
-                            src={airlineLogo}
-                            alt="Logo"
-                            style={{
-                              width: "24px",
-                              height: "24px",
-                            }}
-                          />
-                          <h6
-                            className="ms-3 mb-0 fw-bold"
-                            style={{ fontSize: "14px" }}
-                          >
-                            Jet Air - Economy
-                          </h6>
-                        </Col>
-                      </Row>
-
-                      {/* Detail Section */}
-                      <Row className="mt-3 flex-column flex-sm-row gap-xs-3">
-                        <Col
-                          sm={8}
-                          lg={9}
-                          className="d-flex align-items-center mb-3 mb-sm-0"
-                        >
-                          {/* Flight Details */}
-                          <Container
-                            fluid
-                            className="d-flex justify-content-center align-items-center"
-                          >
-                            {/* Departure */}
-                            <Col
-                              sm={2}
-                              className="text-center d-flex flex-column align-items-center"
-                            >
-                              <span
-                                style={{ fontSize: "16px", fontWeight: "bold" }}
-                              >
-                                07:00
-                              </span>
-                              <p
-                                style={{
-                                  margin: "0",
-                                  fontSize: "12px",
-                                  color: "#6B7280",
-                                }}
-                              >
-                                JKT
-                              </p>
-                            </Col>
-
-                            {/* Duration and Arrow */}
-                            <Col
-                              sm={8}
-                              className="text-center d-flex flex-column align-items-center"
-                            >
-                              <span
-                                style={{ fontSize: "12px", color: "#6B7280" }}
-                              >
-                                4h 0m
-                              </span>
-                              <img
-                                src={longArrowRight}
-                                alt="Arrow"
-                                className="img-fluid long-arrow-icon"
-                                style={{
-                                  maxWidth: "100%",
-                                  width: "100%",
-                                  maxWidth: "433px",
-                                }}
-                              />
-                              <span
-                                style={{ fontSize: "12px", color: "#6B7280" }}
-                              >
-                                Direct
-                              </span>
-                            </Col>
-
-                            {/* Arrival */}
-                            <Col
-                              sm={2}
-                              className="text-center d-flex flex-column align-items-center"
-                            >
-                              <span
-                                style={{ fontSize: "16px", fontWeight: "bold" }}
-                              >
-                                11:00
-                              </span>
-                              <p
-                                style={{
-                                  margin: "0",
-                                  fontSize: "12px",
-                                  color: "#6B7280",
-                                }}
-                              >
-                                MLB
-                              </p>
-                            </Col>
-                          </Container>
-
-                          {/* Baggage Icon */}
-                          <div>
+                {flightsData.map((flight, index) => (
+                  <Accordion.Item
+                    eventKey={index}
+                    className="flight-box shadow-sm"
+                    key={index}
+                  >
+                    <Accordion.Header className="p-0 position-relative">
+                      <Container>
+                        {/* Header */}
+                        <Row className="align-items-center">
+                          <Col className="d-flex align-items-center">
                             <img
-                              src={baggageDelay}
-                              alt="Baggage Icon"
-                              className="img-fluid"
+                              src={flight?.airline.imageUrl}
+                              alt="Logo"
                               style={{
                                 width: "24px",
                                 height: "24px",
                               }}
                             />
-                          </div>
-                        </Col>
-
-                        {/* Price and Button */}
-                        <Col className="d-flex flex-column justify-content-center">
-                          <h5
-                            className="fw-bold text-center"
-                            style={{
-                              color: "#7126B5",
-                              fontSize: "18px",
-                            }}
-                          >
-                            IDR 4.950.000
-                          </h5>
-                          <Button
-                            className="btn btn-block w-full"
-                            style={{
-                              backgroundColor: "#7126B5",
-                            }}
-                          >
-                            Pilih
-                          </Button>
-                        </Col>
-                      </Row>
-                    </Container>
-                  </Accordion.Header>
-
-                  <Accordion.Body>
-                    <Container>
-                      <Row>
-                        <h6
-                          style={{
-                            color: "#4B1979",
-                            fontSize: "14px",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          Detail Penerbangan
-                        </h6>
-                      </Row>
-                      <Row>
-                        <Col
-                          xs={7}
-                          sm={8}
-                          md={9}
-                          xl={10}
-                          className="d-flex flex-column"
-                        >
-                          <h6
-                            style={{
-                              fontSize: "16px",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            07:00
-                          </h6>
-                          <span
-                            style={{
-                              fontSize: "14px",
-                            }}
-                          >
-                            3 Maret 2023
-                          </span>
-                          <span
-                            style={{
-                              fontSize: "14px",
-                            }}
-                          >
-                            Soekarno Hatta - Terminal 1A Domestik
-                          </span>
-                        </Col>
-                        <Col>
-                          <span
-                            style={{
-                              color: "#A06ECE",
-                              fontSize: "12px",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            Keberangkatan
-                          </span>
-                        </Col>
-                      </Row>
-                      <hr />
-                      <Row>
-                        <Col
-                          xs={1}
-                          className="d-flex justify-content-center align-items-center"
-                        >
-                          <img
-                            src={airlineLogo}
-                            alt="Logo"
-                            style={{
-                              width: "24px",
-                              height: "24px",
-                            }}
-                          />
-                        </Col>
-                        <Col>
-                          <div
-                            className="fw-bold d-flex flex-column mb-3"
-                            style={{
-                              fontSize: "14px",
-                            }}
-                          >
-                            <span className="fw-bold">Jet Air - Economy</span>
-                            <span>JT - 203</span>
-                          </div>
-
-                          <div
-                            className="d-flex flex-column"
-                            style={{
-                              fontSize: "14px",
-                            }}
-                          >
-                            <h6 className="fw-bold">Informasi</h6>
-                            <span>Baggage 20 kg</span>
-                            <span>Cabin baggage 7 kg</span>
-                            <span>In Flight Entertainment</span>
-                          </div>
-                        </Col>
-                      </Row>
-                      <hr />
-                      <Row>
-                        <Col
-                          xs={7}
-                          sm={8}
-                          md={9}
-                          xl={10}
-                          className="d-flex flex-column"
-                          style={{
-                            fontSize: "14px",
-                          }}
-                        >
-                          <span className="fw-bold">11:00</span>
-                          <span>3 Maret 2023</span>
-                          <span className="fw-bold">
-                            Melbourne International Airport
-                          </span>
-                        </Col>
-                        <Col>
-                          <span
-                            style={{
-                              color: "#A06ECE",
-                              fontSize: "12px",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            Kedatangan
-                          </span>
-                        </Col>
-                      </Row>
-                    </Container>
-                  </Accordion.Body>
-                </Accordion.Item>
-                <Accordion.Item eventKey="1" className="flight-box shadow-sm">
-                  <Accordion.Header className="p-0 position-relative">
-                    <Container>
-                      {/* Header */}
-                      <Row className="align-items-center">
-                        <Col className="d-flex align-items-center">
-                          <img
-                            src={airlineLogo}
-                            alt="Logo"
-                            style={{
-                              width: "24px",
-                              height: "24px",
-                            }}
-                          />
-                          <h6
-                            className="ms-3 mb-0 fw-bold"
-                            style={{ fontSize: "14px" }}
-                          >
-                            Jet Air - Economy
-                          </h6>
-                        </Col>
-                      </Row>
-
-                      {/* Detail Section */}
-                      <Row className="mt-3 flex-column flex-sm-row gap-xs-3">
-                        <Col
-                          sm={8}
-                          lg={9}
-                          className="d-flex align-items-center mb-3 mb-sm-0"
-                        >
-                          {/* Flight Details */}
-                          <Container
-                            fluid
-                            className="d-flex justify-content-center align-items-center"
-                          >
-                            {/* Departure */}
-                            <Col
-                              sm={2}
-                              className="text-center d-flex flex-column align-items-center"
+                            <h6
+                              className="ms-3 mb-0 fw-bold"
+                              style={{ fontSize: "14px" }}
                             >
-                              <span
-                                style={{ fontSize: "16px", fontWeight: "bold" }}
-                              >
-                                07:00
-                              </span>
-                              <p
-                                style={{
-                                  margin: "0",
-                                  fontSize: "12px",
-                                  color: "#6B7280",
-                                }}
-                              >
-                                JKT
-                              </p>
-                            </Col>
+                              {flight?.airline.name} - {flight?.class}
+                            </h6>
+                          </Col>
+                        </Row>
 
-                            {/* Duration and Arrow */}
-                            <Col
-                              sm={8}
-                              className="text-center d-flex flex-column align-items-center"
+                        {/* Detail Section */}
+                        <Row className="mt-3 flex-column flex-sm-row gap-xs-3">
+                          <Col
+                            sm={8}
+                            lg={9}
+                            className="d-flex align-items-center mb-3 mb-sm-0"
+                          >
+                            {/* Flight Details */}
+                            <Container
+                              fluid
+                              className="d-flex justify-content-center align-items-center"
                             >
-                              <span
-                                style={{ fontSize: "12px", color: "#6B7280" }}
+                              {/* Departure */}
+                              <Col
+                                sm={2}
+                                className="text-center d-flex flex-column align-items-center"
                               >
-                                4h 0m
-                              </span>
+                                <span
+                                  style={{
+                                    fontSize: "16px",
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  {formatTime(flight?.departureTime)}
+                                </span>
+                                <p
+                                  style={{
+                                    margin: "0",
+                                    fontSize: "12px",
+                                    color: "#6B7280",
+                                  }}
+                                >
+                                  {flight?.departure.code}
+                                </p>
+                              </Col>
+
+                              {/* Duration and Arrow */}
+                              <Col
+                                sm={8}
+                                className="text-center d-flex flex-column align-items-center"
+                              >
+                                <span
+                                  style={{ fontSize: "12px", color: "#6B7280" }}
+                                >
+                                  {flight?.duration}
+                                </span>
+                                <img
+                                  src={longArrowRight}
+                                  alt="Arrow"
+                                  className="img-fluid long-arrow-icon"
+                                  style={{
+                                    width: "100%",
+                                    maxWidth: "433px",
+                                  }}
+                                />
+                                <span
+                                  style={{ fontSize: "12px", color: "#6B7280" }}
+                                >
+                                  {flight?.information}
+                                </span>
+                              </Col>
+
+                              {/* Arrival */}
+                              <Col
+                                sm={2}
+                                className="text-center d-flex flex-column align-items-center"
+                              >
+                                <span
+                                  style={{
+                                    fontSize: "16px",
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  {formatTime(flight?.arrivalTime)}
+                                </span>
+                                <p
+                                  style={{
+                                    margin: "0",
+                                    fontSize: "12px",
+                                    color: "#6B7280",
+                                  }}
+                                >
+                                  {flight?.arrival.code}
+                                </p>
+                              </Col>
+                            </Container>
+
+                            {/* Baggage Icon */}
+                            <div>
                               <img
-                                src={longArrowRight}
-                                alt="Arrow"
-                                className="img-fluid long-arrow-icon"
+                                src={baggageDelay}
+                                alt="Baggage Icon"
+                                className="img-fluid"
                                 style={{
-                                  maxWidth: "100%",
-                                  width: "100%",
-                                  maxWidth: "433px",
+                                  width: "24px",
+                                  height: "24px",
                                 }}
                               />
-                              <span
-                                style={{ fontSize: "12px", color: "#6B7280" }}
-                              >
-                                Direct
-                              </span>
-                            </Col>
+                            </div>
+                          </Col>
 
-                            {/* Arrival */}
-                            <Col
-                              sm={2}
-                              className="text-center d-flex flex-column align-items-center"
+                          {/* Price and Button */}
+                          <Col className="d-flex flex-column justify-content-center">
+                            <h5
+                              className="fw-bold text-center"
+                              style={{
+                                color: "#7126B5",
+                                fontSize: "18px",
+                              }}
                             >
-                              <span
-                                style={{ fontSize: "16px", fontWeight: "bold" }}
-                              >
-                                11:00
-                              </span>
-                              <p
-                                style={{
-                                  margin: "0",
-                                  fontSize: "12px",
-                                  color: "#6B7280",
-                                }}
-                              >
-                                MLB
-                              </p>
-                            </Col>
-                          </Container>
+                              IDR {flight?.price}
+                            </h5>
+                            <Button
+                              className="btn btn-block w-full"
+                              style={{
+                                backgroundColor: "#7126B5",
+                              }}
+                              onClick={(event) => {
+                                event.stopPropagation(); // Prevent Accordion from toggling
+                                handleBookingPage(flight);
+                              }}
+                            >
+                              Pilih
+                            </Button>
+                          </Col>
+                        </Row>
+                      </Container>
+                    </Accordion.Header>
 
-                          {/* Baggage Icon */}
-                          <div>
+                    <Accordion.Body>
+                      <Container>
+                        <Row>
+                          <h6
+                            style={{
+                              color: "#4B1979",
+                              fontSize: "14px",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Detail Penerbangan
+                          </h6>
+                        </Row>
+                        <Row>
+                          <Col
+                            xs={7}
+                            sm={8}
+                            md={9}
+                            xl={10}
+                            className="d-flex flex-column"
+                          >
+                            <h6
+                              style={{
+                                fontSize: "16px",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              {formatTime(flight?.departureTime)}
+                            </h6>
+                            <span
+                              style={{
+                                fontSize: "14px",
+                              }}
+                            >
+                              {formatDate(flight?.departureTime)}
+                            </span>
+                            <span
+                              style={{
+                                fontSize: "14px",
+                              }}
+                            >
+                              {flight?.departure.name} - {flight?.arrival.name}
+                            </span>
+                          </Col>
+                          <Col>
+                            <span
+                              style={{
+                                color: "#A06ECE",
+                                fontSize: "12px",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Keberangkatan
+                            </span>
+                          </Col>
+                        </Row>
+                        <hr />
+                        <Row>
+                          <Col
+                            xs={1}
+                            className="d-flex justify-content-center align-items-center"
+                          >
                             <img
-                              src={baggageDelay}
-                              alt="Baggage Icon"
-                              className="img-fluid"
+                              src={flight?.airline.imageUrl}
+                              alt="Logo"
                               style={{
                                 width: "24px",
                                 height: "24px",
                               }}
                             />
-                          </div>
-                        </Col>
-
-                        {/* Price and Button */}
-                        <Col className="d-flex flex-column justify-content-center">
-                          <h5
-                            className="fw-bold text-center"
-                            style={{
-                              color: "#7126B5",
-                              fontSize: "18px",
-                            }}
-                          >
-                            IDR 4.950.000
-                          </h5>
-                          <Button
-                            className="btn btn-block w-full"
-                            style={{
-                              backgroundColor: "#7126B5",
-                            }}
-                          >
-                            Pilih
-                          </Button>
-                        </Col>
-                      </Row>
-                    </Container>
-                  </Accordion.Header>
-
-                  <Accordion.Body>
-                    <Container>
-                      <Row>
-                        <h6
-                          style={{
-                            color: "#4B1979",
-                            fontSize: "14px",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          Detail Penerbangan
-                        </h6>
-                      </Row>
-                      <Row>
-                        <Col
-                          xs={7}
-                          sm={8}
-                          md={9}
-                          xl={10}
-                          className="d-flex flex-column"
-                        >
-                          <h6
-                            style={{
-                              fontSize: "16px",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            07:00
-                          </h6>
-                          <span
-                            style={{
-                              fontSize: "14px",
-                            }}
-                          >
-                            3 Maret 2023
-                          </span>
-                          <span
-                            style={{
-                              fontSize: "14px",
-                            }}
-                          >
-                            Soekarno Hatta - Terminal 1A Domestik
-                          </span>
-                        </Col>
-                        <Col>
-                          <span
-                            style={{
-                              color: "#A06ECE",
-                              fontSize: "12px",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            Keberangkatan
-                          </span>
-                        </Col>
-                      </Row>
-                      <hr />
-                      <Row>
-                        <Col
-                          xs={1}
-                          className="d-flex justify-content-center align-items-center"
-                        >
-                          <img
-                            src={airlineLogo}
-                            alt="Logo"
-                            style={{
-                              width: "24px",
-                              height: "24px",
-                            }}
-                          />
-                        </Col>
-                        <Col>
-                          <div
-                            className="fw-bold d-flex flex-column mb-3"
-                            style={{
-                              fontSize: "14px",
-                            }}
-                          >
-                            <span className="fw-bold">Jet Air - Economy</span>
-                            <span>JT - 203</span>
-                          </div>
-
-                          <div
-                            className="d-flex flex-column"
-                            style={{
-                              fontSize: "14px",
-                            }}
-                          >
-                            <h6 className="fw-bold">Informasi</h6>
-                            <span>Baggage 20 kg</span>
-                            <span>Cabin baggage 7 kg</span>
-                            <span>In Flight Entertainment</span>
-                          </div>
-                        </Col>
-                      </Row>
-                      <hr />
-                      <Row>
-                        <Col
-                          xs={7}
-                          sm={8}
-                          md={9}
-                          xl={10}
-                          className="d-flex flex-column"
-                          style={{
-                            fontSize: "14px",
-                          }}
-                        >
-                          <span className="fw-bold">11:00</span>
-                          <span>3 Maret 2023</span>
-                          <span className="fw-bold">
-                            Melbourne International Airport
-                          </span>
-                        </Col>
-                        <Col>
-                          <span
-                            style={{
-                              color: "#A06ECE",
-                              fontSize: "12px",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            Kedatangan
-                          </span>
-                        </Col>
-                      </Row>
-                    </Container>
-                  </Accordion.Body>
-                </Accordion.Item>
-                <Accordion.Item eventKey="2" className="flight-box shadow-sm">
-                  <Accordion.Header className="p-0 position-relative">
-                    <Container>
-                      {/* Header */}
-                      <Row className="align-items-center">
-                        <Col className="d-flex align-items-center">
-                          <img
-                            src={airlineLogo}
-                            alt="Logo"
-                            style={{
-                              width: "24px",
-                              height: "24px",
-                            }}
-                          />
-                          <h6
-                            className="ms-3 mb-0 fw-bold"
-                            style={{ fontSize: "14px" }}
-                          >
-                            Jet Air - Economy
-                          </h6>
-                        </Col>
-                      </Row>
-
-                      {/* Detail Section */}
-                      <Row className="mt-3 flex-column flex-sm-row gap-xs-3">
-                        <Col
-                          sm={8}
-                          lg={9}
-                          className="d-flex align-items-center mb-3 mb-sm-0"
-                        >
-                          {/* Flight Details */}
-                          <Container
-                            fluid
-                            className="d-flex justify-content-center align-items-center"
-                          >
-                            {/* Departure */}
-                            <Col
-                              sm={2}
-                              className="text-center d-flex flex-column align-items-center"
-                            >
-                              <span
-                                style={{ fontSize: "16px", fontWeight: "bold" }}
-                              >
-                                07:00
-                              </span>
-                              <p
-                                style={{
-                                  margin: "0",
-                                  fontSize: "12px",
-                                  color: "#6B7280",
-                                }}
-                              >
-                                JKT
-                              </p>
-                            </Col>
-
-                            {/* Duration and Arrow */}
-                            <Col
-                              sm={8}
-                              className="text-center d-flex flex-column align-items-center"
-                            >
-                              <span
-                                style={{ fontSize: "12px", color: "#6B7280" }}
-                              >
-                                4h 0m
-                              </span>
-                              <img
-                                src={longArrowRight}
-                                alt="Arrow"
-                                className="img-fluid long-arrow-icon"
-                                style={{
-                                  maxWidth: "100%",
-                                  width: "100%",
-                                  maxWidth: "433px",
-                                }}
-                              />
-                              <span
-                                style={{ fontSize: "12px", color: "#6B7280" }}
-                              >
-                                Direct
-                              </span>
-                            </Col>
-
-                            {/* Arrival */}
-                            <Col
-                              sm={2}
-                              className="text-center d-flex flex-column align-items-center"
-                            >
-                              <span
-                                style={{ fontSize: "16px", fontWeight: "bold" }}
-                              >
-                                11:00
-                              </span>
-                              <p
-                                style={{
-                                  margin: "0",
-                                  fontSize: "12px",
-                                  color: "#6B7280",
-                                }}
-                              >
-                                MLB
-                              </p>
-                            </Col>
-                          </Container>
-
-                          {/* Baggage Icon */}
-                          <div>
-                            <img
-                              src={baggageDelay}
-                              alt="Baggage Icon"
-                              className="img-fluid"
+                          </Col>
+                          <Col>
+                            <div
+                              className="fw-bold d-flex flex-column mb-3"
                               style={{
-                                width: "24px",
-                                height: "24px",
+                                fontSize: "14px",
                               }}
-                            />
-                          </div>
-                        </Col>
-
-                        {/* Price and Button */}
-                        <Col className="d-flex flex-column justify-content-center">
-                          <h5
-                            className="fw-bold text-center"
-                            style={{
-                              color: "#7126B5",
-                              fontSize: "18px",
-                            }}
-                          >
-                            IDR 4.950.000
-                          </h5>
-                          <Button
-                            className="btn btn-block w-full"
-                            style={{
-                              backgroundColor: "#7126B5",
-                            }}
-                          >
-                            Pilih
-                          </Button>
-                        </Col>
-                      </Row>
-                    </Container>
-                  </Accordion.Header>
-
-                  <Accordion.Body>
-                    <Container>
-                      <Row>
-                        <h6
-                          style={{
-                            color: "#4B1979",
-                            fontSize: "14px",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          Detail Penerbangan
-                        </h6>
-                      </Row>
-                      <Row>
-                        <Col
-                          xs={7}
-                          sm={8}
-                          md={9}
-                          xl={10}
-                          className="d-flex flex-column"
-                        >
-                          <h6
-                            style={{
-                              fontSize: "16px",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            07:00
-                          </h6>
-                          <span
-                            style={{
-                              fontSize: "14px",
-                            }}
-                          >
-                            3 Maret 2023
-                          </span>
-                          <span
-                            style={{
-                              fontSize: "14px",
-                            }}
-                          >
-                            Soekarno Hatta - Terminal 1A Domestik
-                          </span>
-                        </Col>
-                        <Col>
-                          <span
-                            style={{
-                              color: "#A06ECE",
-                              fontSize: "12px",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            Keberangkatan
-                          </span>
-                        </Col>
-                      </Row>
-                      <hr />
-                      <Row>
-                        <Col
-                          xs={1}
-                          className="d-flex justify-content-center align-items-center"
-                        >
-                          <img
-                            src={airlineLogo}
-                            alt="Logo"
-                            style={{
-                              width: "24px",
-                              height: "24px",
-                            }}
-                          />
-                        </Col>
-                        <Col>
-                          <div
-                            className="fw-bold d-flex flex-column mb-3"
-                            style={{
-                              fontSize: "14px",
-                            }}
-                          >
-                            <span className="fw-bold">Jet Air - Economy</span>
-                            <span>JT - 203</span>
-                          </div>
-
-                          <div
-                            className="d-flex flex-column"
-                            style={{
-                              fontSize: "14px",
-                            }}
-                          >
-                            <h6 className="fw-bold">Informasi</h6>
-                            <span>Baggage 20 kg</span>
-                            <span>Cabin baggage 7 kg</span>
-                            <span>In Flight Entertainment</span>
-                          </div>
-                        </Col>
-                      </Row>
-                      <hr />
-                      <Row>
-                        <Col
-                          xs={7}
-                          sm={8}
-                          md={9}
-                          xl={10}
-                          className="d-flex flex-column"
-                          style={{
-                            fontSize: "14px",
-                          }}
-                        >
-                          <span className="fw-bold">11:00</span>
-                          <span>3 Maret 2023</span>
-                          <span className="fw-bold">
-                            Melbourne International Airport
-                          </span>
-                        </Col>
-                        <Col>
-                          <span
-                            style={{
-                              color: "#A06ECE",
-                              fontSize: "12px",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            Kedatangan
-                          </span>
-                        </Col>
-                      </Row>
-                    </Container>
-                  </Accordion.Body>
-                </Accordion.Item>
-                <Accordion.Item eventKey="3" className="flight-box shadow-sm">
-                  <Accordion.Header className="p-0 position-relative">
-                    <Container>
-                      {/* Header */}
-                      <Row className="align-items-center">
-                        <Col className="d-flex align-items-center">
-                          <img
-                            src={airlineLogo}
-                            alt="Logo"
-                            style={{
-                              width: "24px",
-                              height: "24px",
-                            }}
-                          />
-                          <h6
-                            className="ms-3 mb-0 fw-bold"
-                            style={{ fontSize: "14px" }}
-                          >
-                            Jet Air - Economy
-                          </h6>
-                        </Col>
-                      </Row>
-
-                      {/* Detail Section */}
-                      <Row className="mt-3 flex-column flex-sm-row gap-xs-3">
-                        <Col
-                          sm={8}
-                          lg={9}
-                          className="d-flex align-items-center mb-3 mb-sm-0"
-                        >
-                          {/* Flight Details */}
-                          <Container
-                            fluid
-                            className="d-flex justify-content-center align-items-center"
-                          >
-                            {/* Departure */}
-                            <Col
-                              sm={2}
-                              className="text-center d-flex flex-column align-items-center"
                             >
-                              <span
-                                style={{ fontSize: "16px", fontWeight: "bold" }}
-                              >
-                                07:00
+                              <span className="fw-bold">
+                                {flight?.airline.name} - {flight?.class}
                               </span>
-                              <p
-                                style={{
-                                  margin: "0",
-                                  fontSize: "12px",
-                                  color: "#6B7280",
-                                }}
-                              >
-                                JKT
-                              </p>
-                            </Col>
+                              <span>{flight?.flightNumber}</span>
+                            </div>
 
-                            {/* Duration and Arrow */}
-                            <Col
-                              sm={8}
-                              className="text-center d-flex flex-column align-items-center"
-                            >
-                              <span
-                                style={{ fontSize: "12px", color: "#6B7280" }}
-                              >
-                                4h 0m
-                              </span>
-                              <img
-                                src={longArrowRight}
-                                alt="Arrow"
-                                className="img-fluid long-arrow-icon"
-                                style={{
-                                  maxWidth: "100%",
-                                  width: "100%",
-                                  maxWidth: "433px",
-                                }}
-                              />
-                              <span
-                                style={{ fontSize: "12px", color: "#6B7280" }}
-                              >
-                                Direct
-                              </span>
-                            </Col>
-
-                            {/* Arrival */}
-                            <Col
-                              sm={2}
-                              className="text-center d-flex flex-column align-items-center"
-                            >
-                              <span
-                                style={{ fontSize: "16px", fontWeight: "bold" }}
-                              >
-                                11:00
-                              </span>
-                              <p
-                                style={{
-                                  margin: "0",
-                                  fontSize: "12px",
-                                  color: "#6B7280",
-                                }}
-                              >
-                                MLB
-                              </p>
-                            </Col>
-                          </Container>
-
-                          {/* Baggage Icon */}
-                          <div>
-                            <img
-                              src={baggageDelay}
-                              alt="Baggage Icon"
-                              className="img-fluid"
+                            <div
+                              className="d-flex flex-column"
                               style={{
-                                width: "24px",
-                                height: "24px",
+                                fontSize: "14px",
                               }}
-                            />
-                          </div>
-                        </Col>
-
-                        {/* Price and Button */}
-                        <Col className="d-flex flex-column justify-content-center">
-                          <h5
-                            className="fw-bold text-center"
-                            style={{
-                              color: "#7126B5",
-                              fontSize: "18px",
-                            }}
-                          >
-                            IDR 4.950.000
-                          </h5>
-                          <Button
-                            className="btn btn-block w-full"
-                            style={{
-                              backgroundColor: "#7126B5",
-                            }}
-                          >
-                            Pilih
-                          </Button>
-                        </Col>
-                      </Row>
-                    </Container>
-                  </Accordion.Header>
-
-                  <Accordion.Body>
-                    <Container>
-                      <Row>
-                        <h6
-                          style={{
-                            color: "#4B1979",
-                            fontSize: "14px",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          Detail Penerbangan
-                        </h6>
-                      </Row>
-                      <Row>
-                        <Col
-                          xs={7}
-                          sm={8}
-                          md={9}
-                          xl={10}
-                          className="d-flex flex-column"
-                        >
-                          <h6
-                            style={{
-                              fontSize: "16px",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            07:00
-                          </h6>
-                          <span
-                            style={{
-                              fontSize: "14px",
-                            }}
-                          >
-                            3 Maret 2023
-                          </span>
-                          <span
-                            style={{
-                              fontSize: "14px",
-                            }}
-                          >
-                            Soekarno Hatta - Terminal 1A Domestik
-                          </span>
-                        </Col>
-                        <Col>
-                          <span
-                            style={{
-                              color: "#A06ECE",
-                              fontSize: "12px",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            Keberangkatan
-                          </span>
-                        </Col>
-                      </Row>
-                      <hr />
-                      <Row>
-                        <Col
-                          xs={1}
-                          className="d-flex justify-content-center align-items-center"
-                        >
-                          <img
-                            src={airlineLogo}
-                            alt="Logo"
-                            style={{
-                              width: "24px",
-                              height: "24px",
-                            }}
-                          />
-                        </Col>
-                        <Col>
-                          <div
-                            className="fw-bold d-flex flex-column mb-3"
-                            style={{
-                              fontSize: "14px",
-                            }}
-                          >
-                            <span className="fw-bold">Jet Air - Economy</span>
-                            <span>JT - 203</span>
-                          </div>
-
-                          <div
+                            >
+                              <h6 className="fw-bold">Informasi</h6>
+                              <span>{flight?.information}</span>
+                            </div>
+                          </Col>
+                        </Row>
+                        <hr />
+                        <Row>
+                          <Col
+                            xs={7}
+                            sm={8}
+                            md={9}
+                            xl={10}
                             className="d-flex flex-column"
                             style={{
                               fontSize: "14px",
                             }}
                           >
-                            <h6 className="fw-bold">Informasi</h6>
-                            <span>Baggage 20 kg</span>
-                            <span>Cabin baggage 7 kg</span>
-                            <span>In Flight Entertainment</span>
-                          </div>
-                        </Col>
-                      </Row>
-                      <hr />
-                      <Row>
-                        <Col
-                          xs={7}
-                          sm={8}
-                          md={9}
-                          xl={10}
-                          className="d-flex flex-column"
-                          style={{
-                            fontSize: "14px",
-                          }}
-                        >
-                          <span className="fw-bold">11:00</span>
-                          <span>3 Maret 2023</span>
-                          <span className="fw-bold">
-                            Melbourne International Airport
-                          </span>
-                        </Col>
-                        <Col>
-                          <span
-                            style={{
-                              color: "#A06ECE",
-                              fontSize: "12px",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            Kedatangan
-                          </span>
-                        </Col>
-                      </Row>
-                    </Container>
-                  </Accordion.Body>
-                </Accordion.Item>
+                            <span className="fw-bold">
+                              {formatTime(flight?.arrivalTime)}
+                            </span>
+                            <span>{formatDate(flight?.arrivalTime)}</span>
+                            <span className="fw-bold">
+                              {flight?.arrival.name}
+                            </span>
+                          </Col>
+                          <Col>
+                            <span
+                              style={{
+                                color: "#A06ECE",
+                                fontSize: "12px",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Kedatangan
+                            </span>
+                          </Col>
+                        </Row>
+                      </Container>
+                    </Accordion.Body>
+                  </Accordion.Item>
+                ))}
               </Accordion>
             )}
           </Col>
@@ -1420,9 +750,14 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
             <Container className="class-modal-content">
               <Row
                 className={`${selectedElement === "termurah" ? "selected" : ""} d-flex justify-content-between border p-2`}
-                onClick={() =>
-                  handleSelectFilter("termurah", "termurah", "Harga - Termurah")
-                }
+                onClick={() => {
+                  handleSelectFilter(
+                    "termurah",
+                    "termurah",
+                    "Harga - Termurah"
+                  );
+                  handleFilterChange({ isCheapest: true });
+                }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
@@ -1442,13 +777,14 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
               </Row>
               <Row
                 className={`${selectedElement === "terpendek" ? "selected" : ""} d-flex justify-content-between border p-2`}
-                onClick={() =>
+                onClick={() => {
                   handleSelectFilter(
                     "terpendek",
                     "terpendek",
                     "Durasi - Terpendek"
-                  )
-                }
+                  );
+                  handleFilterChange({ shortest: true });
+                }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
@@ -1468,13 +804,14 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
               </Row>
               <Row
                 className={`${selectedElement === "keberangkatan-awal" ? "selected" : ""} d-flex justify-content-between border p-2`}
-                onClick={() =>
+                onClick={() => {
                   handleSelectFilter(
                     "keberangkatan-awal",
                     "keberangkatan-awal",
                     "Keberangkatan - Paling Awal"
-                  )
-                }
+                  );
+                  handleFilterChange({ earliestDeparture: true });
+                }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
@@ -1494,13 +831,14 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
               </Row>
               <Row
                 className={`${selectedElement === "keberangkatan-akhir" ? "selected" : ""} d-flex justify-content-between border p-2`}
-                onClick={() =>
+                onClick={() => {
                   handleSelectFilter(
                     "keberangkatan-akhir",
                     "keberangkatan-akhir",
                     "Keberangkatan - Paling Akhir"
-                  )
-                }
+                  );
+                  handleFilterChange({ latestDeparture: true });
+                }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
@@ -1520,13 +858,14 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
               </Row>
               <Row
                 className={`${selectedElement === "kedatangan-awal" ? "selected" : ""} d-flex justify-content-between border p-2`}
-                onClick={() =>
+                onClick={() => {
                   handleSelectFilter(
                     "kedatangan-awal",
                     "kedatangan-awal",
                     "Kedatangan - Paling Awal"
-                  )
-                }
+                  );
+                  handleFilterChange({ earliestArrival: true });
+                }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
@@ -1546,13 +885,14 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
               </Row>
               <Row
                 className={`${selectedElement === "kedatangan-akhir" ? "selected" : ""} d-flex justify-content-between border p-2`}
-                onClick={() =>
+                onClick={() => {
                   handleSelectFilter(
                     "kedatangan-akhir",
                     "kedatangan-akhir",
                     "Kedatangan - Paling Akhir"
-                  )
-                }
+                  );
+                  handleFilterChange({ latestArrival: true });
+                }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
@@ -1583,8 +923,6 @@ const SearchFlight = ({fromInput, toInput, departureDate, returnDate, passengers
         </Modal>
       </Container>
     </>
-  ) : (
-    <HomePageScreen />
   );
 };
 

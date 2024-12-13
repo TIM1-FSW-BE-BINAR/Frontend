@@ -1,0 +1,28 @@
+.title-header {
+  font-size: 1.5rem;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 426px) {
+  .notif-type {
+    font-size: 11px !important;
+  }
+
+  .notif-date {
+    font-size: 9px !important;
+  }
+
+  .notif-title {
+    font-size: 16px !important;
+  }
+
+  .notif-description {
+    font-size: 12.5px !important;
+  }
+
+  .img-search-not-found {
+    width: 15rem !important;
+  }
+}
