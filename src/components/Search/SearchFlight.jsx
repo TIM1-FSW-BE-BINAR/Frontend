@@ -22,7 +22,7 @@ import {
   addDays,
   isSameDay,
 } from "date-fns";
-import { id } from "date-fns/locale";
+import { id, enUS } from "date-fns/locale";
 import { Navigate, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getFlights, getFlightId } from "../../service/flight/flightService";
@@ -43,7 +43,7 @@ const SearchFlight = ({
   const navigate = useNavigate();
 
   const [filterShowModal, setFilterShowModal] = useState(false);
-  const [filter, setFilter] = useState("Pilih Filter");
+  const [filter, setFilter] = useState("Filter");
   const [tempFilter, setTempFilter] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("");
   const [selectedElement, setSelectedElement] = useState("");
@@ -214,7 +214,7 @@ const SearchFlight = ({
     <>
       <Container className="">
         <Row className="mt-5 mb-2">
-          <h2>Pilih Penerbangan</h2>
+          <h2>Select a Flight</h2>
         </Row>
         <Row>
           <Col xs={12} sm={8} md={8} className="mb-2 mb-sm-0">
@@ -224,7 +224,7 @@ const SearchFlight = ({
               onClick={() => navigate({ to: "/" })}
             >
               <FaArrowLeft className="me-2" />
-              {fromInput} {">"} {toInput} - {passengers} Penumpang -{" "}
+              {fromInput} {">"} {toInput} - {passengers} Passenger -{" "}
               {classInput}
             </Button>
           </Col>
@@ -236,7 +236,7 @@ const SearchFlight = ({
               }}
               onClick={() => navigate({ to: "/" })}
             >
-              Ubah Pencarian
+              Change Search
             </Button>
           </Col>
         </Row>
@@ -267,7 +267,7 @@ const SearchFlight = ({
                   handleDateBtnActive(index, dateSelect);
                 }}
               >
-                <h6>{format(date, "EEEE", { locale: id })}</h6>
+                <h6>{format(date, "EEEE", { locale: enUS })}</h6>
                 <span>{format(date, "dd/MM/yyyy")}</span>
               </Button>
             ))}
@@ -607,7 +607,7 @@ const SearchFlight = ({
                                 handleBookingPage(flight);
                               }}
                             >
-                              Pilih
+                              Select
                             </Button>
                           </Col>
                         </Row>
@@ -624,7 +624,7 @@ const SearchFlight = ({
                               fontWeight: "bold",
                             }}
                           >
-                            Detail Penerbangan
+                            Flight Details
                           </h6>
                         </Row>
                         <Row>
@@ -666,7 +666,7 @@ const SearchFlight = ({
                                 fontWeight: "bold",
                               }}
                             >
-                              Keberangkatan
+                              Departure
                             </span>
                           </Col>
                         </Row>
@@ -705,7 +705,7 @@ const SearchFlight = ({
                                 fontSize: "14px",
                               }}
                             >
-                              <h6 className="fw-bold">Informasi</h6>
+                              <h6 className="fw-bold">Information</h6>
                               <span>{flight?.information}</span>
                             </div>
                           </Col>
@@ -738,7 +738,7 @@ const SearchFlight = ({
                                 fontWeight: "bold",
                               }}
                             >
-                              Kedatangan
+                              Arrival
                             </span>
                           </Col>
                         </Row>
@@ -773,14 +773,14 @@ const SearchFlight = ({
                   handleSelectFilter(
                     "termurah",
                     "termurah",
-                    "Harga - Termurah"
+                    "Price - Cheapest"
                   );
                   handleFilterChange({ isCheapest: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
-                    <span className="fw-bold">Harga -</span>Termurah
+                    <span className="fw-bold">Price - </span>Cheapest
                   </h6>
                 </Col>
 
@@ -800,14 +800,14 @@ const SearchFlight = ({
                   handleSelectFilter(
                     "terpendek",
                     "terpendek",
-                    "Durasi - Terpendek"
+                    "Duration - Shortest"
                   );
                   handleFilterChange({ shortest: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
-                    <span className="fw-bold">Durasi -</span>Terpendek
+                    <span className="fw-bold">Duration - </span>Shortest
                   </h6>
                 </Col>
 
@@ -827,14 +827,14 @@ const SearchFlight = ({
                   handleSelectFilter(
                     "keberangkatan-awal",
                     "keberangkatan-awal",
-                    "Keberangkatan - Paling Awal"
+                    "Departure - Earliest"
                   );
                   handleFilterChange({ earliestDeparture: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
-                    <span className="fw-bold">Keberangkatan -</span>Paling Awal
+                    <span className="fw-bold">Departure - </span>Earliest
                   </h6>
                 </Col>
 
@@ -854,14 +854,14 @@ const SearchFlight = ({
                   handleSelectFilter(
                     "keberangkatan-akhir",
                     "keberangkatan-akhir",
-                    "Keberangkatan - Paling Akhir"
+                    "Departure - Latest"
                   );
                   handleFilterChange({ latestDeparture: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
-                    <span className="fw-bold">Keberangkatan -</span>Paling Akhir
+                    <span className="fw-bold">Departure - </span>Latest
                   </h6>
                 </Col>
 
@@ -881,14 +881,14 @@ const SearchFlight = ({
                   handleSelectFilter(
                     "kedatangan-awal",
                     "kedatangan-awal",
-                    "Kedatangan - Paling Awal"
+                    "Arrival - Earliest"
                   );
                   handleFilterChange({ earliestArrival: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
-                    <span className="fw-bold">Kedatangan -</span>Paling Awal
+                    <span className="fw-bold">Arrival - </span>Earliest
                   </h6>
                 </Col>
 
@@ -908,14 +908,14 @@ const SearchFlight = ({
                   handleSelectFilter(
                     "kedatangan-akhir",
                     "kedatangan-akhir",
-                    "Kedatangan - Paling Akhir"
+                    "Arrival - Latest"
                   );
                   handleFilterChange({ latestArrival: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
-                    <span className="fw-bold">Kedatangan -</span>Paling Akhir
+                    <span className="fw-bold">Arrival - </span>Latest
                   </h6>
                 </Col>
 
@@ -933,10 +933,10 @@ const SearchFlight = ({
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleFilterClose}>
-              Tutup
+              Close
             </Button>
             <Button variant="primary" onClick={handleSaveFilter}>
-              Simpan
+              Save
             </Button>
           </Modal.Footer>
         </Modal>

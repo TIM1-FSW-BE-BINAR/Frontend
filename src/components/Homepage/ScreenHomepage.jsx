@@ -190,7 +190,7 @@ const Homepage = () => {
     queryKey: ["flights", page, state],
     queryFn: () =>
       getFlights({
-        ...(state !== "Semua" && { state: state }),
+        ...(state !== "All" && { state: state }),
         page,
         limit: 12,
       }),
@@ -219,7 +219,7 @@ const Homepage = () => {
     queryKey: ["all-flights", state],
     queryFn: () =>
       getFlights({
-        ...(state !== "Semua" && { state: state }),
+        ...(state !== "All" && { state: state }),
       }),
     enabled: true,
   });
@@ -294,7 +294,7 @@ const Homepage = () => {
                     className="p-5 align-items-center d-none d-md-block"
                   >
                     <h1>
-                      <i>Diskon Hari ini</i>
+                      <i>Today{"`"}s Discount</i>
                     </h1>
                     <h1 className="text-primary">85%!</h1>
                   </Col>
@@ -303,7 +303,7 @@ const Homepage = () => {
                     <div className="d-block d-md-none d-flex position-relative">
                       <div className="position-absolute p-2">
                         <h2>
-                          <i>Diskon Hari ini</i>{" "}
+                          <i>Today{"`"}s Discount</i>{" "}
                           <span className="text-primary">85%!</span>
                         </h2>
                       </div>
@@ -339,8 +339,8 @@ const Homepage = () => {
             <Row>
               <Col>
                 <h3>
-                  Pilih Jadwal Penerbangan spesial di{" "}
-                  <span className="text-primary">Tiketku!</span>
+                  Choose a Special Flight Schedule with{" "}
+                  <span className="text-primary">AirFly!</span>
                 </h3>
               </Col>
             </Row>
@@ -513,7 +513,7 @@ const Homepage = () => {
                         <FormLabel>Passengers</FormLabel>
                         <Form.Control
                           type="text"
-                          placeholder="Tambah Penumpang"
+                          placeholder="Add Passengers"
                           className="custom-placeholder form-input"
                           value={
                             totalPassengers
@@ -536,7 +536,7 @@ const Homepage = () => {
                         <FormLabel>Seat Class</FormLabel>
                         <Form.Control
                           type="text"
-                          placeholder="Pilih Class"
+                          placeholder="Select Class"
                           className="custom-placeholder form-input"
                           onClick={() => setClassModalShow(true)}
                           value={classInput}
@@ -552,7 +552,7 @@ const Homepage = () => {
                   className="btn btn-block w-100 mt-2 mx-0 animated-button"
                   style={{ backgroundColor: "#7126b5" }}
                 >
-                  Cari Penerbangan
+                  Search for Flights
                 </Button>
               </Form>
             </Row>
@@ -598,8 +598,8 @@ const Homepage = () => {
                     }}
                   />
                   <div className="ms-2">
-                    <p className="fw-bold mb-0">Dewasa</p>
-                    <p>(12 Tahun Keatas)</p>
+                    <p className="fw-bold mb-0">Adult</p>
+                    <p>(12 Years and Above)</p>
                   </div>
                 </Col>
                 {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
@@ -680,8 +680,8 @@ const Homepage = () => {
                     }}
                   />
                   <div className="ms-2">
-                    <p className="fw-bold mb-0">Anak</p>
-                    <p>(2 - 11 Tahun)</p>
+                    <p className="fw-bold mb-0">Child</p>
+                    <p>(2 - 11 Years Old)</p>
                   </div>
                 </Col>
                 {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
@@ -762,8 +762,8 @@ const Homepage = () => {
                     }}
                   />
                   <div className="ms-2">
-                    <p className="fw-bold mb-0">Bayi</p>
-                    <p>(Dibawah 2 Tahun)</p>
+                    <p className="fw-bold mb-0">Baby</p>
+                    <p>(Under 2 Years Old)</p>
                   </div>
                 </Col>
                 {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
@@ -841,7 +841,7 @@ const Homepage = () => {
               className="animated-button"
               style={{ backgroundColor: "#7126b5" }}
             >
-              Simpan
+              Save
             </Button>
           </Modal.Footer>
         </Modal>
@@ -957,7 +957,7 @@ const Homepage = () => {
               onClick={handleClassClose}
               className="animated-button"
             >
-              Tutup
+              Close
             </Button>
             <Button
               variant="primary"
@@ -965,7 +965,7 @@ const Homepage = () => {
               className="animated-button"
               style={{ backgroundColor: "#7126b5" }}
             >
-              Simpan
+              Save
             </Button>
           </Modal.Footer>
         </Modal>
@@ -974,11 +974,11 @@ const Homepage = () => {
       <section id="favorit">
         <Container className="mt-3">
           <Row className="mb-2">
-            <h2>Destinasi Favorit</h2>
+            <h2>Favorite Destinations</h2>
           </Row>
           <Row className="g-2 mb-2 flex-wrap">
             {/* Tombol dengan responsivitas */}
-            {["Semua", "Asia", "Amerika", "Australia", "Eropa", "Afrika"].map(
+            {["All", "Asia", "Amerika", "Australia", "Eropa", "Afrika"].map(
               (label, index) => (
                 <Col
                   key={index}
@@ -1057,7 +1057,8 @@ const Homepage = () => {
                           fontSize: "14px",
                         }}
                       >
-                        {flight?.departure.city} <FaArrowRight /> {flight?.arrival.city}
+                        {flight?.departure.city} <FaArrowRight />{" "}
+                        {flight?.arrival.city}
                       </Card.Title>
                       <p
                         className="text-primary mb-1"
@@ -1082,7 +1083,7 @@ const Homepage = () => {
                             fontSize: "14px",
                           }}
                         >
-                          Mulai dari{" "}
+                          Starts from{" "}
                           <span
                             className="text-danger"
                             style={{
