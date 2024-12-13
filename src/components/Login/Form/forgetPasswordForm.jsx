@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import toast, { Toaster } from "react-hot-toast";
 import { Link, useNavigate } from "@tanstack/react-router";
 import ResetPasswordForm from "./resetPasswordForm";
+import { useSpring, animated } from "@react-spring/web";
 
 const ForgetPasswordForm = ({ onBack }) => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const ForgetPasswordForm = ({ onBack }) => {
     },
     onSuccess: (result) => {
       if (result?.meta?.statusCode === 200) {
-        toast.success("Email berhasil dikirim", {
+        toast.success("Email Sent!", {
           style: {
             padding: "16px",
             background: "#73CA5C",
@@ -48,7 +49,7 @@ const ForgetPasswordForm = ({ onBack }) => {
       }
     },
     onError: () => {
-      toast.error("Terjadi kesalahan pada server", {
+      toast.error("Internal Server Error", {
         style: {
           padding: "16px",
           background: "#FF4D4F",
@@ -69,7 +70,7 @@ const ForgetPasswordForm = ({ onBack }) => {
     },
     onSuccess: (result) => {
       if (result?.meta?.statusCode === 200) {
-        toast.success("Kode OTP berhasil diverifikasi", {
+        toast.success(" OTP Code Verified Succesfully", {
           style: {
             padding: "16px",
             background: "#73CA5C",
@@ -120,98 +121,111 @@ const ForgetPasswordForm = ({ onBack }) => {
     e.preventDefault();
     verifyEmailMutation({ email: forgotEmail, otp: otpCode });
   };
+  const formAnimation = useSpring({
+    from: { opacity: 0, transform: "translateY(50px)" },
+    to: { opacity: 1, transform: "translateY(0px)" },
+    config: { tension: 200, friction: 20 },
+  });
 
   if (showResetForm) {
-    return <ResetPasswordForm email={forgotEmail} otp={otpCode} onBack={() => setShowResetForm(false)} />;
+    return (
+      <ResetPasswordForm
+        email={forgotEmail}
+        otp={otpCode}
+        onBack={() => setShowResetForm(false)}
+      />
+    );
   }
 
   return (
     <>
-      <IoArrowBack
-        onClick={onBack}
-        style={{
-          cursor: "pointer",
-          fontSize: "1.5rem",
-          marginBottom: "20px",
-        }}
-      />
-      <h2 className="fw-bold text-start mb-4">Lupa Password</h2>
+      <animated.div style={formAnimation}>
+        <IoArrowBack
+          onClick={onBack}
+          style={{
+            cursor: "pointer",
+            fontSize: "1.5rem",
+            marginBottom: "20px",
+          }}
+        />
+        <h2 className="fw-bold text-start mb-4">Forgot Password</h2>
 
-      <Form onSubmit={isEmailSubmitted ? handleOtpSubmit : handleEmailSubmit}>
-        {/* Input Email */}
-        <Form.Group className="mb-3">
-          <Form.Control
-            type="email"
-            placeholder="Contoh: johndee@gmail.com"
-            required
-            value={forgotEmail}
-            onChange={(e) => setForgotEmail(e.target.value)}
-            style={{
-              borderRadius: "15px",
-              padding: "1em",
-            }}
-            disabled={isEmailSubmitted} 
-          />
-          <Form.Text muted>
-            Masukan alamat email untuk me-reset password
-          </Form.Text>
-        </Form.Group>
-
-        {/* Input OTP */}
-        {isEmailSubmitted && (
+        <Form onSubmit={isEmailSubmitted ? handleOtpSubmit : handleEmailSubmit}>
+          {/* Input Email */}
           <Form.Group className="mb-3">
             <Form.Control
-              type="text"
-              placeholder="Masukkan kode OTP"
+              type="email"
+              placeholder="example: johndee@gmail.com"
               required
-              value={otpCode}
-              onChange={(e) => setOtpCode(e.target.value)}
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
               style={{
                 borderRadius: "15px",
                 padding: "1em",
               }}
+              disabled={isEmailSubmitted}
             />
             <Form.Text muted>
-              Masukkan kode OTP yang telah dikirimkan ke email Anda
+              Enter your email address to reset password
             </Form.Text>
           </Form.Group>
-        )}
 
-        {/* Tombol Submit */}
-        <Button
-          variant="primary"
-          type="submit"
-          className="w-100 mt-3 mb-3"
-          disabled={
-            (!forgotEmail && !isEmailSubmitted) ||
-            (isEmailSubmitted && !otpCode)
-          }
-          style={{
-            backgroundColor: "#7126B5",
-            border: "none",
-            transition: "opacity 0.3s ease",
-            opacity:
+          {/* Input OTP */}
+          {isEmailSubmitted && (
+            <Form.Group className="mb-3">
+              <Form.Control
+                type="text"
+                placeholder="Enter OTP"
+                required
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value)}
+                style={{
+                  borderRadius: "15px",
+                  padding: "1em",
+                }}
+              />
+              <Form.Text muted>
+                Enter OTP code that have been sent to your email
+              </Form.Text>
+            </Form.Group>
+          )}
+
+          {/* Tombol Submit */}
+          <Button
+            variant="primary"
+            type="submit"
+            className="w-100 mt-3 mb-3"
+            disabled={
               (!forgotEmail && !isEmailSubmitted) ||
               (isEmailSubmitted && !otpCode)
-                ? "0.5"
-                : "1",
-          }}
-          onMouseEnter={(e) =>
-            (!forgotEmail && !isEmailSubmitted) ||
-            (isEmailSubmitted && !otpCode)
-              ? null
-              : (e.currentTarget.style.opacity = "0.5")
-          }
-          onMouseLeave={(e) =>
-            (!forgotEmail && !isEmailSubmitted) ||
-            (isEmailSubmitted && !otpCode)
-              ? null
-              : (e.currentTarget.style.opacity = "1")
-          }
-        >
-          {isEmailSubmitted ? "Verifikasi OTP" : "Kirim Email"}
-        </Button>
-      </Form>
+            }
+            style={{
+              backgroundColor: "#7126B5",
+              border: "none",
+              transition: "opacity 0.3s ease",
+              opacity:
+                (!forgotEmail && !isEmailSubmitted) ||
+                (isEmailSubmitted && !otpCode)
+                  ? "0.5"
+                  : "1",
+            }}
+            onMouseEnter={(e) =>
+              (!forgotEmail && !isEmailSubmitted) ||
+              (isEmailSubmitted && !otpCode)
+                ? null
+                : (e.currentTarget.style.opacity = "0.5")
+            }
+            onMouseLeave={(e) =>
+              (!forgotEmail && !isEmailSubmitted) ||
+              (isEmailSubmitted && !otpCode)
+                ? null
+                : (e.currentTarget.style.opacity = "1")
+            }
+          >
+            {isEmailSubmitted ? "Verify OTP" : "Send Email"}
+          </Button>
+        </Form>
+      </animated.div>
     </>
   );
 };

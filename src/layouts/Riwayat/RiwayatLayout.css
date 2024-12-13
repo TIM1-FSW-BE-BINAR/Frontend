@@ -1,83 +1,117 @@
-.react-datepicker__header {
+/* File: CustomDatePicker.css */
+
+/* Styling kalender react-datepicker */
+.custom-calendar .react-datepicker__header {
   background-color: #ffffff;
   border: none;
-  padding: 0.5rem 0;
+  padding: 10px 0;
+  font-size: 1rem;
+}
+
+.custom-calendar .react-datepicker__day-name,
+.custom-calendar .react-datepicker__day {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  margin: 2px;
+  font-size: 0.9rem;
+}
+
+.custom-calendar .react-datepicker__day--selected {
+  background-color: #6f42c1;
+  color: #ffffff;
+  border-radius: 20px;
+}
+
+.custom-calendar .react-datepicker__day--keyboard-selected {
+  background-color: #6f42c1;
+  color: #ffffff;
+}
+
+.custom-calendar .react-datepicker__current-month {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Styling modal kalender */
+.modal-calendar .modal-dialog {
+  max-width: 500px;
+}
+
+.modal-calendar .modal-content {
+  border-radius: 15px;
+  border: none;
+}
+
+.modal-calendar {
+  width: 20rem;
+  justify-self: center;
 }
 
 .custom-calendar {
   width: 100%;
+  justify-self: center;
+}
+
+/* Menghapus border dari header DatePicker */
+.custom-calendar .react-datepicker__header {
   border: none;
-  background-color: #f9f9f9;
+  height: 5rem;
+  justify-self: center;
 }
 
-.custom-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 1rem;
-  font-size: 1.2rem;
-  color: #4b1979;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
+/* Menghapus border dari body DatePicker */
+.custom-calendar .react-datepicker {
+  border: none !important;
+  box-shadow: none !important;
 }
 
-.react-datepicker__current-month {
-  display: none; /* Sembunyikan header default bulan dan tahun */
+/* Menghapus border dari tiap-tiap hari (jika ada) */
+.custom-calendar .react-datepicker__day {
+  border: none !important;
 }
 
-.react-datepicker__day-names {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  justify-items: center;
-  margin-bottom: 0.5rem;
+@media (max-width: 426px) {
+  .search-column {
+    width: 78vw !important;
+  }
+
+  .modal-calendar {
+    width: 18rem;
+  }
+
+  .react-datepicker__day-name {
+    width: 20px !important;
+    font-size: 12px !important;
+  }
+
+  .react-datepicker__day {
+    width: 20px !important;
+
+    font-size: 12px !important;
+  }
+
+  .react-datepicker__day--selected {
+    width: 38px !important;
+
+    border-radius: 20px !important;
+  }
+
+  .custom-calendar .react-datepicker__header {
+    width: 18rem;
+
+    justify-self: start;
+  }
 }
 
-.react-datepicker__day {
-  width: 2.5rem;
-  height: 2.5rem;
-  line-height: 2.5rem;
-  margin: 0.2rem;
-  border-radius: 50%;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
+@media (min-width: 427px) and (max-width: 768px) {
+  .search-column {
+    width: 55vw !important;
+  }
 }
 
-.react-datepicker__day:hover {
-  background-color: #e0e0e0;
-}
-
-.react-datepicker__day--selected {
-  background-color: #7126b5 !important;
-  color: white !important;
-  border-radius: 50%;
-}
-
-.react-datepicker__day--keyboard-selected {
-  background-color: #a06ece !important;
-}
-
-.weekend-day {
-  color: red !important;
-  font-weight: bold;
-}
-
-.highlighted-day {
-  background-color: #d3a6f0 !important;
-  color: black !important;
-}
-
-.prev-button,
-.next-button {
-  background: none;
-  border: none;
-  color: #4b1979;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.react-datepicker__week {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  justify-items: center;
+@media (min-width: 769px) and (max-width: 1024px) {
+  .search-column {
+    width: 42vw !important;
+  }
 }

@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { ToastContainer } from "react-toastify";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import NotFound from "../components/NotFound/404";
 export const Route = createRootRoute({
   component: () => (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID}>
@@ -13,4 +14,5 @@ export const Route = createRootRoute({
       <ToastContainer theme="colored" />
     </GoogleOAuthProvider>
   ),
+  notFoundComponent: NotFound,
 });

@@ -19,6 +19,9 @@ function Search() {
   const departureDate = searchParams.get("departureDate");
   const returnDate = searchParams.get("returnDate");
   const totalPassengers = searchParams.get("totalPassengers");
+  const adultInput = searchParams.get("adultInput");
+  const childInput = searchParams.get("childInput");
+  const babyInput = searchParams.get("babyInput");
   const classInput = searchParams.get("classInput");
 
   const departureAirportCode = fromInput?.split("-")[1];
@@ -30,6 +33,9 @@ function Search() {
     departureDate,
     returnDate,
     totalPassengers,
+    adultInput,
+    childInput,
+    babyInput,
     classInput,
     departureAirportCode,
     returnAirportCode,
@@ -83,6 +89,9 @@ function Search() {
         departureDate={departureDate}
         returnDate={returnDate}
         passengers={totalPassengers}
+        adultInput={adultInput}
+        childInput={childInput}
+        babyInput={babyInput}
         classInput={classInput?.replace("+", " ")}
         departureAirportId={departureAirportId}
         returnAirportId={returnAirportId}

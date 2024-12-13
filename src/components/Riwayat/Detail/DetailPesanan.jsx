@@ -7,8 +7,9 @@ import { getIdBooking } from "../../../service/booking";
 import { useSelector } from "react-redux";
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale";
+import "./DetailPesanan.css";
 
-const DetailPesanan = ({ id }) => {
+const DetailPesanan = ({ id, onBack }) => {
   const { token } = useSelector((state) => state.auth);
   const [booking, setBookingDetail] = useState(null);
 
@@ -44,19 +45,14 @@ const DetailPesanan = ({ id }) => {
 
   return (
     <Card
-      style={{
-        width: "24rem",
-        borderRadius: "10px",
-        border: "1px solid #D0D0D0",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-        position: "absolute",
-        right: "13rem",
-      }}
+      className="shadow-sm rounded border-1 mt-5 custom-card customized-style"
+      style={{ width: "25rem", left: "0", background: "#FFFFFF" }}
+      onClick={onBack}
     >
       <Card.Body>
         {/* Status Pesanan */}
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h6 className="fw-bold">Detail Pesanan</h6>
+          <h6 className="fw-bold">Booking Detail</h6>
           <span
             className="px-3 py-1 text-white"
             style={{
@@ -103,7 +99,7 @@ const DetailPesanan = ({ id }) => {
             </p>
           </div>
           <span className="fw-bold" style={{ color: "#A06ECE" }}>
-            Keberangkatan
+            Departure
           </span>
         </div>
         <hr />
@@ -128,7 +124,7 @@ const DetailPesanan = ({ id }) => {
             </p>
             {/* Informasi Penumpang */}
             <div className="mt-4">
-              <h6 className="fw-bolder mb-0">Informasi:</h6>
+              <h6 className="fw-bolder mb-0">Information:</h6>
               {booking?.bookingDetail?.map((detail, index) => (
                 <div key={detail.id}>
                   <p
@@ -168,14 +164,14 @@ const DetailPesanan = ({ id }) => {
           </div>
 
           <span className="fw-bold" style={{ color: "#A06ECE" }}>
-            Kedatangan
+            Arrival
           </span>
         </div>
         <hr />
 
         {/* Rincian Harga */}
         <div className="mb-3">
-          <h6 className="fw-bold">Rincian Harga:</h6>
+          <h6 className="fw-bold">Payment Detail:</h6>
           <div>
             {groupedPassengers &&
               Object.entries(groupedPassengers).map(([type, data]) => (
@@ -192,7 +188,11 @@ const DetailPesanan = ({ id }) => {
           <hr />
           <div className="d-flex justify-content-between fw-bold">
             <p>Total</p>
-            <p>IDR {booking?.totalPrice || "N/A"}</p>
+            <p>
+              {booking?.totalPrice
+                ? `IDR ${booking.totalPrice.toLocaleString("id-ID")}`
+                : "Price not available"}
+            </p>
           </div>
         </div>
 
@@ -204,8 +204,19 @@ const DetailPesanan = ({ id }) => {
             borderRadius: "10px",
             width: "100%",
           }}
+          className="mb-2"
         >
-          Cetak Tiket
+          Print Invoice
+        </Button>
+        <Button
+          style={{
+            backgroundColor: "#FF0000",
+            border: "none",
+            borderRadius: "10px",
+            width: "100%",
+          }}
+        >
+          Cancel Booking
         </Button>
       </Card.Body>
     </Card>
