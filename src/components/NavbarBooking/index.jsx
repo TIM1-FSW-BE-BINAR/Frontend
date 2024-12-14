@@ -1,51 +1,25 @@
-import {  useNavigate, useLocation } from "@tanstack/react-router";
+import {  useNavigate } from "@tanstack/react-router";
 import {
   Navbar,
   Container,
-  Col,
   Row,
-  Breadcrumb,
   Stack,
 } from "react-bootstrap";
 import { useEffect } from "react";
 import {  useSelector } from "react-redux";
-//import { setToken, setUser } from "../../redux/slices/auth";
 import { useState } from "react";
+import { Breadcrumb } from "react-bootstrap";
 import "./NavbarBooking.css";
+import PropTypes from "prop-types";
 
-const NavbarBooking = (isSaved) => {
-  //const dispatch = useDispatch();
+const NavbarBooking = ({isSaved}) => {
+  const [isPayment, setIsPayment] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-
   const { token } = useSelector((state) => state.auth);
-
-  // State untuk melacak penyelesaian
-  const [isDataDiriCompleted, setIsDataDiriCompleted] = useState(false);
-  const [isBayarCompleted, setIsBayarCompleted] = useState(false);
-  //const [isSaved, setisSaved] = useState(false);
-  // Logika untuk menentukan apakah path aktif
-  const isActive = (path) => location.pathname === path;
-
-  // Fungsi untuk memvalidasi akses dan navigasi
-  const handleNavigation = (path) => {
-    if (
-      path === "/Pemesanan" ||
-      (path === "/bayar" && isDataDiriCompleted) ||
-      (path === "/selesai" && isBayarCompleted)
-    ) {
-      navigate({ to: path });
-    }
-  };
-
-  const completeDataDiri = () => setIsDataDiriCompleted(true);
-  const completeBayar = () => setIsBayarCompleted(true);
-
-  //   Timer logic
   const initialTime = 15 * 60;
   const [timeLeft, setTimeLeft] = useState(initialTime);
   const [isTimerActive, setIsTimerActive] = useState(true);
-  
 
   useEffect(() => {
     if (!token) {
@@ -62,8 +36,7 @@ const NavbarBooking = (isSaved) => {
     }
 
     return () => clearInterval(interval);
-  }, [isTimerActive, timeLeft]);
-  // [token];
+  }, [isTimerActive, timeLeft, token]);
 
   const formatTime = (seconds) => {
     const hours = String(Math.floor(seconds / 3600)).padStart(2, "0");
@@ -72,13 +45,8 @@ const NavbarBooking = (isSaved) => {
     return `${hours}:${minutes}:${secs}`;
   };
 
-  // const resetTimer = () => {
-  //   setTimeLeft(initialTime);
-  //   setIsTimerActive(true);
-  //   setIsOverlayVisible(false);
-  // };
   const resetTimer = () => {
-    navigate({to : "/"})
+    navigate({ to: "/" });
   };
 
   const handleOverlayClose = () => {
@@ -100,70 +68,36 @@ const NavbarBooking = (isSaved) => {
             <Row>
               <Breadcrumb>
                 <Breadcrumb.Item
-                  active={isActive("/Booking")}
-                  onClick={() => handleNavigation("/Booking")}
-                  style={
-                    isActive("/Booking")
-                      ? {
-                          fontWeight: "bold",
-                          color: "black",
-                          textDecoration: "none",
-                          cursor: "default",
-                        }
-                      : {
-                          color: "black",
-                          textDecoration: "none",
-                          cursor: "pointer",
-                        }
-                  }
+                  style={{
+                    fontWeight: "bold",
+                    color: "black",
+                  }}
                 >
-                  Isi Data Diri
+                  <span style={{ textDecoration: "none" }}>
+                    Personal Information
+                  </span>
                 </Breadcrumb.Item>
                 <Breadcrumb.Item
-                  active={isActive("/payment")}
-                  onClick={() => handleNavigation("/payment")}
-                  style={
-                    isActive("/payment")
-                      ? {
-                          fontWeight: "bold",
-                          color: "black",
-                          textDecoration: "none",
-                          cursor: "default",
-                        }
-                      : {
-                          color: isDataDiriCompleted ? "black" : "gray",
-                          textDecoration: "none",
-                          cursor: isDataDiriCompleted
-                            ? "pointer"
-                            : "not-allowed",
-                        }
-                  }
+                  active={isPayment}
+                  style={{
+                    fontWeight: isPayment ? "bold" : "normal",
+                    color: isPayment ? "black" : "#6c757d",
+                  }}
                 >
-                  Bayar
+                  <span style={{ textDecoration: "none" }}>Payment</span>
                 </Breadcrumb.Item>
                 <Breadcrumb.Item
-                  active={isActive("/selesai")}
-                  onClick={() => handleNavigation("/selesai")}
-                  style={
-                    isActive("/selesai")
-                      ? {
-                          fontWeight: "bold",
-                          color: "black",
-                          textDecoration: "none",
-                          cursor: "default",
-                        }
-                      : {
-                          color: isBayarCompleted ? "black" : "gray",
-                          textDecoration: "none",
-                          cursor: isBayarCompleted ? "pointer" : "not-allowed",
-                        }
-                  }
+                  active={isComplete}
+                  style={{
+                    fontWeight: isComplete ? "bold" : "normal",
+                    color: isComplete ? "black" : "#6c757d",
+                  }}
                 >
-                  Selesai
+                  <span style={{ textDecoration: "none" }}>Complete</span>
                 </Breadcrumb.Item>
               </Breadcrumb>
             </Row>
-            
+
             <Row>
               <div>
                 {!token ? (
@@ -176,17 +110,17 @@ const NavbarBooking = (isSaved) => {
                   >
                     <div id="black-overlay" className="vh-100"></div>
                     <div id="box-timer">
-                      {"Anda harus login terlebih dahulu!"}
+                      {"You must log in first!"}
                       <button onClick={handleOverlayClose} id="close-button">
                         X
                       </button>
                     </div>
                   </div>
-                ) : !isSaved ? (
+                ) : isSaved ? (
                   <Row>
                     <div id="box-timer" style={{ backgroundColor: "#73CA5C" }}>
                       <div style={{ justifyContent: "center" }}>
-                        {"Data anda berhasil tersimpan!"}
+                        {"Your data has been successfully saved!"}
                       </div>
                     </div>
                   </Row>
@@ -194,7 +128,7 @@ const NavbarBooking = (isSaved) => {
                   <div>
                     {timeLeft > 0 ? (
                       <div id="box-timer">
-                        Selesaikan dalam {formatTime(timeLeft)}
+                        Complete within {formatTime(timeLeft)}
                       </div>
                     ) : (
                       <>
@@ -203,7 +137,7 @@ const NavbarBooking = (isSaved) => {
                           <div id="box-timer">
                             <div style={{ justifyContent: "center" }}>
                               {
-                                "Maaf, waktu pemesanan habis, silahkan ulangi lagi."
+                                "Sorry, the booking time has expired. Please try again."
                               }
                             </div>
                             <button onClick={resetTimer} id="close-button">
@@ -222,6 +156,12 @@ const NavbarBooking = (isSaved) => {
       </Navbar>
     </>
   );
+};
+
+NavbarBooking.propTypes = {
+  isSaved: PropTypes.bool,
+  // isPayment: PropTypes.bool,
+  // isComplete: PropTypes.bool,
 };
 
 export default NavbarBooking;

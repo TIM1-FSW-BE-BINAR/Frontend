@@ -27,31 +27,42 @@ const seatLayout = [
   },
 ];
 
-const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
-  const [seats, setSeats] = useState([]);
+const SeatMapReturn = ({
+  selectedSeatsReturn,
+  setSelectedSeatsReturn,
+  totalSeat,
+  isSaved,
+}) => {
+  const [returnSeats, setReturnSeats] = useState([]);
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
 
-  const flightId = parseInt(searchParams.get("flightId"), 10) || 0;
-  const { data: flight, isLoading } = useQuery({
-    queryKey: ["flight", flightId],
-    queryFn: () => getFlightId(flightId),
-    enabled: !!flightId,
+  const returnFlightId = parseInt(searchParams.get("returnFlightId"), 10) || 0;
+
+  const { data: returnFlight, isLoading } = useQuery({
+    queryKey: ["flight", returnFlightId],
+    queryFn: () => getFlightId(returnFlightId),
+    enabled: !!returnFlightId,
   });
 
   useEffect(() => {
-    const fetchSeats = async () => {
+    const fetchReturnSeats = async () => {
       try {
-        const params = { flightId };
+        const params = { flightId: returnFlightId };
         const data = await getAllSeats(params);
-        setSeats(data?.data || []);
+        setReturnSeats(data?.data || []);
       } catch (error) {
-        console.error("Error fetching seat data:", error.message, error.stack);
+        console.error(
+          "Error fetching return seat data:",
+          error.message,
+          error.stack
+        );
       }
     };
-
-    fetchSeats();
-  }, [flightId]);
+    if (returnFlightId) {
+      fetchReturnSeats();
+    }
+  }, [returnFlightId]);
 
   const handleSeatClick = (seat) => {
     if (isSaved) {
@@ -64,21 +75,25 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
     }
 
     if (
-      selectedSeats.length >= totalSeat &&
-      !selectedSeats.some((selectedSeat) => selectedSeat.id === seat.id)
+      selectedSeatsReturn.length >= totalSeat &&
+      !selectedSeatsReturn.some((selectedSeat) => selectedSeat.id === seat.id)
     ) {
-      toast.error(`You can only choose ${totalSeat} seat.`);
+      toast.error(`You can only choose  ${totalSeat} seat.`);
       return;
     }
 
-    if (selectedSeats.some((selectedSeat) => selectedSeat.id === seat.id)) {
-      setSelectedSeats(
-        selectedSeats.filter((selectedSeat) => selectedSeat.id !== seat.id)
+    if (
+      selectedSeatsReturn.some((selectedSeat) => selectedSeat.id === seat.id)
+    ) {
+      setSelectedSeatsReturn(
+        selectedSeatsReturn.filter(
+          (selectedSeat) => selectedSeat.id !== seat.id
+        )
       );
     } else {
-      const nextPassenger = `P${selectedSeats.length + 1}`;
-      setSelectedSeats([
-        ...selectedSeats,
+      const nextPassenger = `P${selectedSeatsReturn.length + 1}`;
+      setSelectedSeatsReturn([
+        ...selectedSeatsReturn,
         { id: seat.id, seatNumber: seat.seatNumber, passenger: nextPassenger },
       ]);
     }
@@ -106,15 +121,16 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
       <div
         id="box-timer"
         style={{
-          background: "#73CA5C",
+          background: "#4A90E2",
           border: "1px solid white",
           borderRadius: "10px",
           marginTop: "15px",
           zIndex: "1",
         }}
       >
-        {flight?.data?.class || "Unknown"} -{" "}
-        {seats.filter((s) => s.status === "AVAILABLE").length} Seats Available
+        {returnFlight?.data?.class || "Unknown"} -{" "}
+        {returnSeats.filter((s) => s.status === "AVAILABLE").length} Seats
+        Available
       </div>
       <br />
       <div className="seat-map">
@@ -125,11 +141,25 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
                 return <div key={seatIndex} style={{ width: "35px" }}></div>;
               }
 
-              const seat = seats.find((seat) => seat.seatNumber === seatNumber);
-              const isSelected = selectedSeats.some(
+              const seat = returnSeats.find(
+                (seat) => seat.seatNumber === seatNumber
+              );
+              const isSelected = selectedSeatsReturn.some(
                 (selectedSeat) => selectedSeat.id === seat?.id
               );
 
+              const seatStyle = {
+                default: { backgroundColor: "#4A90E2" },
+                selected: { backgroundColor: "#7126B5" },
+                booked: { backgroundColor: "#D0D0D0", cursor: "not-allowed" },
+              };
+              const getSeatStyle = (seat, isSelected) => {
+                if (seat?.status === "LOCKED") return seatStyle.booked;
+                if (isSelected) return seatStyle.selected;
+                return seatStyle.default;
+              };
+
+              // If the seat is a letter (row header)
               if (["A", "B", "C", "D", "E", "F"].includes(seatNumber)) {
                 return (
                   <div
@@ -145,6 +175,7 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
                 );
               }
 
+              // If the seat is a number (seat number)
               if (
                 [
                   "1",
@@ -185,12 +216,12 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
               return (
                 <div
                   key={seatIndex}
-                  className={`seat ${
-                    seat?.status === "LOCKED" ? "booked" : ""
-                  } ${isSelected ? "selected" : ""}`}
+                  className={`seat ${seat?.status === "LOCKED" ? "booked" : ""} ${
+                    isSelected ? "selected" : ""
+                  }`}
                   onClick={() => seat && handleSeatClick(seat)}
                   style={{
-                    backgroundColor: isSelected ? "#7126B5" : "",
+                    ...getSeatStyle(seat, isSelected),
                   }}
                 >
                   {isSelected && (
@@ -200,7 +231,10 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
                         fontSize: "14px",
                       }}
                     >
-                      {selectedSeats.find((s) => s.id === seat?.id)?.passenger}
+                      {
+                        selectedSeatsReturn.find((s) => s.id === seat?.id)
+                          ?.passenger
+                      }
                     </div>
                   )}
                 </div>
@@ -218,7 +252,6 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
           .seat {
             width: 35px;
             height: 35px;
-            background-color: #73CA5C;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -251,7 +284,6 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
             transform: translate(-50%, -50%);
           }
           .seat.selected {
-            background-color: #7126B5; 
             color: white;
           }
         `}
@@ -261,11 +293,11 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
   );
 };
 
-SeatMap.propTypes = {
-  selectedSeats: PropTypes.array,
-  setSelectedSeats: PropTypes.func,
-  totalSeat: PropTypes.number,
-  isSaved: PropTypes.bool,
+SeatMapReturn.propTypes = {
+  selectedSeatsReturn: PropTypes.array.isRequired,
+  setSelectedSeatsReturn: PropTypes.func.isRequired,
+  totalSeat: PropTypes.number.isRequired,
+  isSaved: PropTypes.bool.isRequired,
 };
 
-export default SeatMap;
+export default SeatMapReturn;
