@@ -10,12 +10,12 @@ function Index() {
   const [openHomepage, setOpenHomepage] = useState(true); // components yang akan dirender pertama kali nilainya true, sedangkan component yg lain nilai defaultnya false dulu
   return (
     <>
-      <GuestLayout
-        openHomepage={openHomepage}
-        setOpenHomepage={setOpenHomepage}
-      >
-        {openHomepage && <ScreenHomepage />}
-      </GuestLayout>
+        <GuestLayout
+          openHomepage={openHomepage}
+          setOpenHomepage={setOpenHomepage}
+        >
+          {openHomepage && <ScreenHomepage />}
+        </GuestLayout>
     </>
   );
 }

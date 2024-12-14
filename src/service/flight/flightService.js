@@ -34,34 +34,3 @@ export const getFlightId = async (id) => {
   return result;
 };
 
-// Daftar Params untuk data flights
-//   page,
-//   limit,
-//   seatClass,
-//   isCheapest,
-//   flightNumber,
-//   priceMin,
-//   priceMax,
-//   earliestDeparture,
-//   latestDeparture,
-//   earliestArrival,
-//   latestArrival,
-//   shortest,
-//   arrivalAirport,
-//   departureAirport,
-//   departureDate;
-// Contoh Cara pemanggilan :
-// const flights = await getFlights({
-//   page: 1,
-//   limit: 10,
-//   seatClass: "economy",
-//   isCheapest: true,
-//   flightNumber: "12345",
-//   priceMin: 500000,
-//   priceMax: 1000000,
-//   earliestDeparture: "2024-12-01",
-//   latestDeparture: "2024-12-10",
-//   arrivalAirport: "JFK",
-//   departureAirport: "LAX",
-//   departureDate: "2024-12-01",
-// });
