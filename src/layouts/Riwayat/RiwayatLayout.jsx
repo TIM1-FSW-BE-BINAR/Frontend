@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import NavigationBar from "../../components/Navbar";
 import {
   Container,
@@ -12,21 +11,30 @@ import {
 import { Link } from "@tanstack/react-router";
 import {
   VscArrowLeft,
+  VscArrowRight,
+  VscChevronLeft,
+  VscChevronRight,
   VscFilter,
   VscSearch,
   VscChromeClose,
 } from "react-icons/vsc";
-import { LocalizationProvider, DateRangePicker } from "@mui/x-date-pickers-pro";
+import React, { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { format } from "date-fns";
+import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { TextField, Button as MUIButton } from "@mui/material";
 import "./RiwayatLayout.css";
 import { useRiwayatContext } from "../../components/Riwayat/RiwayatContext";
 
 function PageHeader() {
   const [showFilterDate, setShowFilterDate] = useState(false);
-  const { setFilterDate, setSearchQuery } = useRiwayatContext();
+  const { setSearchQuery, setFilterDate } = useRiwayatContext();
   const [showSearch, setShowSearch] = useState(false);
-  const [selectedDate, setSelectedDate] = useState([null, null]);
-  const [confirmedDate, setConfirmedDate] = useState(new Date());
+  const [dateRange, setDateRange] = useState([null, null]);
+
   const [searchHistory, setSearchHistory] = useState([]);
   const [searchInput, setSearchInput] = useState("");
 
@@ -41,8 +49,11 @@ function PageHeader() {
   }, []);
 
   const handleSaveDate = () => {
-    setFilterDate(selectedDate);
-    setConfirmedDate(selectedDate);
+    if (dateRange[0] && dateRange[1]) {
+      setFilterDate(dateRange); // Simpan filter date ke konteks
+    } else {
+      setFilterDate(null); // Reset jika rentang tanggal tidak valid
+    }
     setShowFilterDate(false);
   };
 
@@ -74,81 +85,58 @@ function PageHeader() {
   };
 
   return (
-    <Container fluid className="bg-light">
-      {/* Header riwayat */}
-      <Row className="align-items-center">
-        <Col
-          xs={6}
-          md={4}
-          className="offset-md-2"
-          style={{ marginTop: "25px" }}
-        >
-          <h1
-            className="d-flex m-0 fw-bold fs-4 text-start"
-            style={{ position: "relative", color: "#000000", right: "7rem" }}
-          >
+    <>
+      {/* Header Notifikasi */}
+      <Row className="align-items-center justify-content-center">
+        <Col md={10} lg={10} className="text-start">
+          <h1 className="fw-bold fs-4 title-header text-wrap text-start text-dark">
             History
           </h1>
         </Col>
       </Row>
 
       {/* Tombol Beranda dan Filter */}
-      <Row className="m-5 justify-content-center">
-        <Col
-          md={9}
-          className="d-flex align-items-center justify-content-center"
-        >
+      <Row className="align-items-center justify-content-center mt-4">
+        <Col md={10} lg={10}>
           <ListGroup>
             <ListGroup.Item
               style={{
                 background: "#A06ECE",
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
+                height: "3.5rem",
+
                 borderRadius: "15px",
-                width: "70rem",
               }}
+              className="listGroup-custom d-flex justify-content-between align-items-center p-3 w-100"
             >
               {/* Tombol Beranda */}
               <Button
-                variant="Link"
+                variant="link"
                 as={Link}
-                className="text-decoration-none d-flex align-items-center"
                 to="/"
+                className="text-decoration-none d-flex align-items-center"
                 style={{ color: "white" }}
               >
-                <VscArrowLeft className="me-2" size={20} /> Beranda
+                <VscArrowLeft className="me-2" size={20} /> Home
               </Button>
 
               {/* Tombol Filter dan Search */}
               <div className="d-flex align-items-center">
                 <Button
                   variant="light"
-                  className="d-flex align-items-center justify-content-center"
-                  style={{
-                    border: "1px solid #7126B5",
-                    color: "#151515",
-                    borderRadius: "15px",
-                    padding: "5px 15px",
-                    marginRight: "0.5rem",
-                  }}
+                  className="d-flex align-items-center justify-content-center me-2 "
+                  style={{ borderRadius: "10px", height: "2rem" }}
                   onClick={handleShowDate}
                 >
                   <VscFilter className="me-2" size={20} /> Filter
                 </Button>
 
-                <Button
-                  variant="link"
-                  className="d-flex align-items-center justify-content-center"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    boxShadow: "none",
-                    outline: "none",
-                  }}
-                  onClick={handleShowSearch}
-                >
-                  <VscSearch style={{ color: "#151515" }} size={20} />
+                <Button variant="link" onClick={handleShowSearch}>
+                  <VscSearch
+                    className="search-icon"
+                    style={{ color: "#151515" }}
+                    size={20}
+                  />
                 </Button>
               </div>
             </ListGroup.Item>
@@ -156,121 +144,96 @@ function PageHeader() {
         </Col>
       </Row>
 
-      {/* Modal Pencarian */}
-      <Modal
-        style={{ top: "4rem", left: "19rem" }}
-        show={showSearch}
-        onHide={handleCloseSearch}
-        centered
-      >
+      <Modal show={showSearch} onHide={handleCloseSearch} centered>
         <Modal.Header closeButton>
-          <Modal.Title>
-            <Form.Group
-              controlId="filterSearch"
-              style={{ position: "relative", width: "27rem" }}
-            >
-              <Form.Control
-                type="text"
-                placeholder="Masukkan Booking Code"
-                style={{ paddingRight: "40px" }}
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)} // Update state input
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleSearch(); // Jalankan pencarian saat Enter ditekan
-                    e.preventDefault();
-                  }
-                }}
-              />
-
-              <VscSearch
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  right: "10px",
-                  transform: "translateY(-50%)",
-                  color: "#D0D0D0",
-                  cursor: "pointer",
-                }}
-                size={20}
-                onClick={handleSearch}
-              />
-            </Form.Group>
-          </Modal.Title>
+          <Form.Group controlId="filterSearch">
+            <Form.Control
+              className="search-column "
+              type="text"
+              placeholder="Input your search..."
+              style={{ width: "27rem" }}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch();
+                  e.preventDefault();
+                }
+              }}
+            />
+          </Form.Group>
         </Modal.Header>
-        <Modal.Body style={{ maxHeight: "20rem", overflowY: "auto" }}>
-          <Form>
-            <div className="mt-3">
-              <h6>Pencarian Terkini</h6>
-              <ListGroup>
-                {searchHistory.map((item, index) => (
-                  <ListGroup.Item
-                    key={index}
-                    className="d-flex justify-content-between align-items-center"
-                    onClick={() => handleHistorySearch(item)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    {item}
-                    <Button
-                      variant="link"
-                      size="sm"
-                      onClick={() => handleDeleteHistory(item)}
-                    >
-                      <VscChromeClose style={{ color: "#8A8A8A" }} />
-                    </Button>
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            </div>
-          </Form>
+        <Modal.Body style={{ height: "20rem", overflowY: "auto" }}>
+          <h6>Recent History</h6>
+          <ListGroup>
+            {searchHistory.map((item, index) => (
+              <ListGroup.Item
+                key={index}
+                onClick={() => handleHistorySearch(item)}
+                style={{ cursor: "pointer" }}
+              >
+                {item}
+                <Button
+                  variant="link"
+                  size="sm"
+                  onClick={() => handleDeleteHistory(item)}
+                >
+                  <VscChromeClose style={{ color: "#8A8A8A" }} />
+                </Button>
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
         </Modal.Body>
       </Modal>
 
-      {/* Modal Filter Tanggal */}
       <Modal
-        style={{ width: "25rem", top: "12rem", left: "54rem" }}
         show={showFilterDate}
         onHide={handleCloseDate}
+        centered
+        dialogClassName="modal-calendar"
       >
-        <Modal.Header closeButton></Modal.Header>
+        <Modal.Header closeButton className="border-0" />
         <Modal.Body>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DateRangePicker
               startText="Start Date"
               endText="End Date"
-              value={selectedDate}
-              onChange={(newValue) => setSelectedDate(newValue)}
+              value={dateRange}
+              onChange={(newValue) => setDateRange(newValue)}
               renderInput={(startProps, endProps) => (
-                <div className="d-flex flex-column">
-                  <Form.Group className="mb-3">
-                    <Form.Control
-                      {...startProps.inputProps}
-                      ref={startProps.inputRef}
-                    />
-                  </Form.Group>
-                  <Form.Group>
-                    <Form.Control
-                      {...endProps.inputProps}
-                      ref={endProps.inputRef}
-                    />
-                  </Form.Group>
+                <div style={{ display: "flex", gap: "1rem" }}>
+                  <TextField {...startProps} fullWidth />
+                  <TextField {...endProps} fullWidth />
                 </div>
               )}
             />
           </LocalizationProvider>
         </Modal.Body>
-        <Modal.Footer>
-          <Button
-            style={{ backgroundColor: "#4B1979" }}
-            variant="none"
-            className="text-white"
-            onClick={handleSaveDate}
-          >
-            Simpan
-          </Button>
+        <Modal.Footer className="d-flex justify-content-end border-0">
+          <div className="d-flex justify-content-between button-group">
+            <Button
+              className="button-reset-calendar align-self-center"
+              variant="outline-secondary"
+              onClick={() => {
+                setDateRange([null, null]);
+                setFilterDate(null);
+                handleCloseDate();
+              }}
+            >
+              Reset
+            </Button>
+            <Button
+              className="text-white button-calendar align-self-center ms-2"
+              style={{ backgroundColor: "#4B1979" }}
+              variant="none"
+              onClick={handleSaveDate}
+            >
+              Save
+            </Button>
+          </div>
         </Modal.Footer>
       </Modal>
-    </Container>
+    </>
   );
 }
 
@@ -278,8 +241,10 @@ export default function RiwayatLayout({ children }) {
   return (
     <>
       <NavigationBar />
-      <PageHeader />
-      {children}
+      <Container fluid="xxl">
+        <PageHeader />
+        {children}
+      </Container>
     </>
   );
 }

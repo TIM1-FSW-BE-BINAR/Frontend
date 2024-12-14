@@ -1,24 +1,38 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Card } from "react-bootstrap";
 import { IoLocationSharp } from "react-icons/io5";
-import { VscArrowRight } from "react-icons/vsc";
-import DetailPesanan from "./Detail/DetailPesananan";
-import { useRiwayatContext } from "./RiwayatContext";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { getAllBookings } from "../../service/booking";
 import format from "date-fns/format";
-import { id } from "date-fns/locale";
+import isSameDay from "date-fns/isSameDay";
+import { isWithinInterval, parseISO } from "date-fns";
+import { useRiwayatContext } from "./RiwayatContext";
+import DetailPesanan from "./Detail/DetailPesanan";
+import "./ScreenRiwayat.css";
 
 const ScreenRiwayat = () => {
   const { token } = useSelector((state) => state.auth);
-  const queryClient = useQueryClient();
   const { filterDate, searchQuery } = useRiwayatContext();
-  const [booking, setBooking] = useState([]);
   const [groupedBookings, setGroupedBookings] = useState([]);
   const [durations, setDurations] = useState({});
   const [selectedId, setSelectedId] = useState(null);
+  const [isDetailVisible, setIsDetailVisible] = useState(false);
+  const [showDetailPrompt, setShowDetailPrompt] = useState(true);
+
+  // Track screen width
+  const [isMobile, setIsMobile] = useState(
+    window.matchMedia("(max-width: 426px)").matches
+  );
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 426px)");
+
+    const handleResize = () => setIsMobile(mediaQuery.matches);
+
+    mediaQuery.addEventListener("change", handleResize);
+    return () => mediaQuery.removeEventListener("change", handleResize);
+  }, []);
 
   const { data, isSuccess, isLoading } = useQuery({
     queryKey: ["getAllbookings"],
@@ -26,78 +40,45 @@ const ScreenRiwayat = () => {
     enabled: !!token,
   });
 
-  // Update this in ScreenRiwayat.jsx
   useEffect(() => {
     if (data && data.length > 0) {
-      // Apply filter by selected date range
       let filteredData = data;
 
-      // Filter by selected date range (if any)
+      // Filter data by filterDate range if provided
       if (filterDate && filterDate[0] && filterDate[1]) {
-        const startDate = new Date(filterDate[0]);
-        const endDate = new Date(filterDate[1]);
-
         filteredData = filteredData.filter((booking) => {
-          const bookingDate = new Date(booking.bookingDate);
-          return bookingDate >= startDate && bookingDate <= endDate;
+          const bookingDate = parseISO(booking.bookingDate); // Pastikan tanggal diparsing
+          return isWithinInterval(bookingDate, {
+            start: filterDate[0],
+            end: filterDate[1],
+          });
         });
       }
 
-      // Sort filtered data based on bookingDate
+      // Filter data by searchQuery if provided
+      if (searchQuery) {
+        const lowerSearchQuery = searchQuery.toLowerCase();
+        filteredData = filteredData.filter((booking) => {
+          const bookingCode = booking.code.toLowerCase();
+          const departure =
+            booking.flight?.departure?.name?.toLowerCase() || "";
+          const arrival = booking.flight?.arrival?.name?.toLowerCase() || "";
+          const classes = booking.flight?.class.toLowerCase() || "";
+          return (
+            bookingCode.includes(lowerSearchQuery) ||
+            departure.includes(lowerSearchQuery) ||
+            arrival.includes(lowerSearchQuery) ||
+            classes.includes(lowerSearchQuery)
+          );
+        });
+      }
+
+      // Sort data by latest bookingDate
       const sortedData = filteredData.sort(
         (a, b) => new Date(b.bookingDate) - new Date(a.bookingDate)
       );
 
-      // Grouping based on month and year
-      const grouped = sortedData.reduce((acc, booking) => {
-        const bookingDate = new Date(booking.bookingDate);
-        const formattedDate = format(bookingDate, "MMMM yyyy"); // Format "Month Year"
-
-        if (!acc[formattedDate]) {
-          acc[formattedDate] = [];
-        }
-        acc[formattedDate].push(booking);
-
-        return acc;
-      }, {});
-
-      setGroupedBookings(Object.entries(grouped));
-    }
-  }, [data, filterDate]); // Re-run whenever `data` or `filterDate` changes
-
-  // Modify this inside the useEffect in ScreenRiwayat.jsx
-  useEffect(() => {
-    if (data && data.length > 0) {
-      // Apply search query (if any)
-      let filteredData = data;
-
-      // Apply search query (if any)
-      if (searchQuery.trim()) {
-        filteredData = filteredData.filter((booking) =>
-          booking.code.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-      }
-
-      // Apply date filter if there's a date range
-      if (filterDate && filterDate[0] && filterDate[1]) {
-        const startDate = new Date(filterDate[0]);
-        const endDate = new Date(filterDate[1]);
-
-        startDate.setDate(1);
-        endDate.setMonth(endDate.getMonth() + 1);
-        endDate.setDate(0);
-
-        filteredData = filteredData.filter((booking) => {
-          const bookingDate = new Date(booking.bookingDate);
-          return bookingDate >= startDate && bookingDate <= endDate;
-        });
-      }
-
-      const sortedData = filteredData.sort(
-        (a, b) => new Date(b.bookingDate) - new Date(a.bookingDate)
-      );
-
-      // Group by month and year
+      // Group data by month and year
       const grouped = sortedData.reduce((acc, booking) => {
         const bookingDate = new Date(booking.bookingDate);
         const formattedDate = format(bookingDate, "MMMM yyyy");
@@ -111,204 +92,256 @@ const ScreenRiwayat = () => {
       }, {});
 
       setGroupedBookings(Object.entries(grouped));
+      setShowDetailPrompt(false); // Hide the prompt if bookings exist
+    } else {
+      setShowDetailPrompt(false); // Hide the prompt if no bookings exist
     }
   }, [data, filterDate, searchQuery]);
 
   useEffect(() => {
-    setSelectedId(null);
-  }, [searchQuery]);
+    if (data) {
+      const calculatedDurations = data.reduce((acc, booking) => {
+        if (booking.flight?.departureTime && booking.flight?.arrivalTime) {
+          const departureTime = new Date(booking.flight.departureTime);
+          const arrivalTime = new Date(booking.flight.arrivalTime);
 
-  const handleCardClick = (id) => {
-    setSelectedId((prevId) => (prevId === id ? null : id));
+          const diffInMinutes = Math.floor(
+            (arrivalTime - departureTime) / 60000
+          ); // Selisih dalam menit
+          const hours = Math.floor(diffInMinutes / 60); // Jam
+          const minutes = diffInMinutes % 60; // Menit
+
+          acc[booking.id] = `${hours}h ${minutes}m`;
+        } else {
+          acc[booking.id] = "N/A";
+        }
+        return acc;
+      }, {});
+
+      setDurations(calculatedDurations);
+    }
+  }, [data]);
+
+  const handleCardClickMobile = (id) => {
+    setSelectedId(id);
+    setIsDetailVisible((prev) => !prev);
+    setShowDetailPrompt(false);
+  };
+
+  const handleCardClickDesktop = (id) => {
+    if (selectedId === id) {
+      // Jika ID yang dipilih sama dengan yang sedang aktif, tutup detail
+      setSelectedId(null);
+      setIsDetailVisible(false);
+    } else {
+      // Jika ID berbeda, buka detail dengan ID baru
+      setSelectedId(id);
+      setIsDetailVisible(true);
+    }
+
+    setShowDetailPrompt(false);
+  };
+
+  const handleBack = () => {
+    if (isMobile) {
+      setIsDetailVisible(false);
+      setSelectedId(null);
+    }
   };
 
   return (
-    <Container fluid className="bg-light py-3">
-      <Row>
-        {/* Bagian kiri: Riwayat Pemesanan */}
-        <Col
-          md={8}
-          className="pe-3"
-          style={{ position: "relative", right: "6.5rem", bottom: "3rem" }}
+    <Container fluid className="py-3 " style={{ background: "#FFFFFF" }}>
+      <div
+        className={`d-flex ${isMobile ? "flex-column" : "flex-row"}`}
+        style={{ gap: "1rem" }}
+      >
+        {/* Riwayat Screen */}
+        <div
+          className={isDetailVisible && isMobile ? "d-none" : ""}
+          style={{
+            flex: isMobile ? "unset" : 1,
+            maxWidth: isMobile ? "unset" : "60%",
+          }}
         >
-          {/* Cek jika data berhasil di-fetch */}
           {isLoading ? (
             <p>Loading...</p>
           ) : isSuccess && groupedBookings.length > 0 ? (
-            groupedBookings.map(([monthYear, bookings]) => {
-              return (
-                <div key={monthYear}>
-                  <h5
-                    className="d-flex fw-bold mt-5"
-                    style={{
-                      position: "relative",
-                      left: "19.5rem",
-                    }}
-                  >
-                    {monthYear}
-                  </h5>
-                  {bookings.map((booking) => {
-                    let bgColor = "#73CA5C";
-                    if (booking.status === "CANCELED") bgColor = "#FF0000";
-                    if (booking.status === "EXPIRED") bgColor = "#8A8A8A";
+            groupedBookings.map(([monthYear, bookings]) => (
+              <div key={monthYear}>
+                <h5
+                  className="fw-bold mt-5 text-start position-relative custom-date"
+                  style={{ left: "6rem" }}
+                >
+                  {monthYear}
+                </h5>
+                {bookings.map((booking) => {
+                  let bgColor = "#73CA5C";
+                  if (booking.status === "CANCELED") bgColor = "#FF0000";
+                  if (booking.status === "EXPIRED") bgColor = "#8A8A8A";
 
-                    return (
-                      <Card
-                        key={booking.id}
-                        className="mb-3 border rounded"
-                        style={{
-                          width: "44rem",
-                          left: "18.5rem",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => handleCardClick(booking.id)}
-                      >
-                        <Card.Body>
-                          <div className="d-flex justify-content-between align-items-center mb-2">
-                            <div
-                              className="text-white px-3 py-1"
-                              style={{
-                                backgroundColor: bgColor,
-                                borderRadius: "10px",
-                                fontSize: "12px",
-                              }}
-                            >
-                              {booking.status}
+                  return (
+                    <Card
+                      key={booking.id}
+                      className="mb-3 border rounded shadow-sm custom-card"
+                      onClick={
+                        isMobile
+                          ? () => handleCardClickMobile(booking.id)
+                          : () => handleCardClickDesktop(booking.id)
+                      }
+                      style={{
+                        cursor: "pointer",
+                        width: "40rem",
+                        left: "6rem",
+                      }}
+                    >
+                      <Card.Body>
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                          <div
+                            className="text-white px-3 py-1 mb-3 rounded-pill custom-status"
+                            style={{ backgroundColor: bgColor }}
+                          >
+                            {booking.status}
+                          </div>
+                        </div>
+
+                        <div className="d-flex justify-content-between align-items-center">
+                          <IoLocationSharp className="fs-3 text-muted location-icon me-2" />
+                          <div className="w-25 text-start custom-departure">
+                            <h6 className="mb-1 fs-6 fw-bolder custom-airport-location">
+                              {booking.flight.departure?.name ||
+                                "Airline not available"}
+                            </h6>
+                            <div>
+                              <span className="fs-7 fw-normal custom-date-deparr-date">
+                                {format(
+                                  new Date(booking.flight.departureTime),
+                                  "dd MMMM yyyy"
+                                )}
+                              </span>
+                              <br />
+                              <span className="fs-7 fw-normal custom-date-deparr-time">
+                                {format(
+                                  new Date(booking.flight.departureTime),
+                                  "HH:mm"
+                                )}
+                              </span>
                             </div>
                           </div>
 
-                          <div className="d-flex justify-content-between align-items-center">
-                            <div style={{ width: "15rem", marginLeft: "2rem" }}>
-                              <IoLocationSharp
-                                style={{
-                                  position: "relative",
-                                  top: "1.5rem",
-                                  right: "2rem",
-                                  fontSize: "1.5rem",
-                                  color: "#8A8A8A",
-                                }}
-                              />
-                              <h6 className="mb-1 fs-6 fw-bolder">
-                                {booking.flight.departure?.name ||
-                                  "Airline not available"}
-                              </h6>
+                          <div className="d-flex flex-column align-items-center">
+                            <span className="mb-2 custom-duration">
+                              {durations[booking.id]}
+                            </span>
+                            <img
+                              src="/src/assets/homepage/icon/arrow-right.png"
+                              alt="duration"
+                              className="w-50 arrow-right"
+                            />
+                          </div>
 
-                              <div>
-                                <span className="fs-7 fw-normal">
-                                  {format(
-                                    new Date(booking.flight.departureTime),
-                                    "dd MMMM yyyy"
-                                  )}
-                                </span>
-                                <br />
-                                <span className="fs-7 fw-normal">
-                                  {format(
-                                    new Date(booking.flight.departureTime),
-                                    "HH:mm"
-                                  )}
-                                </span>
-                              </div>
-                            </div>
-
-                            <div
-                              className="d-flex flex-column align-items-center"
-                              style={{ marginRight: "2rem" }}
-                            >
-                              <span className="mb-2">
-                                {durations[booking.id]}
+                          <IoLocationSharp className="fs-3 text-muted location-icon me-2" />
+                          <div className="w-25 text-start custom-arrival">
+                            <h6 className="mb-1 fs-6 fw-bolder custom-airport-location">
+                              {booking.flight.arrival?.name ||
+                                "Airline not available"}
+                            </h6>
+                            <div>
+                              <span className="fs-7 fw-normal custom-date-deparr-date">
+                                {format(
+                                  new Date(booking.flight.arrivalTime),
+                                  "dd MMMM yyyy"
+                                )}
                               </span>
-                              <img
-                                src="img/arrowRight1.svg"
-                                style={{ width: "12rem" }}
-                              />
-                            </div>
-
-                            <div style={{ width: "15rem", marginLeft: "2rem" }}>
-                              <IoLocationSharp
-                                style={{
-                                  position: "relative",
-                                  top: "1.5rem",
-                                  right: "2rem",
-                                  fontSize: "1.5rem",
-                                  color: "#8A8A8A",
-                                }}
-                              />
-                              <h6 className="mb-1 fs-6 fw-bolder">
-                                {booking.flight.arrival?.name ||
-                                  "Airline not available"}
-                              </h6>
-                              <div>
-                                <span className="fs-7 fw-normal">
-                                  {format(
-                                    new Date(booking.flight.arrivalTime),
-                                    "dd MMMM yyyy"
-                                  )}
-                                </span>
-                                <br />
-                                <span className="fs-7 fw-normal">
-                                  {format(
-                                    new Date(booking.flight.arrivalTime),
-                                    "HH:mm"
-                                  )}
-                                </span>
-                              </div>
+                              <br />
+                              <span className="fs-7 fw-normal custom-date-deparr-time">
+                                {format(
+                                  new Date(booking.flight.arrivalTime),
+                                  "HH:mm"
+                                )}
+                              </span>
                             </div>
                           </div>
-                          <hr />
-                          {/* Menampilkan detail booking */}
-                          <div className="d-flex justify-content-between">
-                            <div>
-                              <span className="fs-6 fw-bolder">
-                                Booking Code:
-                              </span>
-                              <br />
-                              <span className="fw-normal">{booking.code}</span>
-                            </div>
-                            <div>
-                              <span className="fs-6 fw-bolder">Class:</span>
-                              <br />
-                              <span className="fw-normal">
-                                {booking.flight?.class || "Class not available"}
-                              </span>
-                            </div>
-                            <span
-                              className="fs-5 fw-bolder align-self-center"
-                              style={{ color: "#4B1979" }}
-                            >
-                              {`IDR ${booking.totalPrice}`}
+                        </div>
+                        <hr />
+                        {/* Menampilkan detail booking */}
+                        <div className="d-flex justify-content-between">
+                          <div>
+                            <span className="fs-6 fw-bolder custom-footer">
+                              Booking Code:
+                            </span>
+                            <br />
+                            <span className="fw-normal custom-footer">
+                              {booking.code}
                             </span>
                           </div>
-                        </Card.Body>
-                      </Card>
-                    );
-                  })}
-                </div>
-              );
-            })
+                          <div>
+                            <span className="fs-6 fw-bolder ms-2 custom-footer">
+                              Class:
+                            </span>
+                            <br />
+                            <span className="fw-normal ms-2 custom-footer">
+                              {booking.flight?.class || "Class not available"}
+                            </span>
+                          </div>
+                          <span
+                            className="fs-5 fw-bolder ms-4 align-self-center custom-price"
+                            style={{ color: "#4B1979" }}
+                          >
+                            {booking?.totalPrice
+                              ? `IDR ${booking.totalPrice.toLocaleString("id-ID")}`
+                              : "Price not available"}
+                          </span>
+                        </div>
+                      </Card.Body>
+                    </Card>
+                  );
+                })}
+              </div>
+            ))
           ) : (
             <div
-              className="d-flex justify-content-center align-items-center mt-5 flex-column"
-              style={{ position: "relative", left: "10rem" }}
+              className="search-not-found d-flex justify-content-center align-items-center mt-5 flex-column"
+              style={{
+                maxWidth: "100%",
+                padding: "0 1rem",
+                position: "relative",
+                left: "20rem",
+              }}
             >
               <img
                 src="src/assets/homepage/not-found.png"
                 alt="tidak-ditemukan"
-                style={{ width: "25rem" }}
+                style={{ width: "100%", maxWidth: "25rem" }}
+                className="img-search-not-found"
               />
-              <span className="mt-3">Maaf, pencarian Anda tidak ditemukan</span>
+              <span className="mt-3 text-center">
+                Maaf, pencarian Anda tidak ditemukan
+              </span>
             </div>
           )}
-        </Col>
+        </div>
 
-        {/* Bagian kanan: Detail Pesanan */}
-        <Col md={4} className="ps-3">
-          {selectedId ? (
-            <DetailPesanan id={selectedId} /> // Pass 'selectedId' sebagai prop 'id'
-          ) : (
-            <p>Click a booking to see details</p>
-          )}
-        </Col>
-      </Row>
+        {/* DetailPesanan Screen */}
+        {isDetailVisible && (
+          <Row
+            style={{
+              flex: isMobile ? "unset" : 1,
+              maxWidth: isMobile ? "unset" : "40%",
+            }}
+          >
+            <DetailPesanan id={selectedId} onBack={handleBack} />
+          </Row>
+        )}
+
+        {showDetailPrompt && (
+          <Row
+            className="detail-prompt mt-5"
+            style={{ position: "relative", left: "7rem" }}
+          >
+            <p>Click to see detail</p>
+          </Row>
+        )}
+      </div>
     </Container>
   );
 };
