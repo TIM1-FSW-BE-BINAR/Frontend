@@ -160,7 +160,7 @@ const Homepage = () => {
         fromInput,
         toInput,
         departureDate,
-        returnDate: returnDate || "", // Kirim kosong jika null
+        returnDate: checkedSwitch ? returnDate : "", // Kirim kosong jika null
         totalPassengers,
         adultInput,
         childInput,

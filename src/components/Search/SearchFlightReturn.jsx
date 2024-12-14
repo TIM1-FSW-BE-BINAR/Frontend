@@ -27,9 +27,7 @@ import { Navigate, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getFlights, getFlightId } from "../../service/flight/flightService";
 
-import SearchFlightReturn from "./SearchFlightReturn";
-
-const SearchFlight = ({
+const SearchFlightReturn = ({
   fromInput,
   toInput,
   departureDate,
@@ -41,7 +39,9 @@ const SearchFlight = ({
   classInput,
   departureAirportId,
   returnAirportId,
+  flightSelect
 }) => {
+
   const navigate = useNavigate();
 
   // Tentang kondisi hasil search
@@ -50,49 +50,48 @@ const SearchFlight = ({
   const [ticketSoldOut, setTicketSoldOut] = useState(false);
 
   // Tentang week date departure
-  const [dateBtnActive, setDateBtnActive] = useState(null);
-  const departureDateObj = new Date(departureDate);
-  const [currentWeek, setCurrentWeek] = useState(departureDateObj); // Tanggal acuan untuk 1 minggu
-  const [weekDates, setWeekDates] = useState([]); // Menyimpan daftar tanggal dalam 1 minggu
-  const [departureDateActive, setDepartureDateActive] = useState(departureDate); // handle search saat date active nya diganti
+  const [dateBtnActiveReturn, setDateBtnActiveReturn] = useState(null);
+  const returnDateObj = new Date(returnDate);
+  const [currentWeekReturn, setCurrentWeekReturn] = useState(returnDateObj); // Tanggal acuan untuk 1 minggu
+  const [weekDatesReturn, setWeekDatesReturn] = useState([]); // Menyimpan daftar tanggal dalam 1 minggu
+  const [returnDateActive, setreturnDateActive] = useState(returnDate); // handle search saat date active nya diganti
 
-  const calculateWeekDates = (baseDate) => {
+  const calculateWeekDatesReturn = (baseDate) => {
     const startDate = startOfWeek(baseDate, { weekStartsOn: 1 }); // Mulai dari hari Senin
     return Array.from({ length: 7 }, (_, i) => addDays(startDate, i));
   };
 
   // update tanggal saat minggu berubah
   useEffect(() => {
-    const week = calculateWeekDates(currentWeek);
+    const week = calculateWeekDatesReturn(currentWeekReturn);
 
-    // Update hanya jika weekDates berubah
-    setWeekDates((prevWeekDates) => {
-      if (JSON.stringify(prevWeekDates) !== JSON.stringify(week)) {
+    // Update hanya jika weekDatesReturn berubah
+    setWeekDatesReturn((prevWeekDatesReturn) => {
+      if (JSON.stringify(prevWeekDatesReturn) !== JSON.stringify(week)) {
         return week;
       }
-      return prevWeekDates;
+      return prevWeekDatesReturn;
     });
 
-    if (dateBtnActive === null) {
+    if (dateBtnActiveReturn === null) {
       const activeIndex = week.findIndex((date) =>
-        isSameDay(date, departureDateObj)
+        isSameDay(date, returnDateObj)
       );
-      setDateBtnActive(activeIndex);
+      setDateBtnActiveReturn(activeIndex);
     }
-  }, [currentWeek, departureDateObj, dateBtnActive]);
+  }, [currentWeekReturn, returnDateObj, dateBtnActiveReturn]);
 
   const handleNextWeek = () => {
-    setCurrentWeek((prevDate) => addWeeks(prevDate, 1)); // Tambah 1 Minggu
+    setCurrentWeekReturn((prevDate) => addWeeks(prevDate, 1)); // Tambah 1 Minggu
   };
 
   const handlePreviousWeek = () => {
-    setCurrentWeek((prevDate) => subWeeks(prevDate, 1)); // Kurangi 1 Minggu
+    setCurrentWeekReturn((prevDate) => subWeeks(prevDate, 1)); // Kurangi 1 Minggu
   };
 
-  const handleDateBtnActive = (index, date) => {
-    setDateBtnActive(index);
-    setDepartureDateActive(date);
-    console.log(departureDateActive);
+  const handleDateBtnActiveReturn = (index, date) => {
+    setDateBtnActiveReturn(index);
+    setreturnDateActive(date);
     setTicketSoldOut(false);
   };
 
@@ -159,16 +158,16 @@ const SearchFlight = ({
 
   // fetch data flight nya berdasarkan filter
   const { data, isSuccess, isError, isPending } = useQuery({
-    queryKey: ["search-flights", filterChange, departureDateActive],
+    queryKey: ["search-flights-return", filterChange, returnDateActive],
     queryFn: () =>
       getFlights({
-        departureAirport: departureAirportId,
-        arrivalAirport: returnAirportId,
+        departureAirport: returnAirportId,
+        arrivalAirport: departureAirportId,
         seatClass: seatClassValue,
-        departureTime: departureDateActive,
+        departureTime: returnDateActive,
         ...filterChange,
       }),
-    enabled: !!departureAirportId && !!returnAirportId 
+    enabled: !!departureAirportId && !!returnAirportId
   });
 
   useEffect(() => {
@@ -197,9 +196,7 @@ const SearchFlight = ({
   ]);
   // Tentang perfilteran dan fetch search selesai
 
-  // Menuju halaman bookingPage dan handle ketika ada return date nya
-  const [returnScreen, setReturnScreen] = useState(false);
-  const [flightSelect, setFlightSelect] = useState("");
+  // Menuju halaman bookingPage
 
   const handleBookingPage = async (flight) => {
     const flightDataById = await getFlightId(flight?.id);
@@ -207,15 +204,10 @@ const SearchFlight = ({
       // tiket nya habis
       setTicketSoldOut(true);
     } else {
-      // cek di params apakah ada nilai dari returnDate nya, jika ada render halaman return ticket
-      if (returnDate !== "") {
-        console.log("ada return date");
-        setFlightSelect(flight.id);
-        setReturnScreen(true);
-      } else {
         // tiket tersedia, kirim flight nya ke booking
         const queryParams = new URLSearchParams({
-          flightId: flight.id,
+          flightId: flightSelect,
+          returnFlightId: flight.id,
           totalPassengers: passengers,
           adultInput,
           childInput,
@@ -225,31 +217,15 @@ const SearchFlight = ({
         navigate({
           to: `/booking?${queryParams}`,
         });
-      }
+      
     }
   };
 
-
-  return returnScreen ? (
-    <SearchFlightReturn 
-  fromInput={fromInput}
-  toInput={toInput}
-  departureDate={departureDate}
-  returnDate={returnDate}
-  passengers={passengers}
-  adultInput={adultInput}
-  childInput={childInput}
-  babyInput={babyInput}
-  classInput={classInput}
-  departureAirportId={departureAirportId}
-  returnAirportId={returnAirportId}
-  flightSelect={flightSelect}
-/>
-  ) : (
+  return (
     <>
       <Container className="">
         <Row className="mt-5 mb-2">
-          <h2>Select a Flight</h2>
+          <h2>Select a Flight Return</h2>
         </Row>
         <Row>
           <Col xs={12} sm={8} md={8} className="mb-2 mb-sm-0">
@@ -259,7 +235,7 @@ const SearchFlight = ({
               onClick={() => navigate({ to: "/" })}
             >
               <FaArrowLeft className="me-2" />
-              {fromInput} {">"} {toInput} - {passengers} Passenger -{" "}
+              {toInput} {">"} {fromInput} - {passengers} Passenger -{" "}
               {classInput}
             </Button>
           </Col>
@@ -291,15 +267,15 @@ const SearchFlight = ({
             lg={10}
             className="d-flex flex-wrap justify-content-center gap-3 w-full"
           >
-            {weekDates.map((date, index) => (
+            {weekDatesReturn.map((date, index) => (
               <Button
                 key={index}
                 className={`${
-                  dateBtnActive === index ? "date-active" : ""
+                  dateBtnActiveReturn === index ? "date-active" : ""
                 } d-flex flex-column justify-content-center align-items-center w-full px-3 py-1 date-btn`}
                 onClick={() => {
                   const dateSelect = format(date, "yyyy-MM-dd");
-                  handleDateBtnActive(index, dateSelect);
+                  handleDateBtnActiveReturn(index, dateSelect);
                 }}
               >
                 <h6>{format(date, "EEEE", { locale: enUS })}</h6>
@@ -980,4 +956,4 @@ const SearchFlight = ({
   );
 };
 
-export default SearchFlight;
+export default SearchFlightReturn;
