@@ -7,10 +7,10 @@ import { setToken, setUser } from "../../redux/slices/auth";
 import { useCallback, useEffect, useState } from "react";
 import { profileMe } from "../../service/auth";
 import { useQuery } from "@tanstack/react-query";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+// import "./SidebarAkun.css";
 import { BeatLoader } from "react-spinners";
-import { Toaster, toast } from "react-hot-toast";
-import "./SidebarAkun.css";
 
 export default function SidebarAkun({
   openUbahProfil,
@@ -28,7 +28,7 @@ export default function SidebarAkun({
   const handleClick = (setterFunction) => {
     setOpenUbahProfil(false);
     setOpenPengaturanAkun(false);
-    setterFunction((prev) => !prev); // Toggle state
+    setterFunction((prev) => !prev); // Toggle the state
   };
 
   const handleLogout = useCallback(() => {
@@ -40,7 +40,7 @@ export default function SidebarAkun({
   const { data, isSuccess, isError, isLoading } = useQuery({
     queryKey: ["profileMe"],
     queryFn: profileMe,
-    enabled: !!token,
+    enabled: token ? true : false,
   });
 
   useEffect(() => {
@@ -53,152 +53,186 @@ export default function SidebarAkun({
 
   if (isLoading)
     return (
-      <div className="d-flex justify-content-center align-items-center vh-100">
-        <BeatLoader />
+      <div className="d-flex justify-content-center ">
+        <BeatLoader style={{ position: "relative", marginTop: "15rem" }} />
       </div>
     );
 
   const logoutConfirmation = (event) => {
     event.preventDefault();
-    setOverlayVisible(true);
-
-    toast(
-      (t) => (
-        <div className="text-center logout-toast">
-          <p>Apakah Anda yakin ingin keluar?</p>
-          <div>
-            <button
-              onClick={() => {
-                toast.dismiss(t.id);
-                setOverlayVisible(false);
-                handleLogout();
-              }}
-              className="btn btn-danger me-2"
-            >
-              Ya
-            </button>
-            <button
-              onClick={() => {
-                toast.dismiss(t.id);
-                setOverlayVisible(false);
-              }}
-              className="btn btn-secondary"
-            >
-              Tidak
-            </button>
-          </div>
+    setOverlayVisible(true); // Show the overlay when toast is triggered
+    toast.warn(
+      <div style={{ textAlign: "center" }}>
+        <p>Apakah Anda yakin ingin keluar?</p>
+        <div style={{ marginTop: "10px" }}>
+          <button
+            onClick={() => {
+              toast.dismiss();
+              setOverlayVisible(false); // Hide overlay after toast is dismissed
+              handleLogout();
+            }}
+            style={{
+              marginRight: "10px",
+              background: "#FF5C5C",
+              border: "none",
+              color: "#fff",
+              padding: "5px 10px",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            Ya
+          </button>
+          <button
+            onClick={() => {
+              toast.dismiss();
+              setOverlayVisible(false); // Hide overlay when user dismisses the toast
+            }}
+            style={{
+              background: "#ccc",
+              border: "none",
+              padding: "5px 10px",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            Tidak
+          </button>
         </div>
-      ),
+      </div>,
       {
-        duration: Infinity, // Keep toast visible until action is taken
-        position: "top-center", // Default position for better control
+        autoClose: false,
+        closeButton: false,
+        className: "custom-toast-center",
+        bodyClassName: "custom-toast-body",
       }
     );
   };
 
   return (
     <>
-      <Container
-        fluid
-        className="p-0 mt-4 custom-sidebar"
-        style={{
-          position: "relative",
-          left: "10rem",
-          bottom: "4rem",
-          width: "50vw",
-        }}
-      >
+      <Container fluid>
         <Row className="flex-nowrap">
-          {/* Sidebar */}
-          <Col
-            xs={12}
-            md={4}
-            xl={3}
-            className="p-3"
-            style={{ width: "19rem", minHeight: "100vh" }}
-          >
-            <Nav className="flex-column">
-              {/* Ubah Profil */}
-              <Nav.Item
-                className="py-2 custom-nav-item"
-                style={{
-                  backgroundColor: openUbahProfil ? "#e3e3e3" : "transparent",
-                }}
+          <Col xs="auto" md={6} xl={6} className="bg-white shadow-sm mx-3">
+            <div className="d-flex flex-column align-items-center ">
+              <Nav
+                className="flex-column mb-sm-0 align-items-center m-0 p-0"
+                id="menu"
               >
-                <Nav.Link
-                  href="#"
-                  className="d-flex align-items-center text-dark "
-                  onClick={() => handleClick(setOpenUbahProfil)}
-                  style={{}}
+                <Nav.Item
+                  as={Row}
+                  className="w-100 offset-md-1"
+                  style={
+                    openUbahProfil
+                      ? {
+                          cursor: "pointer",
+                          background: "#CFD4ED",
+                        }
+                      : {}
+                  }
                 >
-                  <VscEdit
-                    size={24}
-                    className="me-3 custom-nav-icon"
-                    style={{ color: "#7126B5" }}
-                  />
-                  <span className="custom-span">Ubah Profil</span>
-                </Nav.Link>
-              </Nav.Item>
+                  <Nav.Link
+                    as={Col}
+                    xs="auto"
+                    md={10}
+                    xl={10}
+                    href="#"
+                    className="align-middle text-black py-2 d-flex justify-content-center align-items-center m-0 p-0 w-100"
+                    onClick={() => handleClick(setOpenUbahProfil)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <VscEdit
+                      style={{
+                        marginLeft: "10px",
+                        marginRight: "-10px",
+                        width: "24px",
+                        height: "24px",
+                        color: "#7126B5",
+                      }}
+                    />
+                    <span className="ms-5 d-none d-sm-inline fs-10 w-100">
+                      Ubah Profil
+                    </span>
+                  </Nav.Link>
+                </Nav.Item>
 
-              {/* Pengaturan Akun */}
-              <Nav.Item
-                className="py-2 custom-nav-item"
-                style={{
-                  backgroundColor: openPengaturanAkun
-                    ? "#e3e3e3"
-                    : "transparent",
-                }}
-              >
-                <Nav.Link
-                  href="#"
-                  className="d-flex align-items-center text-dark"
-                  onClick={() => handleClick(setOpenPengaturanAkun)}
+                <Nav.Item
+                  as={Row}
+                  className="w-100 offset-md-1"
+                  style={
+                    openPengaturanAkun
+                      ? {
+                          cursor: "pointer",
+                          background: "#CFD4ED",
+                        }
+                      : {}
+                  }
                 >
-                  <VscGear
-                    size={24}
-                    className="me-3 custom-nav-icon"
-                    style={{ color: "#7126B5" }}
-                  />
-                  <span className="custom-span">Pengaturan Akun</span>
-                </Nav.Link>
-              </Nav.Item>
+                  <Nav.Link
+                    as={Col}
+                    className="text-black py-2 d-flex  align-items-center m-0 p-0"
+                    style={{ width: "15rem", cursor: "pointer" }}
+                    onClick={() => handleClick(setOpenPengaturanAkun)}
+                  >
+                    <VscGear
+                      style={{
+                        marginLeft: "10px",
+                        marginRight: "-10px",
+                        width: "24px",
+                        height: "24px",
+                        color: "#7126B5",
+                      }}
+                    />
+                    <span className="ms-5 d-none d-sm-inline fs-10 w-100">
+                      Pengaturan Akun
+                    </span>
+                  </Nav.Link>
+                </Nav.Item>
 
-              {/* Keluar */}
-              <Nav.Item className="py-2 custom-nav-item">
-                <Nav.Link
-                  href="#"
-                  className="d-flex align-items-center text-dark"
-                  onClick={logoutConfirmation}
+                <Nav.Item
+                  as={Row}
+                  className="w-100 offset-md-1"
+                  style={{ cursor: "pointer" }}
                 >
-                  <VscSignOut
-                    size={24}
-                    className="me-3 custom-nav-icon"
-                    style={{ color: "#7126B5" }}
-                  />
-                  <span className="custom-span"> Keluar</span>
-                </Nav.Link>
-              </Nav.Item>
-            </Nav>
+                  <Nav.Link
+                    as={Col}
+                    xs="auto"
+                    md={10}
+                    xl={10}
+                    href="#"
+                    className="align-middle text-black py-2 d-flex justify-content-center align-items-center m-0 p-0 w-100"
+                    onClick={logoutConfirmation}
+                  >
+                    <VscSignOut
+                      style={{
+                        marginLeft: "10px",
+                        marginRight: "-10px",
+                        width: "24px",
+                        height: "24px",
+                        color: "#7126B5",
+                      }}
+                    />
+                    <span className="ms-5 d-none d-sm-inline fs-10 w-100">
+                      Keluar
+                    </span>
+                  </Nav.Link>
+                </Nav.Item>
+              </Nav>
+            </div>
           </Col>
 
-          {/* Konten */}
-          <Col className="p-4 ">{children}</Col>
+          <Col
+            className="m-0 p-0   min-vh-100 "
+            style={{ background: "#F4F5F7" }}
+          >
+            {children}
+          </Col>
         </Row>
 
         {/* Overlay for Toast */}
-        {overlayVisible && (
-          <div
-            className="position-fixed w-100 h-100 top-0 start-0 bg-dark bg-opacity-50"
-            style={{ zIndex: 1040 }}
-          />
-        )}
+        {overlayVisible && <div className="custom-toast-overlay" />}
 
-        <Toaster
-          containerClassName="toaster-logout "
-          containerStyle={{
-            top: "50vh",
-          }}
-        />
+        <ToastContainer />
       </Container>
     </>
   );

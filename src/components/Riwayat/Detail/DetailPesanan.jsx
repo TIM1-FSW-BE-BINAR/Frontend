@@ -1,44 +1,22 @@
+// components/Detail/DetailPesanan.jsx
+
 import React, { useEffect, useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query"; // Tambahkan useMutation
-import { Card, Button, Row, Col, Image } from "react-bootstrap";
+import { useQuery } from "@tanstack/react-query";
+import { Card, Button, Row, Col } from "react-bootstrap";
 import { getIdBooking } from "../../../service/booking";
-import { tickets } from "../../../service/ticket";
 import { useSelector } from "react-redux";
-import { VscChromeClose } from "react-icons/vsc";
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale";
-import toast from "react-hot-toast"; // Tambahkan toast untuk notifikasi
 import "./DetailPesanan.css";
 
 const DetailPesanan = ({ id, onBack }) => {
   const { token } = useSelector((state) => state.auth);
   const [booking, setBookingDetail] = useState(null);
-  const [qrCodeImage, setQrCodeImage] = useState(null);
 
   const { data, isLoading, isSuccess, isError, error } = useQuery({
     queryKey: ["getIdBooking", id],
     queryFn: () => getIdBooking(id),
     enabled: !!id && !!token,
-  });
-
-  // Konfigurasi useMutation untuk print ticket
-  const mutation = useMutation({
-    mutationFn: (request) => tickets(id, request),
-    onSuccess: (result) => {
-      toast.success("Ticket printed successfully!");
-      console.log("Print ticket result:", result);
-
-      // Cek apakah respons memiliki data QR code
-      if (result?.qrCodeUrl) {
-        setQrCodeImage(result.qrCodeUrl); // Simpan URL QR code
-      } else {
-        toast.error("QR code not found in the response.");
-      }
-    },
-    onError: (err) => {
-      toast.error("Failed to print ticket. Please try again.");
-      console.error("Print ticket error:", err);
-    },
   });
 
   const groupedPassengers = booking?.bookingDetail?.reduce((acc, detail) => {
@@ -62,42 +40,21 @@ const DetailPesanan = ({ id, onBack }) => {
     }
   }, [isSuccess, data, isError, error]);
 
-  const handlePrintTicket = () => {
-    if (!booking?.id) {
-      toast.error("Booking ID is missing. Cannot print ticket.");
-      return;
-    }
-
-    mutation.mutate({ bookingId: booking.id });
-  };
-
   if (isLoading) return <p>Loading details...</p>;
   if (isError) return <p>Error fetching details: {error.message}</p>;
 
   return (
     <Card
       className="shadow-sm rounded border-1 mt-5 custom-card customized-style"
-      style={{
-        width: "25rem",
-        height: "65rem",
-        left: "0",
-        background: "#FFFFFF",
-      }}
+      style={{ width: "25rem", left: "0", background: "#FFFFFF" }}
+      onClick={onBack}
     >
-      <Button
-        variant="none"
-        className="back-button text-start"
-        style={{ display: "none", backgroundColor: "transparent" }}
-        onClick={onBack}
-      >
-        <VscChromeClose size={25} style={{ color: "black" }} />
-      </Button>
       <Card.Body>
         {/* Status Pesanan */}
-        <div className="d-flex justify-content-between align-items-center mb-3 custom-status">
-          <h6 className="fw-bold custom-h6">Booking Detail</h6>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h6 className="fw-bold">Booking Detail</h6>
           <span
-            className="px-3 py-1 text-white "
+            className="px-3 py-1 text-white"
             style={{
               backgroundColor: "#73CA5C",
               borderRadius: "10px",
@@ -158,7 +115,7 @@ const DetailPesanan = ({ id, onBack }) => {
 
           <div>
             {/* Detail Maskapai */}
-            <h6 className="fw-bolder m-0 custom-flight">
+            <h6 className="fw-bolder m-0">
               {booking?.flight?.airline?.name || "Airline not available"} -{" "}
               {booking?.flight?.class || "N/A"}
             </h6>
@@ -167,9 +124,7 @@ const DetailPesanan = ({ id, onBack }) => {
             </p>
             {/* Informasi Penumpang */}
             <div className="mt-4">
-              <h6 className="fw-bolder mb-0 custom-flight-info">
-                Information:
-              </h6>
+              <h6 className="fw-bolder mb-0">Information:</h6>
               {booking?.bookingDetail?.map((detail, index) => (
                 <div key={detail.id}>
                   <p
@@ -216,7 +171,7 @@ const DetailPesanan = ({ id, onBack }) => {
 
         {/* Rincian Harga */}
         <div className="mb-3">
-          <h6 className="fw-bold custom-payment">Payment Detail:</h6>
+          <h6 className="fw-bold">Payment Detail:</h6>
           <div>
             {groupedPassengers &&
               Object.entries(groupedPassengers).map(([type, data]) => (
@@ -249,13 +204,10 @@ const DetailPesanan = ({ id, onBack }) => {
             borderRadius: "10px",
             width: "100%",
           }}
-          className="mb-2 print-button"
-          onClick={handlePrintTicket} // Tambahkan handler untuk cetak tiket
-          disabled={mutation.isLoading} // Nonaktifkan tombol saat loading
+          className="mb-2"
         >
-          {mutation.isLoading ? "Printing..." : "Print Ticket"}
+          Print Invoice
         </Button>
-
         <Button
           style={{
             backgroundColor: "#FF0000",
@@ -263,22 +215,9 @@ const DetailPesanan = ({ id, onBack }) => {
             borderRadius: "10px",
             width: "100%",
           }}
-          className="cancel-button"
         >
           Cancel Booking
         </Button>
-
-        {booking?.bookingDetail[0]?.qrCodeImage && (
-          <div className="mt-4 text-center">
-            <h6>Scan QR Code:</h6>
-            <Image
-              src={booking?.bookingDetail[0]?.qrCodeImage}
-              alt="QR Code"
-              className="img-fluid"
-              style={{ maxWidth: "200px" }}
-            />
-          </div> // Tampilkan gambar QR code jika ada
-        )}
       </Card.Body>
     </Card>
   );

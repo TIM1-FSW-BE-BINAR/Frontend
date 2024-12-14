@@ -83,7 +83,7 @@ function PageHeader() {
       <Row className="align-items-center justify-content-center">
         <Col md={10} lg={9} className="text-start">
           <h1 className="fw-bold fs-4 title-header text-wrap text-start text-dark">
-            Notification
+            Notifikasi
           </h1>
         </Col>
       </Row>
@@ -109,7 +109,7 @@ function PageHeader() {
                 className="text-decoration-none d-flex align-items-center"
                 style={{ color: "white" }}
               >
-                <VscArrowLeft className="me-2" size={20} /> Home
+                <VscArrowLeft className="me-2" size={20} /> Beranda
               </Button>
 
               {/* Tombol Filter dan Search */}
@@ -249,12 +249,10 @@ function PageHeader() {
 
 export default function NotifikasiLayout({ children }) {
   return (
-    <>
+    <Container fluid="xxl">
       <NavigationBar />
-      <Container fluid="xxl">
-        <PageHeader />
-        {children}
-      </Container>
-    </>
+      <PageHeader />
+      {children}
+    </Container>
   );
 }

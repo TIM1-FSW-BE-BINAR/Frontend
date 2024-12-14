@@ -5,10 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { IoEyeOutline, IoEyeOffOutline, IoArrowBack } from "react-icons/io5";
 import { setToken } from "../../redux/slices/auth";
 import { deleteUser } from "../../service/user"; // Pastikan path sesuai
-import { ToastContainer } from "react-toastify";
-import { Toaster, toast } from "react-hot-toast";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import CSS untuk toast
-import "./ScreenPengaturanAkun.css";
 
 const ScreenPengaturanAkun = () => {
   const dispatch = useDispatch();
@@ -33,22 +31,24 @@ const ScreenPengaturanAkun = () => {
 
   return (
     <Container
-      className="d-flex flex-column py-2 custom-pengaturan-profil"
-      style={{ position: "relative", left: "9rem", background: "#FFFFFF" }}
+      className="d-flex flex-column py-2"
+      style={{ marginLeft: "-5rem" }}
     >
-      <Card className="custom-card-pengaturan" style={{ width: "35rem" }}>
+      <ToastContainer />
+
+      <Card style={{ width: "35rem" }}>
         <Card.Header className="text-white" style={{ background: "#A06ECE" }}>
-          <h5 className="mb-0 custom-h5">Hapus Akun</h5>
+          <h5 className="mb-0">Hapus Akun</h5>
         </Card.Header>
         <Card.Body>
-          <p className="text-gray-600 mb-4 custom-p">
+          <p className="text-gray-600 mb-4">
             This action cannot be undone. Please continue with caution
           </p>
           <Button
             size="lg"
-            className="d-flex justify-content-center mx-auto w-25 custom-button"
+            className="d-flex justify-content-center mx-auto w-25"
             variant="danger"
-            onClick={() => setShowModal(true)}
+            onClick={() => setShowModal(true)} // Menampilkan modal konfirmasi
           >
             Delete
           </Button>

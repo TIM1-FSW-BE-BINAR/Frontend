@@ -150,7 +150,7 @@ const ScreenRiwayat = () => {
   };
 
   return (
-    <Container fluid className="py-3 " style={{ background: "#FFFFFF" }}>
+    <Container fluid className="py-3" style={{ background: "#FFFFFF" }}>
       <div
         className={`d-flex ${isMobile ? "flex-column" : "flex-row"}`}
         style={{ gap: "1rem" }}
@@ -323,23 +323,23 @@ const ScreenRiwayat = () => {
 
         {/* DetailPesanan Screen */}
         {isDetailVisible && (
-          <Row
+          <div
             style={{
               flex: isMobile ? "unset" : 1,
               maxWidth: isMobile ? "unset" : "40%",
             }}
           >
             <DetailPesanan id={selectedId} onBack={handleBack} />
-          </Row>
+          </div>
         )}
 
         {showDetailPrompt && (
-          <Row
+          <div
             className="detail-prompt mt-5"
             style={{ position: "relative", left: "7rem" }}
           >
             <p>Click to see detail</p>
-          </Row>
+          </div>
         )}
       </div>
     </Container>

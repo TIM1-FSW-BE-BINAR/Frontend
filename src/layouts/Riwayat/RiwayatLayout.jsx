@@ -239,12 +239,10 @@ function PageHeader() {
 
 export default function RiwayatLayout({ children }) {
   return (
-    <>
+    <Container fluid="xxl">
       <NavigationBar />
-      <Container fluid="xxl">
-        <PageHeader />
-        {children}
-      </Container>
-    </>
+      <PageHeader />
+      {children}
+    </Container>
   );
 }
