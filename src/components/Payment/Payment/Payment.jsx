@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useSelector } from "react-redux";
 import toast, { Toaster } from "react-hot-toast";
 import { Container, Row, Col, Card, Spinner } from "react-bootstrap";
-import TicketDetails from "../../TicketDetails";
+import DetailPesanan from "../Payment/DetailPesanan";
 
 const PaymentOptions = () => {
   const [snapLoaded, setSnapLoaded] = useState(false);

@@ -69,7 +69,6 @@ export const getGroupBooking = async () => {
 };
 
 export const createBooking = async (request) => {
-  console.log("ini consoleloge service coyy",request);
   const token = localStorage.getItem("token");
   const response = await fetch(
     `${import.meta.env.VITE_API_URL}/api/v1/booking`,
@@ -84,15 +83,25 @@ export const createBooking = async (request) => {
   );
 
   const result = await response.json();
-  if (response.status === 401) {
-    throw new Error(
-      result.error?.message || "Token kedaluwarsa, harap login ulang."
-    );
-  }
+  console.log(response);
+ if (result.meta?.statusCode === 401) {
+   throw new Error(result.error?.message || "Token expired, please relogin.");
+ }
 
-  if (response.status === 201) {
-    console.log(result.meta?.message || "Booking berhasil.");
-    return result.meta;
-  }
+ // Jika statusCode 201, berarti booking berhasil dibuat
+ if (result.meta?.statusCode === 201) {
+   console.log(result.meta?.message || "Booking Created.");
+
+   const bookingId = result.data?.bookingId;
+   console.log("Booking ID dari service:", bookingId); // Log untuk memastikan bookingId ada
+
+   if (bookingId) {
+     localStorage.setItem("bookingId", bookingId);
+     console.log("Booking ID disimpan di localStorage:", bookingId); // Cek apakah disimpan dengan benar
+   }
+
+   return result.data;
+ }
+
   return result?.data;
 };
