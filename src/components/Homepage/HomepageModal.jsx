@@ -129,7 +129,7 @@ const HomepageModal = (props) => {
             <div className="position-relative w-100">
               <Form.Control
                 type="search"
-                placeholder="Masukan Kota atau Negara"
+                placeholder="Select a location"
                 className="ps-5"
                 aria-label="Search"
                 style={{
@@ -161,7 +161,7 @@ const HomepageModal = (props) => {
         <Container className="p-0">
           <Row className="pt-1">
             <Col>
-              <h6 className="fw-bold">Pencarian</h6>
+              <h6 className="fw-bold">Search</h6>
             </Col>
           </Row>
 

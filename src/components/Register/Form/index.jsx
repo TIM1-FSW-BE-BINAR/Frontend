@@ -6,6 +6,7 @@ import { Container, Row, Col, Button, Form, Image } from "react-bootstrap";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { useMutation } from "@tanstack/react-query";
 import { register } from "../../../service/auth";
+import { useSpring, animated } from "@react-spring/web";
 
 import { setToken } from "../../../redux/slices/auth";
 import toast, { Toaster } from "react-hot-toast";
@@ -113,35 +114,35 @@ const RegisterForm = () => {
     });
 
     if (!firstName) {
-      setErrors((prev) => ({ ...prev, firstName: "Nama depan harus diisi" }));
+      setErrors((prev) => ({ ...prev, firstName: "First Name is required" }));
       firstNameRef.current?.focus();
       return;
     }
     if (!lastName) {
-      setErrors((prev) => ({ ...prev, lastName: "Nama belakang harus diisi" }));
+      setErrors((prev) => ({ ...prev, lastName: "Last Name is required" }));
       lastNameRef.current?.focus();
       return;
     }
     if (!email) {
-      setErrors((prev) => ({ ...prev, email: "Email harus diisi" }));
+      setErrors((prev) => ({ ...prev, email: "Email is required" }));
       emailRef.current?.focus();
       return;
     }
     if (!phone) {
-      setErrors((prev) => ({ ...prev, phone: "Nomor Hp harus diisi" }));
+      setErrors((prev) => ({ ...prev, phone: "Phone Number is required" }));
       phoneRef.current?.focus();
       return;
     }
 
     if (!password) {
-      setErrors((prev) => ({ ...prev, password: "Password harus diisi" }));
+      setErrors((prev) => ({ ...prev, password: "Password is required" }));
       passwordRef.current?.focus();
       return;
     }
     if (password !== confirmPassword) {
       setErrors((prev) => ({
         ...prev,
-        confirmPassword: "Password tidak sama!",
+        confirmPassword: "Password is not same!",
       }));
       confirmPasswordRef.current?.focus();
       return;
@@ -176,229 +177,241 @@ const RegisterForm = () => {
       }
     }
   };
+  const formAnimation = useSpring({
+    from: { opacity: 0, transform: "translateY(50px)" },
+    to: { opacity: 1, transform: "translateY(0px)" },
+    config: { tension: 200, friction: 20 },
+  });
 
   return (
     <div
       style={{
         maxWidth: "450px",
+        marginTop: "4rem",
         width: "100%",
+        height: "100%",
+        
       }}
     >
       {" "}
-      <h2 className="fw-bold text-start my-4">Daftar</h2>
-      <Form noValidate onSubmit={handleRegister}>
-        {/* Nama */}
-        <Form.Group className="mb-3" controlId="validationCustom01">
-          <Form.Label>Nama Depan</Form.Label>
-          <Form.Control
-            ref={firstNameRef}
-            type="text"
-            placeholder="Nama Depan"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            isInvalid={!!errors.firstName}
-            style={{
-              borderRadius: "15px",
-              padding: "1em",
-            }}
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.firstName}
-          </Form.Control.Feedback>
-        </Form.Group>
-        <Form.Group className="mb-3" controlId="validationCustom02">
-          <Form.Label>Nama Belakang</Form.Label>
-          <Form.Control
-            ref={lastNameRef}
-            isInvalid={!!errors.lastName}
-            type="text"
-            placeholder="Nama Belakang"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            style={{
-              borderRadius: "15px",
-              padding: "1em",
-            }}
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.lastName}
-          </Form.Control.Feedback>
-        </Form.Group>
-
-        {/* Email */}
-        <Form.Group className="mb-3" controlId="validationCustom03">
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            type="email"
-            ref={emailRef}
-            isInvalid={!!errors.email}
-            placeholder="Contoh: johndoe@gmail.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{
-              borderRadius: "15px",
-              padding: "1em",
-              paddingRight: "2.5em",
-            }}
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.email}
-          </Form.Control.Feedback>
-        </Form.Group>
-
-        {/* Nomor Telepon */}
-        <Form.Group className="mb-3" controlId="validationCustom04">
-          <Form.Label>Nomor Telepon</Form.Label>
-          <PhoneInput
-            ref={phoneRef}
-            isInvalid={!!errors.phone}
-            defaultCountry="ID"
-            placeholder="Masukkan nomor telepon"
-            value={phone}
-            onChange={setPhone}
-            style={{
-              width: "100%",
-              borderRadius: "15px",
-              padding: "1em",
-              border: errors.phone ? "1px solid #dc3545" : "1px solid #ced4da",
-              boxShadow: errors.phone
-                ? "0 0 0 0.25rem rgba(220,53,69,.25)"
-                : "none",
-              outline: "none !important", // Pastikan outline hilang di input utama
-            }}
-            inputStyle={{
-              width: "100%",
-              paddingLeft: "50px", // Untuk ruang ikon bendera
-              border: "none", // Hilangkan border default
-              outline: "none !important", // Pastikan hilangkan outline pada input
-              boxSizing: "border-box",
-            }}
-            countrySelectProps={{
-              style: {
-                position: "absolute",
-                left: "10px", // Posisi ikon negara
-                top: "50%",
-                transform: "translateY(-50%)", // Vertikal center
-                pointerEvents: "auto", // Agar ikon dapat diklik
-                zIndex: 1, // Pastikan ikon di atas input
-                outline: "none !important", // Hilangkan outline pada dropdown negara
-              },
-            }}
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.phone}
-          </Form.Control.Feedback>
-        </Form.Group>
-
-        {/* Buat Password */}
-        <Form.Group className="mb-3" controlId="validationCustom05">
-          <Form.Label>Buat Password</Form.Label>
-          <div style={{ position: "relative" }}>
+      <animated.div style={formAnimation}>
+        <h2 className="fw-bold text-start my-4">Sign Up</h2>
+        <Form noValidate onSubmit={handleRegister}>
+          {/* Nama */}
+          <Form.Group className="mb-3" controlId="validationCustom01">
+            <Form.Label>First Name</Form.Label>
             <Form.Control
-              type={type}
-              ref={passwordRef}
-              placeholder="Masukkan password"
-              required
+              ref={firstNameRef}
+              type="text"
+              placeholder="First Name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              isInvalid={!!errors.firstName}
               style={{
                 borderRadius: "15px",
-                paddingRight: "40px",
                 padding: "1em",
               }}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              isInvalid={!!errors.password}
             />
-            <span
-              onClick={() => handleEyeToggle("password")}
-              style={{
-                position: "absolute",
-                top: errors.password ? "35%" : "50%",
-                right: errors.password ? "40px" : "10px",
-                transform: "translateY(-50%)",
-                cursor: "pointer",
-                zIndex: 2,
-              }}
-            >
-              {icon}
-            </span>
             <Form.Control.Feedback type="invalid">
-              {errors.password}
+              {errors.firstName}
             </Form.Control.Feedback>
-          </div>
-        </Form.Group>
-
-        {/* Konfirmasi Password */}
-        <Form.Group className="mb-3">
-          <Form.Label>Konfirmasi Password</Form.Label>
-          <div style={{ position: "relative" }}>
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="validationCustom02">
+            <Form.Label>Last Name</Form.Label>
             <Form.Control
-              ref={confirmPasswordRef}
-              type={confirmType}
-              placeholder="Konfirmasi password"
+              ref={lastNameRef}
+              isInvalid={!!errors.lastName}
+              type="text"
+              placeholder="Last Name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
               style={{
                 borderRadius: "15px",
-                paddingRight: "40px",
                 padding: "1em",
               }}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              isInvalid={!!errors.confirmPassword}
             />
-            <span
-              onClick={() => handleEyeToggle("confirmPassword")}
-              style={{
-                position: "absolute",
-                top: errors.confirmPassword ? "35%" : "50%",
-                right: errors.confirmPassword ? "40px" : "10px",
-                transform: "translateY(-50%)",
-                cursor: "pointer",
-                zIndex: 2,
-              }}
-            >
-              {confirmIcon}
-            </span>
             <Form.Control.Feedback type="invalid">
-              {errors.confirmPassword}
+              {errors.lastName}
             </Form.Control.Feedback>
-          </div>
-        </Form.Group>
+          </Form.Group>
 
-        <Button
-          variant="primary"
-          type="submit"
-          className="w-100 mb-3"
-          style={{
-            backgroundColor: "#7126B5",
-            border: "none",
-            transition: "opacity 0.3s ease",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.5")}
-          onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-        >
-          Daftar
-        </Button>
-      </Form>
-      <div
-        className="text-center"
-        style={{
-          marginTop: "20px",
-        }}
-      >
-        <p>
-          Sudah punya akun?{" "}
+          {/* Email */}
+          <Form.Group className="mb-3" controlId="validationCustom03">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              ref={emailRef}
+              isInvalid={!!errors.email}
+              placeholder="example: johndoe@gmail.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{
+                borderRadius: "15px",
+                padding: "1em",
+                paddingRight: "2.5em",
+              }}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.email}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          {/* Nomor Telepon */}
+          <Form.Group className="mb-3" controlId="validationCustom04">
+            <Form.Label>Phone Number</Form.Label>
+            <PhoneInput
+              ref={phoneRef}
+              isInvalid={!!errors.phone}
+              defaultCountry="ID"
+              placeholder="Insert Phone Number"
+              value={phone}
+              onChange={setPhone}
+              style={{
+                width: "100%",
+                borderRadius: "15px",
+                padding: "1em",
+                border: errors.phone
+                  ? "1px solid #dc3545"
+                  : "1px solid #ced4da",
+                boxShadow: errors.phone
+                  ? "0 0 0 0.25rem rgba(220,53,69,.25)"
+                  : "none",
+                outline: "none !important",
+              }}
+              inputStyle={{
+                width: "100%",
+                paddingLeft: "50px",
+                border: "none",
+                outline: "none !important",
+                boxSizing: "border-box",
+              }}
+              countrySelectProps={{
+                style: {
+                  position: "absolute",
+                  left: "10px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  pointerEvents: "auto",
+                  zIndex: 1,
+                  outline: "none !important",
+                },
+              }}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.phone}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          {/* Buat Password */}
+          <Form.Group className="mb-3" controlId="validationCustom05">
+            <Form.Label>Create Password</Form.Label>
+            <div style={{ position: "relative" }}>
+              <Form.Control
+                type={type}
+                ref={passwordRef}
+                placeholder="Insert new password"
+                required
+                style={{
+                  borderRadius: "15px",
+                  paddingRight: "40px",
+                  padding: "1em",
+                }}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                isInvalid={!!errors.password}
+              />
+              <span
+                onClick={() => handleEyeToggle("password")}
+                style={{
+                  position: "absolute",
+                  top: errors.password ? "35%" : "50%",
+                  right: errors.password ? "40px" : "10px",
+                  transform: "translateY(-50%)",
+                  cursor: "pointer",
+                  zIndex: 2,
+                }}
+              >
+                {icon}
+              </span>
+              <Form.Control.Feedback type="invalid">
+                {errors.password}
+              </Form.Control.Feedback>
+            </div>
+          </Form.Group>
+
+          {/* Konfirmasi Password */}
+          <Form.Group className="mb-3">
+            <Form.Label>Confrim Password</Form.Label>
+            <div style={{ position: "relative" }}>
+              <Form.Control
+                ref={confirmPasswordRef}
+                type={confirmType}
+                placeholder="Confirm password"
+                style={{
+                  borderRadius: "15px",
+                  paddingRight: "40px",
+                  padding: "1em",
+                }}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                isInvalid={!!errors.confirmPassword}
+              />
+              <span
+                onClick={() => handleEyeToggle("confirmPassword")}
+                style={{
+                  position: "absolute",
+                  top: errors.confirmPassword ? "35%" : "50%",
+                  right: errors.confirmPassword ? "40px" : "10px",
+                  transform: "translateY(-50%)",
+                  cursor: "pointer",
+                  zIndex: 2,
+                }}
+              >
+                {confirmIcon}
+              </span>
+              <Form.Control.Feedback type="invalid">
+                {errors.confirmPassword}
+              </Form.Control.Feedback>
+            </div>
+          </Form.Group>
+
           <Button
-            as={Link}
-            to="/login"
-            className="text-decoration-none bg-transparent border-0 p-0"
+            variant="primary"
+            type="submit"
+            className="w-100 mb-3"
             style={{
-              fontWeight: "bold",
-              color: "#7126B5",
+              backgroundColor: "#7126B5",
+              border: "none",
+              transition: "opacity 0.3s ease",
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.5")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
           >
-            Masuk di sini
+            Daftar
           </Button>
-        </p>
-      </div>
+        </Form>
+        <div
+          className="text-center"
+          style={{
+            marginTop: "20px",
+          }}
+        >
+          <p>
+            Already have an account?{" "}
+            <Button
+              as={Link}
+              to="/login"
+              className="text-decoration-none bg-transparent border-0 p-0"
+              style={{
+                fontWeight: "bold",
+                color: "#7126B5",
+              }}
+            >
+              Login here
+            </Button>
+          </p>
+        </div>
+      </animated.div>
       <div>
         <Toaster
           position="bottom-center"

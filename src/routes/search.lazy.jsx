@@ -19,21 +19,13 @@ function Search() {
   const departureDate = searchParams.get("departureDate");
   const returnDate = searchParams.get("returnDate");
   const totalPassengers = searchParams.get("totalPassengers");
+  const adultInput = searchParams.get("adultInput");
+  const childInput = searchParams.get("childInput");
+  const babyInput = searchParams.get("babyInput");
   const classInput = searchParams.get("classInput");
 
   const departureAirportCode = fromInput?.split("-")[1];
   const returnAirportCode = toInput?.split("-")[1];
-
-  console.log("Data dari query params:", {
-    fromInput,
-    toInput,
-    departureDate,
-    returnDate,
-    totalPassengers,
-    classInput,
-    departureAirportCode,
-    returnAirportCode,
-  });
 
   const [airports, setAirports] = useState([]);
   const [departureAirportId, setDepartureAirportId] = useState(null);
@@ -78,12 +70,15 @@ function Search() {
     <>
       <NavigationBar />
       <ScreenSearch
-        fromInput={fromInput}
-        toInput={toInput}
+        fromInput={fromInput?.replace(/\+/g, " ")}
+        toInput={toInput?.replace(/\+/g, " ")}
         departureDate={departureDate}
         returnDate={returnDate}
         passengers={totalPassengers}
-        classInput={classInput?.replace("+", " ")}
+        adultInput={adultInput}
+        childInput={childInput}
+        babyInput={babyInput}
+        classInput={classInput?.replace(/\+/g, " ")}
         departureAirportId={departureAirportId}
         returnAirportId={returnAirportId}
       />

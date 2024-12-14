@@ -8,299 +8,321 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
 // Import Routes
 
-import { Route as rootRoute } from './routes/__root'
+import { Route as rootRoute } from "./routes/__root";
 
 // Create Virtual Routes
 
-const SearchLazyImport = createFileRoute('/search')()
-const ResetPasswordLazyImport = createFileRoute('/resetPassword')()
-const RegisterLazyImport = createFileRoute('/register')()
-const OtpLazyImport = createFileRoute('/otp')()
-const NotificationLazyImport = createFileRoute('/notification')()
-const LoginLazyImport = createFileRoute('/login')()
-const HistoryLazyImport = createFileRoute('/history')()
-const AccountLazyImport = createFileRoute('/account')()
-const IndexLazyImport = createFileRoute('/')()
-const PemesananIndexLazyImport = createFileRoute('/Pemesanan/')()
-const BayarIndexLazyImport = createFileRoute('/Bayar/')()
+const SearchLazyImport = createFileRoute("/search")();
+const ResetPasswordLazyImport = createFileRoute("/resetPassword")();
+const RegisterLazyImport = createFileRoute("/register")();
+const PaymentLazyImport = createFileRoute("/payment")();
+const OtpLazyImport = createFileRoute("/otp")();
+const NotificationLazyImport = createFileRoute("/notification")();
+const LoginLazyImport = createFileRoute("/login")();
+const HistoryLazyImport = createFileRoute("/history")();
+const CompleteLazyImport = createFileRoute("/complete")();
+const BookingLazyImport = createFileRoute("/booking")();
+const AccountLazyImport = createFileRoute("/account")();
+const IndexLazyImport = createFileRoute("/")();
 
 // Create/Update Routes
 
 const SearchLazyRoute = SearchLazyImport.update({
-  id: '/search',
-  path: '/search',
+  id: "/search",
+  path: "/search",
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/search.lazy').then((d) => d.Route))
+} as any).lazy(() => import("./routes/search.lazy").then((d) => d.Route));
 
 const ResetPasswordLazyRoute = ResetPasswordLazyImport.update({
-  id: '/resetPassword',
-  path: '/resetPassword',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/resetPassword.lazy').then((d) => d.Route))
-
-const RegisterLazyRoute = RegisterLazyImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/register.lazy').then((d) => d.Route))
-
-const OtpLazyRoute = OtpLazyImport.update({
-  id: '/otp',
-  path: '/otp',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/otp.lazy').then((d) => d.Route))
-
-const NotificationLazyRoute = NotificationLazyImport.update({
-  id: '/notification',
-  path: '/notification',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/notification.lazy').then((d) => d.Route))
-
-const LoginLazyRoute = LoginLazyImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/login.lazy').then((d) => d.Route))
-
-const HistoryLazyRoute = HistoryLazyImport.update({
-  id: '/history',
-  path: '/history',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/history.lazy').then((d) => d.Route))
-
-const AccountLazyRoute = AccountLazyImport.update({
-  id: '/account',
-  path: '/account',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/account.lazy').then((d) => d.Route))
-
-const IndexLazyRoute = IndexLazyImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
-
-const PemesananIndexLazyRoute = PemesananIndexLazyImport.update({
-  id: '/Pemesanan/',
-  path: '/Pemesanan/',
+  id: "/resetPassword",
+  path: "/resetPassword",
   getParentRoute: () => rootRoute,
 } as any).lazy(() =>
-  import('./routes/Pemesanan/index.lazy').then((d) => d.Route),
-)
+  import("./routes/resetPassword.lazy").then((d) => d.Route)
+);
 
-const BayarIndexLazyRoute = BayarIndexLazyImport.update({
-  id: '/Bayar/',
-  path: '/Bayar/',
+const RegisterLazyRoute = RegisterLazyImport.update({
+  id: "/register",
+  path: "/register",
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/Bayar/index.lazy').then((d) => d.Route))
+} as any).lazy(() => import("./routes/register.lazy").then((d) => d.Route));
+
+const PaymentLazyRoute = PaymentLazyImport.update({
+  id: "/payment",
+  path: "/payment",
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import("./routes/payment.lazy").then((d) => d.Route));
+
+const OtpLazyRoute = OtpLazyImport.update({
+  id: "/otp",
+  path: "/otp",
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import("./routes/otp.lazy").then((d) => d.Route));
+
+const NotificationLazyRoute = NotificationLazyImport.update({
+  id: "/notification",
+  path: "/notification",
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import("./routes/notification.lazy").then((d) => d.Route));
+
+const LoginLazyRoute = LoginLazyImport.update({
+  id: "/login",
+  path: "/login",
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import("./routes/login.lazy").then((d) => d.Route));
+
+const HistoryLazyRoute = HistoryLazyImport.update({
+  id: "/history",
+  path: "/history",
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import("./routes/history.lazy").then((d) => d.Route));
+
+const CompleteLazyRoute = CompleteLazyImport.update({
+  id: "/complete",
+  path: "/complete",
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import("./routes/complete.lazy").then((d) => d.Route));
+
+const BookingLazyRoute = BookingLazyImport.update({
+  id: "/booking",
+  path: "/booking",
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import("./routes/booking.lazy").then((d) => d.Route));
+
+const AccountLazyRoute = AccountLazyImport.update({
+  id: "/account",
+  path: "/account",
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import("./routes/account.lazy").then((d) => d.Route));
+
+const IndexLazyRoute = IndexLazyImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import("./routes/index.lazy").then((d) => d.Route));
 
 // Populate the FileRoutesByPath interface
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/account': {
-      id: '/account'
-      path: '/account'
-      fullPath: '/account'
-      preLoaderRoute: typeof AccountLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/history': {
-      id: '/history'
-      path: '/history'
-      fullPath: '/history'
-      preLoaderRoute: typeof HistoryLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/notification': {
-      id: '/notification'
-      path: '/notification'
-      fullPath: '/notification'
-      preLoaderRoute: typeof NotificationLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/otp': {
-      id: '/otp'
-      path: '/otp'
-      fullPath: '/otp'
-      preLoaderRoute: typeof OtpLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/resetPassword': {
-      id: '/resetPassword'
-      path: '/resetPassword'
-      fullPath: '/resetPassword'
-      preLoaderRoute: typeof ResetPasswordLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/search': {
-      id: '/search'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof SearchLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/Bayar/': {
-      id: '/Bayar/'
-      path: '/Bayar'
-      fullPath: '/Bayar'
-      preLoaderRoute: typeof BayarIndexLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/Pemesanan/': {
-      id: '/Pemesanan/'
-      path: '/Pemesanan'
-      fullPath: '/Pemesanan'
-      preLoaderRoute: typeof PemesananIndexLazyImport
-      parentRoute: typeof rootRoute
-    }
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexLazyImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/account": {
+      id: "/account";
+      path: "/account";
+      fullPath: "/account";
+      preLoaderRoute: typeof AccountLazyImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/booking": {
+      id: "/booking";
+      path: "/booking";
+      fullPath: "/booking";
+      preLoaderRoute: typeof BookingLazyImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/complete": {
+      id: "/complete";
+      path: "/complete";
+      fullPath: "/complete";
+      preLoaderRoute: typeof CompleteLazyImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/history": {
+      id: "/history";
+      path: "/history";
+      fullPath: "/history";
+      preLoaderRoute: typeof HistoryLazyImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/login": {
+      id: "/login";
+      path: "/login";
+      fullPath: "/login";
+      preLoaderRoute: typeof LoginLazyImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/notification": {
+      id: "/notification";
+      path: "/notification";
+      fullPath: "/notification";
+      preLoaderRoute: typeof NotificationLazyImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/otp": {
+      id: "/otp";
+      path: "/otp";
+      fullPath: "/otp";
+      preLoaderRoute: typeof OtpLazyImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/payment": {
+      id: "/payment";
+      path: "/payment";
+      fullPath: "/payment";
+      preLoaderRoute: typeof PaymentLazyImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/register": {
+      id: "/register";
+      path: "/register";
+      fullPath: "/register";
+      preLoaderRoute: typeof RegisterLazyImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/resetPassword": {
+      id: "/resetPassword";
+      path: "/resetPassword";
+      fullPath: "/resetPassword";
+      preLoaderRoute: typeof ResetPasswordLazyImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/search": {
+      id: "/search";
+      path: "/search";
+      fullPath: "/search";
+      preLoaderRoute: typeof SearchLazyImport;
+      parentRoute: typeof rootRoute;
+    };
   }
 }
 
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexLazyRoute
-  '/account': typeof AccountLazyRoute
-  '/history': typeof HistoryLazyRoute
-  '/login': typeof LoginLazyRoute
-  '/notification': typeof NotificationLazyRoute
-  '/otp': typeof OtpLazyRoute
-  '/register': typeof RegisterLazyRoute
-  '/resetPassword': typeof ResetPasswordLazyRoute
-  '/search': typeof SearchLazyRoute
-  '/Bayar': typeof BayarIndexLazyRoute
-  '/Pemesanan': typeof PemesananIndexLazyRoute
+  "/": typeof IndexLazyRoute;
+  "/account": typeof AccountLazyRoute;
+  "/booking": typeof BookingLazyRoute;
+  "/complete": typeof CompleteLazyRoute;
+  "/history": typeof HistoryLazyRoute;
+  "/login": typeof LoginLazyRoute;
+  "/notification": typeof NotificationLazyRoute;
+  "/otp": typeof OtpLazyRoute;
+  "/payment": typeof PaymentLazyRoute;
+  "/register": typeof RegisterLazyRoute;
+  "/resetPassword": typeof ResetPasswordLazyRoute;
+  "/search": typeof SearchLazyRoute;
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexLazyRoute
-  '/account': typeof AccountLazyRoute
-  '/history': typeof HistoryLazyRoute
-  '/login': typeof LoginLazyRoute
-  '/notification': typeof NotificationLazyRoute
-  '/otp': typeof OtpLazyRoute
-  '/register': typeof RegisterLazyRoute
-  '/resetPassword': typeof ResetPasswordLazyRoute
-  '/search': typeof SearchLazyRoute
-  '/Bayar': typeof BayarIndexLazyRoute
-  '/Pemesanan': typeof PemesananIndexLazyRoute
+  "/": typeof IndexLazyRoute;
+  "/account": typeof AccountLazyRoute;
+  "/booking": typeof BookingLazyRoute;
+  "/complete": typeof CompleteLazyRoute;
+  "/history": typeof HistoryLazyRoute;
+  "/login": typeof LoginLazyRoute;
+  "/notification": typeof NotificationLazyRoute;
+  "/otp": typeof OtpLazyRoute;
+  "/payment": typeof PaymentLazyRoute;
+  "/register": typeof RegisterLazyRoute;
+  "/resetPassword": typeof ResetPasswordLazyRoute;
+  "/search": typeof SearchLazyRoute;
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/': typeof IndexLazyRoute
-  '/account': typeof AccountLazyRoute
-  '/history': typeof HistoryLazyRoute
-  '/login': typeof LoginLazyRoute
-  '/notification': typeof NotificationLazyRoute
-  '/otp': typeof OtpLazyRoute
-  '/register': typeof RegisterLazyRoute
-  '/resetPassword': typeof ResetPasswordLazyRoute
-  '/search': typeof SearchLazyRoute
-  '/Bayar/': typeof BayarIndexLazyRoute
-  '/Pemesanan/': typeof PemesananIndexLazyRoute
+  __root__: typeof rootRoute;
+  "/": typeof IndexLazyRoute;
+  "/account": typeof AccountLazyRoute;
+  "/booking": typeof BookingLazyRoute;
+  "/complete": typeof CompleteLazyRoute;
+  "/history": typeof HistoryLazyRoute;
+  "/login": typeof LoginLazyRoute;
+  "/notification": typeof NotificationLazyRoute;
+  "/otp": typeof OtpLazyRoute;
+  "/payment": typeof PaymentLazyRoute;
+  "/register": typeof RegisterLazyRoute;
+  "/resetPassword": typeof ResetPasswordLazyRoute;
+  "/search": typeof SearchLazyRoute;
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
+  fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
-    | '/'
-    | '/account'
-    | '/history'
-    | '/login'
-    | '/notification'
-    | '/otp'
-    | '/register'
-    | '/resetPassword'
-    | '/search'
-    | '/Bayar'
-    | '/Pemesanan'
-  fileRoutesByTo: FileRoutesByTo
+    | "/"
+    | "/account"
+    | "/booking"
+    | "/complete"
+    | "/history"
+    | "/login"
+    | "/notification"
+    | "/otp"
+    | "/payment"
+    | "/register"
+    | "/resetPassword"
+    | "/search";
+  fileRoutesByTo: FileRoutesByTo;
   to:
-    | '/'
-    | '/account'
-    | '/history'
-    | '/login'
-    | '/notification'
-    | '/otp'
-    | '/register'
-    | '/resetPassword'
-    | '/search'
-    | '/Bayar'
-    | '/Pemesanan'
+    | "/"
+    | "/account"
+    | "/booking"
+    | "/complete"
+    | "/history"
+    | "/login"
+    | "/notification"
+    | "/otp"
+    | "/payment"
+    | "/register"
+    | "/resetPassword"
+    | "/search";
   id:
-    | '__root__'
-    | '/'
-    | '/account'
-    | '/history'
-    | '/login'
-    | '/notification'
-    | '/otp'
-    | '/register'
-    | '/resetPassword'
-    | '/search'
-    | '/Bayar/'
-    | '/Pemesanan/'
-  fileRoutesById: FileRoutesById
+    | "__root__"
+    | "/"
+    | "/account"
+    | "/booking"
+    | "/complete"
+    | "/history"
+    | "/login"
+    | "/notification"
+    | "/otp"
+    | "/payment"
+    | "/register"
+    | "/resetPassword"
+    | "/search";
+  fileRoutesById: FileRoutesById;
 }
 
 export interface RootRouteChildren {
-  IndexLazyRoute: typeof IndexLazyRoute
-  AccountLazyRoute: typeof AccountLazyRoute
-  HistoryLazyRoute: typeof HistoryLazyRoute
-  LoginLazyRoute: typeof LoginLazyRoute
-  NotificationLazyRoute: typeof NotificationLazyRoute
-  OtpLazyRoute: typeof OtpLazyRoute
-  RegisterLazyRoute: typeof RegisterLazyRoute
-  ResetPasswordLazyRoute: typeof ResetPasswordLazyRoute
-  SearchLazyRoute: typeof SearchLazyRoute
-  BayarIndexLazyRoute: typeof BayarIndexLazyRoute
-  PemesananIndexLazyRoute: typeof PemesananIndexLazyRoute
+  IndexLazyRoute: typeof IndexLazyRoute;
+  AccountLazyRoute: typeof AccountLazyRoute;
+  BookingLazyRoute: typeof BookingLazyRoute;
+  CompleteLazyRoute: typeof CompleteLazyRoute;
+  HistoryLazyRoute: typeof HistoryLazyRoute;
+  LoginLazyRoute: typeof LoginLazyRoute;
+  NotificationLazyRoute: typeof NotificationLazyRoute;
+  OtpLazyRoute: typeof OtpLazyRoute;
+  PaymentLazyRoute: typeof PaymentLazyRoute;
+  RegisterLazyRoute: typeof RegisterLazyRoute;
+  ResetPasswordLazyRoute: typeof ResetPasswordLazyRoute;
+  SearchLazyRoute: typeof SearchLazyRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   AccountLazyRoute: AccountLazyRoute,
+  BookingLazyRoute: BookingLazyRoute,
+  CompleteLazyRoute: CompleteLazyRoute,
   HistoryLazyRoute: HistoryLazyRoute,
   LoginLazyRoute: LoginLazyRoute,
   NotificationLazyRoute: NotificationLazyRoute,
   OtpLazyRoute: OtpLazyRoute,
+  PaymentLazyRoute: PaymentLazyRoute,
   RegisterLazyRoute: RegisterLazyRoute,
   ResetPasswordLazyRoute: ResetPasswordLazyRoute,
   SearchLazyRoute: SearchLazyRoute,
-  BayarIndexLazyRoute: BayarIndexLazyRoute,
-  PemesananIndexLazyRoute: PemesananIndexLazyRoute,
-}
+};
 
 export const routeTree = rootRoute
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
 
 /* ROUTE_MANIFEST_START
 {
@@ -310,15 +332,16 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/account",
+        "/booking",
+        "/complete",
         "/history",
         "/login",
         "/notification",
         "/otp",
+        "/payment",
         "/register",
         "/resetPassword",
-        "/search",
-        "/Bayar/",
-        "/Pemesanan/"
+        "/search"
       ]
     },
     "/": {
@@ -326,6 +349,12 @@ export const routeTree = rootRoute
     },
     "/account": {
       "filePath": "account.lazy.jsx"
+    },
+    "/booking": {
+      "filePath": "booking.lazy.jsx"
+    },
+    "/complete": {
+      "filePath": "complete.lazy.jsx"
     },
     "/history": {
       "filePath": "history.lazy.jsx"
@@ -339,6 +368,9 @@ export const routeTree = rootRoute
     "/otp": {
       "filePath": "otp.lazy.jsx"
     },
+    "/payment": {
+      "filePath": "payment.lazy.jsx"
+    },
     "/register": {
       "filePath": "register.lazy.jsx"
     },
@@ -347,12 +379,6 @@ export const routeTree = rootRoute
     },
     "/search": {
       "filePath": "search.lazy.jsx"
-    },
-    "/Bayar/": {
-      "filePath": "Bayar/index.lazy.jsx"
-    },
-    "/Pemesanan/": {
-      "filePath": "Pemesanan/index.lazy.jsx"
     }
   }
 }

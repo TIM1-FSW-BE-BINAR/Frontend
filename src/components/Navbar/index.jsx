@@ -22,7 +22,7 @@ const NavigationBar = () => {
   const { data, isSuccess, isError } = useQuery({
     queryKey: ["profile"],
     queryFn: profile,
-    enabled: token ? true : false,
+    enabled: !!token,
   });
 
   useEffect(() => {
@@ -42,7 +42,7 @@ const NavigationBar = () => {
           }}
           key={expand}
           expand={expand}
-          className="mb-0 "
+          className="mb-0"
         >
           <Container>
             <Navbar.Brand
@@ -51,7 +51,13 @@ const NavigationBar = () => {
               style={{ cursor: "pointer" }}
               className="fw-bold"
             >
-              TiketKU
+              <img
+                src="/img/logo_airfly_black_inline.png"
+                width="80"
+                height="22"
+                className="d-inline-block align-center"
+                alt="Airfly logo"
+              />
             </Navbar.Brand>
 
             <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} />
@@ -62,11 +68,11 @@ const NavigationBar = () => {
             >
               <Offcanvas.Header closeButton>
                 <Offcanvas.Title id={`offcanvasNavbarLabel-expand-${expand}`}>
-                  TiketKU
+                  AirFly
                 </Offcanvas.Title>
               </Offcanvas.Header>
               <Offcanvas.Body>
-                <Nav className="justify-content-end flex-grow-1 pe-3 text-black align-items-center">
+                <Nav className="justify-content-end flex-grow-1 pe-3 text-black align-items-center  ">
                   {user ? (
                     <>
                       <Nav.Link as={Link} to="/history">

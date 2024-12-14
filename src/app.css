@@ -14,10 +14,6 @@ body {
   outline: none !important;
 }
 
-.breadcrumb-item + .breadcrumb-item::before {
-  content: ">";
-  color: #6c757d;
-}
 #black-overlay {
   position: fixed;
   top: 0;

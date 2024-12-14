@@ -22,10 +22,12 @@ import {
   addDays,
   isSameDay,
 } from "date-fns";
-import { id } from "date-fns/locale";
+import { id, enUS } from "date-fns/locale";
 import { Navigate, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { getFlights } from "../../service/flight/flightService";
+import { getFlights, getFlightId } from "../../service/flight/flightService";
+
+import SearchFlightReturn from "./SearchFlightReturn";
 
 const SearchFlight = ({
   fromInput,
@@ -33,25 +35,26 @@ const SearchFlight = ({
   departureDate,
   returnDate,
   passengers,
+  adultInput,
+  childInput,
+  babyInput,
   classInput,
   departureAirportId,
   returnAirportId,
 }) => {
   const navigate = useNavigate();
 
-  const [filterShowModal, setFilterShowModal] = useState(false);
-  const [filter, setFilter] = useState("Pilih Filter");
-  const [tempFilter, setTempFilter] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState("");
-  const [selectedElement, setSelectedElement] = useState("");
-  const [dateBtnActive, setDateBtnActive] = useState(null);
-
+  // Tentang kondisi hasil search
   const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [ticketSoldOut, setTicketSoldOut] = useState(false);
+
+  // Tentang week date departure
+  const [dateBtnActive, setDateBtnActive] = useState(null);
   const departureDateObj = new Date(departureDate);
   const [currentWeek, setCurrentWeek] = useState(departureDateObj); // Tanggal acuan untuk 1 minggu
   const [weekDates, setWeekDates] = useState([]); // Menyimpan daftar tanggal dalam 1 minggu
+  const [departureDateActive, setDepartureDateActive] = useState(departureDate); // handle search saat date active nya diganti
 
   const calculateWeekDates = (baseDate) => {
     const startDate = startOfWeek(baseDate, { weekStartsOn: 1 }); // Mulai dari hari Senin
@@ -86,77 +89,12 @@ const SearchFlight = ({
     setCurrentWeek((prevDate) => subWeeks(prevDate, 1)); // Kurangi 1 Minggu
   };
 
-  // handle search saat date active nya diganti
-  const [departureDateActive, setDepartureDateActive] = useState(departureDate);
-
   const handleDateBtnActive = (index, date) => {
     setDateBtnActive(index);
     setDepartureDateActive(date);
+    console.log(departureDateActive);
+    setTicketSoldOut(false);
   };
-
-  const handleFilterClose = () => {
-    setFilterShowModal(false);
-  };
-
-  const handleSaveFilter = () => {
-    setFilter(tempFilter);
-    setFilterShowModal(false);
-    setSaveFilter(true);
-  };
-
-  const handleSelectFilter = (FilterName, elementId, label) => {
-    setSelectedFilter(FilterName); // Simpan nama Filter yang dipilih
-    setSelectedElement(elementId); // Simpan elemen yang dipilih
-    setTempFilter(label); // Simpan nilai sementara dari pilihan
-  };
-
-  // Logic search data flight (belum kelar)
-  const [flightsData, setFlightsData] = useState([]);
-  const seatClassValue = classInput?.split(" ")[0];
-
-  const [filterChange, setFilterChange] = useState({});
-  const [saveFilter, setSaveFilter] = useState(true);
-
-  const handleFilterChange = (newFilter) => {
-    setFilterChange(newFilter); // Update filter tambahan
-  };
-
-  const { data, isSuccess, isError, isPending } = useQuery({
-    queryKey: ["search-flights", filterChange, departureDateActive],
-    queryFn: () =>
-      getFlights({
-        departureAirport: departureAirportId,
-        arrivalAirport: returnAirportId,
-        seatClass: seatClassValue,
-        departureTime: departureDateActive,
-        ...filterChange,
-      }),
-    enabled: !!departureAirportId && !!returnAirportId && !!saveFilter, // Fetch jika ID sudah ada
-  });
-
-  useEffect(() => {
-    if (isSuccess) {
-      setFlightsData(data);
-      setLoading(false);
-      if (data.length === 0) {
-        setNotFound(true);
-      } else {
-        setNotFound(false);
-      }
-      console.log("fetch search berhasil ",data);
-    } else if (isError) {
-      console.log("fetch search nya error");
-    } else if (isPending) {
-      setLoading(true);
-    }
-  }, [
-    data,
-    isError,
-    isSuccess,
-    departureAirportId,
-    returnAirportId,
-    isPending,
-  ]);
 
   const formatTime = (dateString) => {
     const date = new Date(dateString);
@@ -175,12 +113,143 @@ const SearchFlight = ({
     const year = date.getUTCFullYear(); // Menggunakan getUTCFullYear untuk tahun UTC
     return `${day} ${month} ${year}`;
   };
+  // Tentang week date departure selesai
 
-  return (
+  // Tentang perfilteran dan fetch search
+  const [filterShowModal, setFilterShowModal] = useState(false);
+  const [filter, setFilter] = useState("Filter");
+  const [tempFilter, setTempFilter] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState("");
+  const [selectedElement, setSelectedElement] = useState("");
+
+  const [filterChange, setFilterChange] = useState({});
+  const [filterTempChange, setFilterTempChange] = useState({});
+  const [saveFilter, setSaveFilter] = useState(true);
+  const [flightsData, setFlightsData] = useState([]);
+  const [seatClassValue, setSeatClassValue] = useState(classInput);
+
+  useEffect(() => {
+    if (classInput === "Premium Economy") {
+      setSeatClassValue("PREMIUM_ECONOMY");
+    } else {
+      setSeatClassValue(classInput?.split(" ")[0]);
+    }
+  }, [classInput]);
+
+  const handleFilterClose = () => {
+    setFilterShowModal(false);
+  };
+
+  const handleSaveFilter = () => {
+    setFilter(tempFilter);
+    setSaveFilter(true);
+    setFilterShowModal(false);
+    setFilterChange(filterTempChange);
+  };
+
+  const handleSelectFilter = (FilterName, elementId, label) => {
+    setSelectedFilter(FilterName); // Simpan nama Filter yang dipilih
+    setSelectedElement(elementId); // Simpan elemen yang dipilih
+    setTempFilter(label); // Simpan nilai sementara dari pilihan
+  };
+
+  const handleFilterTempChange = (newFilter) => {
+    setFilterTempChange(newFilter); // Update filter tambahan
+  };
+
+  // fetch data flight nya berdasarkan filter
+  const { data, isSuccess, isError, isPending } = useQuery({
+    queryKey: ["search-flights", filterChange, departureDateActive],
+    queryFn: () =>
+      getFlights({
+        departureAirport: departureAirportId,
+        arrivalAirport: returnAirportId,
+        seatClass: seatClassValue,
+        departureTime: departureDateActive,
+        ...filterChange,
+      }),
+    enabled: !!departureAirportId && !!returnAirportId 
+  });
+
+  useEffect(() => {
+    if (isSuccess) {
+      setFlightsData(data);
+      setLoading(false);
+      setSaveFilter(false);
+      if (data.length === 0) {
+        setNotFound(true);
+      } else {
+        setNotFound(false);
+      }
+      console.log("fetch search berhasil ", data);
+    } else if (isError) {
+      console.log("fetch search nya error");
+    } else if (isPending) {
+      setLoading(true);
+    }
+  }, [
+    data,
+    isError,
+    isSuccess,
+    departureAirportId,
+    returnAirportId,
+    isPending,
+  ]);
+  // Tentang perfilteran dan fetch search selesai
+
+  // Menuju halaman bookingPage dan handle ketika ada return date nya
+  const [returnScreen, setReturnScreen] = useState(false);
+  const [flightSelect, setFlightSelect] = useState("");
+
+  const handleBookingPage = async (flight) => {
+    const flightDataById = await getFlightId(flight?.id);
+    if (flightDataById.error?.message) {
+      // tiket nya habis
+      setTicketSoldOut(true);
+    } else {
+      // cek di params apakah ada nilai dari returnDate nya, jika ada render halaman return ticket
+      if (returnDate !== "") {
+        console.log("ada return date");
+        setFlightSelect(flight.id);
+        setReturnScreen(true);
+      } else {
+        // tiket tersedia, kirim flight nya ke booking
+        const queryParams = new URLSearchParams({
+          flightId: flight.id,
+          totalPassengers: passengers,
+          adultInput,
+          childInput,
+          babyInput,
+        }).toString();
+
+        navigate({
+          to: `/booking?${queryParams}`,
+        });
+      }
+    }
+  };
+
+
+  return returnScreen ? (
+    <SearchFlightReturn 
+  fromInput={fromInput}
+  toInput={toInput}
+  departureDate={departureDate}
+  returnDate={returnDate}
+  passengers={passengers}
+  adultInput={adultInput}
+  childInput={childInput}
+  babyInput={babyInput}
+  classInput={seatClassValue}
+  departureAirportId={departureAirportId}
+  returnAirportId={returnAirportId}
+  flightSelect={flightSelect}
+/>
+  ) : (
     <>
       <Container className="">
         <Row className="mt-5 mb-2">
-          <h2>Pilih Penerbangan</h2>
+          <h2>Select a Flight</h2>
         </Row>
         <Row>
           <Col xs={12} sm={8} md={8} className="mb-2 mb-sm-0">
@@ -190,7 +259,7 @@ const SearchFlight = ({
               onClick={() => navigate({ to: "/" })}
             >
               <FaArrowLeft className="me-2" />
-              {fromInput} {">"} {toInput} - {passengers} Penumpang -{" "}
+              {fromInput} {">"} {toInput} - {passengers} Passenger -{" "}
               {classInput}
             </Button>
           </Col>
@@ -202,13 +271,17 @@ const SearchFlight = ({
               }}
               onClick={() => navigate({ to: "/" })}
             >
-              Ubah Pencarian
+              Change Search
             </Button>
           </Col>
         </Row>
         <Row className="d-flex align-items-center justify-content-between pt-3">
           <Col>
-            <Button onClick={handlePreviousWeek} className="animated-button">
+            <Button
+              onClick={handlePreviousWeek}
+              className="animated-button"
+              style={{ backgroundColor: "#7126b5" }}
+            >
               <FaArrowLeft />
             </Button>
           </Col>
@@ -229,13 +302,17 @@ const SearchFlight = ({
                   handleDateBtnActive(index, dateSelect);
                 }}
               >
-                <h6>{format(date, "EEEE", { locale: id })}</h6>
+                <h6>{format(date, "EEEE", { locale: enUS })}</h6>
                 <span>{format(date, "dd/MM/yyyy")}</span>
               </Button>
             ))}
           </Col>
           <Col>
-            <Button onClick={handleNextWeek} className="animated-button">
+            <Button
+              onClick={handleNextWeek}
+              className="animated-button"
+              style={{ backgroundColor: "#7126b5" }}
+            >
               <FaArrowRight />
             </Button>
           </Col>
@@ -392,7 +469,11 @@ const SearchFlight = ({
                 <span className="fw-bold">
                   Maaf, pencarian Anda tidak ditemukan
                 </span>
-                <span className="text-primary" style={{ cursor: "pointer" }}>
+                <span
+                  className="text-primary"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => navigate({ to: "/" })}
+                >
                   Coba cari perjalanan lainnya!
                 </span>
               </div>
@@ -400,7 +481,11 @@ const SearchFlight = ({
               <div className="d-flex flex-column justify-content-center align-items-center">
                 <img src={ticketSoldOutImage} className="img-fluid w-25" />
                 <span className="fw-bold">Maaf, Tiket terjual habis!</span>
-                <span className="text-primary" style={{ cursor: "pointer" }}>
+                <span
+                  className="text-primary"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => navigate({ to: "/" })}
+                >
                   Coba cari perjalanan lainnya!
                 </span>
               </div>
@@ -429,7 +514,8 @@ const SearchFlight = ({
                               className="ms-3 mb-0 fw-bold"
                               style={{ fontSize: "14px" }}
                             >
-                              {flight?.airline.name} - {flight?.class}
+                              {flight?.airline.name} -{" "}
+                              {flight?.class.replace("_", " ")}
                             </h6>
                           </Col>
                         </Row>
@@ -553,12 +639,10 @@ const SearchFlight = ({
                               }}
                               onClick={(event) => {
                                 event.stopPropagation(); // Prevent Accordion from toggling
-                                console.log(
-                                  `Flight selected: ${flight?.flightNumber}`
-                                );
+                                handleBookingPage(flight);
                               }}
                             >
-                              Pilih
+                              Select
                             </Button>
                           </Col>
                         </Row>
@@ -575,7 +659,7 @@ const SearchFlight = ({
                               fontWeight: "bold",
                             }}
                           >
-                            Detail Penerbangan
+                            Flight Details
                           </h6>
                         </Row>
                         <Row>
@@ -617,7 +701,7 @@ const SearchFlight = ({
                                 fontWeight: "bold",
                               }}
                             >
-                              Keberangkatan
+                              Departure
                             </span>
                           </Col>
                         </Row>
@@ -644,7 +728,8 @@ const SearchFlight = ({
                               }}
                             >
                               <span className="fw-bold">
-                                {flight?.airline.name} - {flight?.class}
+                                {flight?.airline.name} -{" "}
+                                {flight?.class.replace("_", " ")}
                               </span>
                               <span>{flight?.flightNumber}</span>
                             </div>
@@ -655,9 +740,7 @@ const SearchFlight = ({
                                 fontSize: "14px",
                               }}
                             >
-                              <h6 className="fw-bold">Informasi</h6>
-                              <span>Baggage 20 kg</span>
-                              <span>Cabin baggage 7 kg</span>
+                              <h6 className="fw-bold">Information</h6>
                               <span>{flight?.information}</span>
                             </div>
                           </Col>
@@ -690,7 +773,7 @@ const SearchFlight = ({
                                 fontWeight: "bold",
                               }}
                             >
-                              Kedatangan
+                              Arrival
                             </span>
                           </Col>
                         </Row>
@@ -725,14 +808,14 @@ const SearchFlight = ({
                   handleSelectFilter(
                     "termurah",
                     "termurah",
-                    "Harga - Termurah"
+                    "Price - Cheapest"
                   );
-                  handleFilterChange({ isCheapest: true });
+                  handleFilterTempChange({ isCheapest: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
-                    <span className="fw-bold">Harga -</span>Termurah
+                    <span className="fw-bold">Price - </span>Cheapest
                   </h6>
                 </Col>
 
@@ -752,14 +835,14 @@ const SearchFlight = ({
                   handleSelectFilter(
                     "terpendek",
                     "terpendek",
-                    "Durasi - Terpendek"
+                    "Duration - Shortest"
                   );
-                  handleFilterChange({ shortest: true });
+                  handleFilterTempChange({ shortest: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
-                    <span className="fw-bold">Durasi -</span>Terpendek
+                    <span className="fw-bold">Duration - </span>Shortest
                   </h6>
                 </Col>
 
@@ -779,14 +862,14 @@ const SearchFlight = ({
                   handleSelectFilter(
                     "keberangkatan-awal",
                     "keberangkatan-awal",
-                    "Keberangkatan - Paling Awal"
+                    "Departure - Earliest"
                   );
-                  handleFilterChange({ earliestDeparture: true });
+                  handleFilterTempChange({ earliestDeparture: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
-                    <span className="fw-bold">Keberangkatan -</span>Paling Awal
+                    <span className="fw-bold">Departure - </span>Earliest
                   </h6>
                 </Col>
 
@@ -806,14 +889,14 @@ const SearchFlight = ({
                   handleSelectFilter(
                     "keberangkatan-akhir",
                     "keberangkatan-akhir",
-                    "Keberangkatan - Paling Akhir"
+                    "Departure - Latest"
                   );
-                  handleFilterChange({ latestDeparture: true });
+                  handleFilterTempChange({ latestDeparture: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
-                    <span className="fw-bold">Keberangkatan -</span>Paling Akhir
+                    <span className="fw-bold">Departure - </span>Latest
                   </h6>
                 </Col>
 
@@ -833,14 +916,14 @@ const SearchFlight = ({
                   handleSelectFilter(
                     "kedatangan-awal",
                     "kedatangan-awal",
-                    "Kedatangan - Paling Awal"
+                    "Arrival - Earliest"
                   );
-                  handleFilterChange({ earliestArrival: true });
+                  handleFilterTempChange({ earliestArrival: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
-                    <span className="fw-bold">Kedatangan -</span>Paling Awal
+                    <span className="fw-bold">Arrival - </span>Earliest
                   </h6>
                 </Col>
 
@@ -860,14 +943,14 @@ const SearchFlight = ({
                   handleSelectFilter(
                     "kedatangan-akhir",
                     "kedatangan-akhir",
-                    "Kedatangan - Paling Akhir"
+                    "Arrival - Latest"
                   );
-                  handleFilterChange({ latestArrival: true });
+                  handleFilterTempChange({ latestArrival: true });
                 }}
               >
                 <Col xs={9} sm={10} className="p-2">
                   <h6>
-                    <span className="fw-bold">Kedatangan -</span>Paling Akhir
+                    <span className="fw-bold">Arrival - </span>Latest
                   </h6>
                 </Col>
 
@@ -885,10 +968,10 @@ const SearchFlight = ({
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleFilterClose}>
-              Tutup
+              Close
             </Button>
             <Button variant="primary" onClick={handleSaveFilter}>
-              Simpan
+              Save
             </Button>
           </Modal.Footer>
         </Modal>

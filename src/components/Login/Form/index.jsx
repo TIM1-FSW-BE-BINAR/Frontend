@@ -10,7 +10,7 @@ import { setToken } from "../../../redux/slices/auth";
 import { useMutation } from "@tanstack/react-query";
 import toast, { Toaster } from "react-hot-toast";
 import { useGoogleLogin } from "@react-oauth/google";
-
+import { useSpring, animated } from "@react-spring/web";
 
 const loginForm = () => {
   const dispatch = useDispatch();
@@ -49,8 +49,8 @@ const loginForm = () => {
           color: "#FFFFFF",
         },
         iconTheme: {
-          primary: "#000",
-          secondary: "#fff",
+          primary: "#fff",
+          secondary: "#FF0000",
         },
       });
     },
@@ -102,12 +102,10 @@ const loginForm = () => {
 
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: (tokenResponse) => {
-      console.log(tokenResponse),
       googleLoginUser(tokenResponse.access_token);
     },
     onError: (err) => {
       toast.error("Google login error");
-      console.error(err);
     },
   });
 
@@ -125,6 +123,12 @@ const loginForm = () => {
     }
   };
 
+  const formAnimation = useSpring({
+    from: { opacity: 0, transform: "translateY(50px)" },
+    to: { opacity: 1, transform: "translateY(0px)" },
+    config: { tension: 200, friction: 20 },
+  });
+
   return (
     <div
       style={{
@@ -135,147 +139,142 @@ const loginForm = () => {
       {!forgotPassword ? (
         // Form Login
         <>
-          <h2 className="fw-bold text-start mb-4">Masuk</h2>
-
-          <Form onSubmit={handleLogin} noValidate>
-            <Form.Group className="mb-3">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                ref={emailRef}
-                type="email"
-                placeholder="Contoh: johndee@gmail.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                isInvalid={!!errors.email}
-                style={{
-                  borderRadius: "15px",
-                  padding: "1em",
-                }}
-              />
-              <Form.Control.Feedback type="invalid">
-                {errors.email}
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Password</Form.Label>
-              <div style={{ position: "relative" }}>
+          <animated.div style={formAnimation}>
+            <h2 className="fw-bold text-start mb-4">Login</h2>
+            <Form onSubmit={handleLogin} noValidate>
+              <Form.Group className="mb-3">
+                <Form.Label>Email</Form.Label>
                 <Form.Control
-                  ref={passwordRef}
-                  type={type}
-                  placeholder="Masukkan password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  isInvalid={!!errors.password}
+                  ref={emailRef}
+                  type="email"
+                  placeholder="Contoh: johndee@gmail.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  isInvalid={!!errors.email}
                   style={{
                     borderRadius: "15px",
                     padding: "1em",
-                    paddingRight: "40px",
                   }}
                 />
-                <span
-                  onClick={handleEyeToggle}
+                <Form.Control.Feedback type="invalid">
+                  {errors.email}
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Password</Form.Label>
+                <div style={{ position: "relative" }}>
+                  <Form.Control
+                    ref={passwordRef}
+                    type={type}
+                    placeholder="Masukkan password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    isInvalid={!!errors.password}
+                    style={{
+                      borderRadius: "15px",
+                      padding: "1em",
+                      paddingRight: "40px",
+                    }}
+                  />
+                  <span
+                    onClick={handleEyeToggle}
+                    style={{
+                      position: "absolute",
+                      top: errors.password ? "35%" : "50%",
+                      right: errors.password ? "40px" : "10px",
+                      transform: "translateY(-50%)",
+                      cursor: "pointer",
+                      zIndex: 2,
+                    }}
+                  >
+                    {icon}
+                  </span>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.password}
+                  </Form.Control.Feedback>
+                </div>
+                <div
+                  className="text-end mt-1"
                   style={{
-                    position: "absolute",
-                    top: errors.password ? "35%" : "50%",
-                    right: errors.password ? "40px" : "10px",
-                    transform: "translateY(-50%)",
-                    cursor: "pointer",
-                    zIndex: 2,
+                    marginTop: "5px",
                   }}
                 >
-                  {icon}
-                </span>
-                <Form.Control.Feedback type="invalid">
-                  {errors.password}
-                </Form.Control.Feedback>
-              </div>
-              <div
-                className="text-end mt-1"
+                  <Button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleForgotPassword();
+                    }}
+                    className="text-decoration-none bg-transparent border-0"
+                    style={{
+                      fontSize: "0.9rem",
+                      color: "#7126B5",
+                    }}
+                  >
+                    Forget Password?
+                  </Button>
+                </div>
+              </Form.Group>
+              <Button
+                variant="primary"
+                type="submit"
+                className="w-100 "
+                disabled={disabled}
                 style={{
-                  marginTop: "5px",
+                  backgroundColor: "#7126B5",
+                  border: "none",
+                  transition: "opacity 0.3s ease",
+                  opacity: disabled ? "0.5" : "1",
                 }}
+                onMouseEnter={(e) =>
+                  !disabled && (e.currentTarget.style.opacity = "0.5")
+                }
+                onMouseLeave={(e) =>
+                  !disabled && (e.currentTarget.style.opacity = "1")
+                }
               >
+                Login
+              </Button>
+            </Form>
+            <h6 className="text-muted text-center mt-2"> or </h6>
+            <Button
+              variant=""
+              type="submit"
+              className="w-100 mb-3 text-light d-flex align-items-center justify-content-center"
+              onClick={handleGoogleLogin}
+              style={{
+                backgroundColor: "#000000",
+                transition: "opacity 0.3s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+            >
+              <FcGoogle style={{ marginRight: "8px", fontSize: "20px" }} />
+              Login with Google
+            </Button>
+
+            <div
+              className="text-center"
+              style={{
+                marginTop: "20px",
+              }}
+            >
+              <p>
+                Don't have an account?{" "}
                 <Button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleForgotPassword();
-                  }}
-                  className="text-decoration-none bg-transparent border-0"
+                  as={Link}
+                  to="/register"
+                  className="text-decoration-none bg-transparent border-0 p-0"
                   style={{
-                    fontSize: "0.9rem",
+                    fontWeight: "bold",
                     color: "#7126B5",
                   }}
                 >
-                  Lupa Password?
+                  Register here
                 </Button>
-              </div>
-            </Form.Group>
-
-            <Button
-              variant="primary"
-              type="submit"
-              className="w-100 mb-3"
-              disabled={disabled}
-              style={{
-                backgroundColor: "#7126B5",
-                border: "none",
-                transition: "opacity 0.3s ease",
-                opacity: disabled ? "0.5" : "1",
-              }}
-              onMouseEnter={(e) =>
-                !disabled && (e.currentTarget.style.opacity = "0.5")
-              }
-              onMouseLeave={(e) =>
-                !disabled && (e.currentTarget.style.opacity = "1")
-              }
-            >
-              Masuk
-            </Button>
-          </Form>
-          <Button
-            variant="light"
-            icon={<FcGoogle />}
-            type="submit"
-            className="w-100 mb-3"
-            onClick={handleGoogleLogin}
-            style={{
-              backgroundColor: "#FFFFFF",
-              border: "none",
-              transition: "opacity 0.3s ease",
-              opacity: disabled ? "0.5" : "1",
-            }}
-            onMouseEnter={(e) =>
-              !disabled && (e.currentTarget.style.opacity = "0.5")
-            }
-            onMouseLeave={(e) =>
-              !disabled && (e.currentTarget.style.opacity = "1")
-            }
-          >
-            Masuk
-          </Button>
-
-          <div
-            className="text-center"
-            style={{
-              marginTop: "20px",
-            }}
-          >
-            <p>
-              Belum punya akun?{" "}
-              <Button
-                as={Link}
-                to="/register"
-                className="text-decoration-none bg-transparent border-0 p-0"
-                style={{
-                  fontWeight: "bold",
-                  color: "#7126B5",
-                }}
-              >
-                Daftar di sini
-              </Button>
-            </p>
-          </div>
+              </p>
+            </div>
+          </animated.div>
         </>
       ) : (
         // Form Lupa Password
