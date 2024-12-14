@@ -1,5 +1,5 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
-import AkunLayout from "../layouts/AkunLayout";
+import AkunLayout from "../layouts/Account/AkunLayout";
 import { useState } from "react";
 import ScreenUbahProfil from "../components/Akun/ScreenUbahProfil";
 import ScreenPengaturanAkun from "../components/Akun/ScreenPengaturanAkun";
