@@ -21,11 +21,4 @@ export const getAirlines = async (filters = {}) => {
   return result?.data;
 };
 
-// Daftar Params untuk data Airlines
-//   page,
-//   limit,
-// Contoh Cara pemanggilan :
-// const airline = await getAirlines({
-//   page: 1,
-//   limit: 10,
-//})
+
