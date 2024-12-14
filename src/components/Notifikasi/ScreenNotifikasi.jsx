@@ -11,6 +11,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
+import { BeatLoader } from "react-spinners";
+import "./ScreenNotification.css";
 
 const ScreenNotifikasi = () => {
   const { token } = useSelector((state) => state.auth);
@@ -49,11 +51,9 @@ const ScreenNotifikasi = () => {
     return true;
   });
 
-  // Mutation to mark notification as read
   const mutation = useMutation({
     mutationFn: readNotification,
     onSuccess: (updatedNotification, { notificationID }) => {
-      // Update the cache to mark the notification as read
       queryClient.setQueryData(["getUserNotification"], (Notifications) =>
         Notifications.map((notif) =>
           notif.id === notificationID ? { ...notif, isRead: true } : notif
@@ -65,7 +65,6 @@ const ScreenNotifikasi = () => {
     },
   });
 
-  // Handle notification click
   const handleNotificationClick = (index, notificationID, isRead) => {
     if (!notificationID) {
       console.error("Notification ID is undefined");
@@ -78,28 +77,35 @@ const ScreenNotifikasi = () => {
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="d-flex justify-content-center ">
+        <BeatLoader style={{ position: "relative", marginTop: "15rem" }} />
+      </div>
+    );
 
   return (
-    <Container fluid className="bg-light py-3">
+    <Container fluid className=" py-3" style={{ background: "#FFFFFF" }}>
       <Row className="align-items-center">
         <Col md={8} className="offset-md-2">
           {/* Tampilkan pesan jika tidak ada notifikasi yang ditemukan */}
           {filteredNotifications?.length === 0 ? (
-            <div className="d-flex justify-content-center align-items-center mt-5 flex-column">
+            <div className=" d-flex justify-content-center align-items-center mt-5 flex-column">
               <img
                 src="src/assets/homepage/not-found.png"
                 alt="tidak-ditemukan"
                 style={{ width: "25rem" }}
+                className="img-search-not-found"
               />
-              <span className="mt-3">Maaf, pencarian Anda tidak ditemukan</span>
+              <span className="mt-3 text-center">
+                Maaf, pencarian Anda tidak ditemukan
+              </span>
             </div>
           ) : (
             filteredNotifications?.map((notif, index) => (
               <Card
                 key={index}
-                className="mb-2"
-                id="card-notif"
+                className="mb-2 card-notif"
                 style={{
                   borderRadius: "10px",
                   position: "relative",
@@ -124,6 +130,7 @@ const ScreenNotifikasi = () => {
                 <Card.Body className="ps-5">
                   <Card.Title className="d-flex justify-content-between align-items-center">
                     <span
+                      className="notif-type"
                       style={{
                         fontSize: "0.7rem",
                         fontWeight: "400",
@@ -133,10 +140,11 @@ const ScreenNotifikasi = () => {
                       {notif.type}
                     </span>
                     <div
-                      className="d-flex align-items-center gap-2"
+                      className="notif-date d-flex align-items-center gap-2"
                       style={{
                         fontSize: "0.7rem",
                         fontWeight: "400",
+                        color: "#8A8A8A",
                       }}
                     >
                       <span>{formatDateTime(notif.createdAt)}</span>
@@ -146,11 +154,15 @@ const ScreenNotifikasi = () => {
                       />
                     </div>
                   </Card.Title>
-                  <Card.Text style={{ fontSize: "1rem" }}>
+                  <Card.Text
+                    className="notif-title"
+                    style={{ fontSize: "1rem" }}
+                  >
                     {notif.title}
                   </Card.Text>
                   {notif.isRead && (
                     <Card.Text
+                      className="notif-description"
                       style={{
                         fontSize: "0.7rem",
                         fontWeight: "400",
