@@ -167,7 +167,7 @@ const SearchFlightReturn = ({
         departureTime: returnDateActive,
         ...filterChange,
       }),
-    enabled: !!departureAirportId && !!returnAirportId
+    enabled: !!departureAirportId && !!returnAirportId,
   });
 
   useEffect(() => {
@@ -225,7 +225,7 @@ const SearchFlightReturn = ({
     <>
       <Container className="">
         <Row className="mt-5 mb-2">
-          <h2>Select a Flight Return</h2>
+          <h2>Select a Return Flight</h2>
         </Row>
         <Row>
           <Col xs={12} sm={8} md={8} className="mb-2 mb-sm-0">

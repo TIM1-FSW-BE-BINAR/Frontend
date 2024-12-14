@@ -192,7 +192,7 @@ const Homepage = () => {
       getFlights({
         ...(state !== "All" && { state: state }),
         page,
-        limit: 12,
+        limit: 10,
       }),
     enabled: !!page,
   });
@@ -993,6 +993,7 @@ const Homepage = () => {
                     handleButtonCardClick(index);
                     setNotFound(false);
                     setState(label);
+                    setPage(1);
                   }}
                 >
                   <FaSearch className="icon" />
@@ -1001,7 +1002,7 @@ const Homepage = () => {
               )
             )}
           </Row>
-          <Row className="g-3 mb-5">
+          <Row className="g-3 mb-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5">
             {loading ? (
               <Col
                 className="text-center w-full mt-5"
@@ -1028,10 +1029,6 @@ const Homepage = () => {
               flightsData?.map((flight, index) => (
                 <Col
                   key={index}
-                  xs={12}
-                  sm={6}
-                  md={4}
-                  lg={2}
                   className="d-flex"
                 >
                   <Card
@@ -1054,7 +1051,7 @@ const Homepage = () => {
                       <Card.Title
                         className="card-title"
                         style={{
-                          fontSize: "14px",
+                          fontSize: "16px",
                         }}
                       >
                         {flight?.departure.city} <FaArrowRight />{" "}
@@ -1063,7 +1060,7 @@ const Homepage = () => {
                       <p
                         className="text-primary mb-1"
                         style={{
-                          fontSize: "12px",
+                          fontSize: "14px",
                         }}
                       >
                         {flight?.airline.name}
@@ -1072,7 +1069,7 @@ const Homepage = () => {
                         <p
                           className="mb-1"
                           style={{
-                            fontSize: "10px",
+                            fontSize: "12px",
                           }}
                         >
                           {formatDate(flight?.departureTime)}
@@ -1080,14 +1077,14 @@ const Homepage = () => {
                         <p
                           className=""
                           style={{
-                            fontSize: "14px",
+                            fontSize: "16px",
                           }}
                         >
                           Starts from{" "}
                           <span
                             className="text-danger"
                             style={{
-                              fontSize: "14px",
+                              fontSize: "16px",
                             }}
                           >
                             IDR {flight?.price}
@@ -1105,7 +1102,7 @@ const Homepage = () => {
               page={page}
               between={4}
               total={flightsDataAll.length}
-              limit={12}
+              limit={10}
               changePage={(page) => {
                 setPage(page);
               }}
