@@ -8,6 +8,7 @@ import { updateUser } from "../../service/user";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { BeatLoader } from "react-spinners";
+import "./ScreenUbahProfil.css";
 
 const ScreenUbahProfil = () => {
   const { token } = useSelector((state) => state.auth);
@@ -81,12 +82,16 @@ const ScreenUbahProfil = () => {
     );
 
   return (
-    <Container className="d-flex flex-column py-2">
+    <Container
+      fluid="xxl"
+      className="d-flex flex-column py-2 ms-5 custom-ubah-profil"
+      style={{ position: "relative", left: "12rem", background: "#FFFFFF" }}
+    >
       <h1
-        className="mb-3"
+        className="mb-3 custom-h1-ubah"
         style={{
           marginTop: "-1rem",
-          right: "6.8rem",
+          marginLeft: "-5rem",
           position: "relative",
           color: "#000000",
         }}
@@ -94,9 +99,12 @@ const ScreenUbahProfil = () => {
         Ubah Data Profil
       </h1>
 
-      <Card style={{ width: "37rem", right: "7rem" }}>
+      <Card
+        className="custom-card-ubah"
+        style={{ width: "37rem", marginLeft: "-5rem" }}
+      >
         <Card.Header className="text-white" style={{ background: "#A06ECE" }}>
-          <h5 className="mb-0">Data Diri</h5>
+          <h5 className="mb-0 custom-h5-ubah">Data Diri</h5>
         </Card.Header>
         <Card.Body>
           {isLoading ? (
@@ -104,58 +112,66 @@ const ScreenUbahProfil = () => {
           ) : (
             <Form onSubmit={handleSubmit}>
               <Form.Group controlId="formFirstName" className="mb-3">
-                <Form.Label>Nama Depan</Form.Label>
+                <Form.Label className="custom-h5-ubah">Nama Depan</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Nama Depan"
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleChange}
+                  className="form-control-data-diri"
                 />
               </Form.Group>
 
               <Form.Group controlId="formLastName" className="mb-3">
-                <Form.Label>Nama Belakang</Form.Label>
+                <Form.Label className="custom-h5-ubah">
+                  Nama Belakang
+                </Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Nama Belakang"
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleChange}
+                  className="form-control-data-diri"
                 />
               </Form.Group>
 
               <Form.Group controlId="formPhone" className="mb-3">
-                <Form.Label>Nomor Telepon</Form.Label>
+                <Form.Label className="custom-h5-ubah">
+                  Nomor Telepon
+                </Form.Label>
                 <PhoneInput
                   placeholder="Masukkan nomor telepon"
                   value={formData.phone}
                   onChange={handlePhoneChange}
                   defaultCountry="ID"
                   international
-                  className="form-control"
+                  className="form-control form-control-data-diri"
                 />
               </Form.Group>
 
               <Form.Group controlId="formEmail" className="mb-3">
-                <Form.Label>Email</Form.Label>
+                <Form.Label className="custom-h5-ubah">Email</Form.Label>
                 <Form.Control
                   type="email"
                   placeholder="johndoe@gmail.com"
                   name="email"
                   value={data.email}
                   readOnly
+                  className="form-control-data-diri"
                 />
               </Form.Group>
 
               <Button
                 size="lg"
                 type="submit"
-                className="d-flex justify-content-center mx-auto w-25"
+                variant="none"
+                className="d-flex justify-content-center mx-auto w-25 text-white button-save"
                 style={{ background: "#4B1979" }}
                 disabled={isUpdating}
               >
-                {isUpdating ? "Menyimpan..." : "Simpan"}
+                {isUpdating ? "Saving..." : "Save"}
               </Button>
             </Form>
           )}
