@@ -7,8 +7,10 @@ import { useSelector } from "react-redux";
 import { VscChromeClose } from "react-icons/vsc";
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale";
-import toast from "react-hot-toast"; // Tambahkan toast untuk notifikasi
+import toast, { Toaster } from "react-hot-toast"; // Tambahkan toast untuk notifikasi
 import "./DetailPesanan.css";
+import { getIdPayment } from "../../../service/payment";
+import DetailPesananLoading from "../Loading/DetailPesananLoading";
 
 const DetailPesanan = ({ id, onBack }) => {
   const { token } = useSelector((state) => state.auth);
@@ -19,6 +21,12 @@ const DetailPesanan = ({ id, onBack }) => {
     queryKey: ["getIdBooking", id],
     queryFn: () => getIdBooking(id),
     enabled: !!id && !!token,
+  });
+
+  const { dataPay, isSuccessPay, isLoadingPay } = useQuery({
+    queryKey: ["getIdPayment", id],
+    queryFn: getIdPayment,
+    enabled: !!token && !!id,
   });
 
   // Konfigurasi useMutation untuk print ticket
@@ -71,7 +79,7 @@ const DetailPesanan = ({ id, onBack }) => {
     mutation.mutate({ bookingId: booking.id });
   };
 
-  if (isLoading) return <p>Loading details...</p>;
+  if (isLoading) return <DetailPesananLoading />;
   if (isError) return <p>Error fetching details: {error.message}</p>;
 
   return (
@@ -242,31 +250,35 @@ const DetailPesanan = ({ id, onBack }) => {
         </div>
 
         {/* Tombol Cetak Tiket */}
-        <Button
-          style={{
-            backgroundColor: "#4B1979",
-            border: "none",
-            borderRadius: "10px",
-            width: "100%",
-          }}
-          className="mb-2 print-button"
-          onClick={handlePrintTicket} // Tambahkan handler untuk cetak tiket
-          disabled={mutation.isLoading} // Nonaktifkan tombol saat loading
-        >
-          {mutation.isLoading ? "Printing..." : "Print Ticket"}
-        </Button>
+        {!booking?.bookingDetail[0]?.qrCodeImage && (
+          <>
+            <Button
+              style={{
+                backgroundColor: "#4B1979",
+                border: "none",
+                borderRadius: "10px",
+                width: "100%",
+              }}
+              className="mb-2 print-button"
+              onClick={handlePrintTicket} // Tambahkan handler untuk cetak tiket
+              disabled={mutation.isLoading} // Nonaktifkan tombol saat loading
+            >
+              {mutation.isLoading ? "Printing..." : "Print Ticket"}
+            </Button>
 
-        <Button
-          style={{
-            backgroundColor: "#FF0000",
-            border: "none",
-            borderRadius: "10px",
-            width: "100%",
-          }}
-          className="cancel-button"
-        >
-          Cancel Booking
-        </Button>
+            <Button
+              style={{
+                backgroundColor: "#FF0000",
+                border: "none",
+                borderRadius: "10px",
+                width: "100%",
+              }}
+              className="cancel-button"
+            >
+              Cancel Booking
+            </Button>
+          </>
+        )}
 
         {booking?.bookingDetail[0]?.qrCodeImage && (
           <div className="mt-4 text-center">
@@ -280,6 +292,7 @@ const DetailPesanan = ({ id, onBack }) => {
           </div> // Tampilkan gambar QR code jika ada
         )}
       </Card.Body>
+      <Toaster />
     </Card>
   );
 };

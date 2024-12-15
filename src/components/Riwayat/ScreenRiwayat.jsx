@@ -10,8 +10,10 @@ import { isWithinInterval, parseISO } from "date-fns";
 import { useRiwayatContext } from "./RiwayatContext";
 import DetailPesanan from "./Detail/DetailPesanan";
 import "./ScreenRiwayat.css";
+import { getIdPayment } from "../../service/payment";
+import ScreenRiwayatLoading from "./Loading/ScreenRiwayatLoading";
 
-const ScreenRiwayat = () => {
+const ScreenRiwayat = (paymentId) => {
   const { token } = useSelector((state) => state.auth);
   const { filterDate, searchQuery } = useRiwayatContext();
   const [groupedBookings, setGroupedBookings] = useState([]);
@@ -38,6 +40,12 @@ const ScreenRiwayat = () => {
     queryKey: ["getAllbookings"],
     queryFn: getAllBookings,
     enabled: !!token,
+  });
+
+  const { dataPay, isSuccessPay, isLoadingPay } = useQuery({
+    queryKey: ["getIdPayment", paymentId],
+    queryFn: getIdPayment,
+    enabled: !!token && !!paymentId,
   });
 
   useEffect(() => {
@@ -164,7 +172,7 @@ const ScreenRiwayat = () => {
           }}
         >
           {isLoading ? (
-            <p>Loading...</p>
+            <ScreenRiwayatLoading />
           ) : isSuccess && groupedBookings.length > 0 ? (
             groupedBookings.map(([monthYear, bookings]) => (
               <div key={monthYear}>
@@ -175,6 +183,7 @@ const ScreenRiwayat = () => {
                   {monthYear}
                 </h5>
                 {bookings.map((booking) => {
+                  const isSelected = booking.id === selectedId;
                   let bgColor = "#73CA5C";
                   if (booking.status === "CANCELED") bgColor = "#FF0000";
                   if (booking.status === "EXPIRED") bgColor = "#8A8A8A";
@@ -192,6 +201,9 @@ const ScreenRiwayat = () => {
                         cursor: "pointer",
                         width: "40rem",
                         left: "6rem",
+                        border: isSelected
+                          ? "2px solid aqua"
+                          : "1px solid #ddd",
                       }}
                     >
                       <Card.Body>
