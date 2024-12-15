@@ -1,8 +1,22 @@
+/* Menghilangkan garis bawah dan mengubah warna untuk breadcrumb yang tidak aktif */
+.breadcrumb-item a {
+  text-decoration: none;  /* Menghilangkan underline */
+  color: #6c757d;         /* Warna default untuk item yang tidak aktif */
+}
 
+/* Gaya khusus untuk item yang aktif */
+.breadcrumb-item.active a {
+  font-weight: bold;
+  color: black;           /* Warna hitam untuk item yang aktif */
+}
+
+/* Mengatur separator breadcrumb */
 .breadcrumb-item + .breadcrumb-item::before {
   content: ">";
-  color: #6c757d; 
+  color: #6c757d;
 }
+
+
 #black-overlay {
   position: fixed;
   top: 0;
