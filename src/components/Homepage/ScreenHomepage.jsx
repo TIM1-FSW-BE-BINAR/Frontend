@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Button,
   Card,
@@ -23,8 +23,7 @@ import babyIcon from "../../assets/homepage/icon/baby-icon.png";
 import plusIcon from "../../assets/homepage/icon/plus-icon.png";
 import minusIcon from "../../assets/homepage/icon/minus-icon.png";
 import selectedIcon from "../../assets/homepage/icon/selected-icon.png";
-import cardImg from "../../assets/homepage/card-img.png";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch,FaArrowRight } from "react-icons/fa";
 import HomepageModal from "./HomepageModal";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
@@ -32,13 +31,15 @@ import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers-pro/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
+import { PaginationControl } from "react-bootstrap-pagination-control";
 import toast, { Toaster } from "react-hot-toast";
 
 import { useQuery } from "@tanstack/react-query";
 import { getFlights } from "../../service/flight/flightService";
-import { getAirlines } from "../../service/airline/airlineService";
-import { getAirports } from "../../service/airport/airportService";
 import { useNavigate } from "@tanstack/react-router";
+
+// Context 
+import {HomepageContext} from "../../context/HomepageContext";
 
 const ScreenHomepage = () => {
   return <Homepage />;
@@ -46,28 +47,38 @@ const ScreenHomepage = () => {
 
 const Homepage = () => {
   const [modalShow, setModalShow] = useState(false);
-  const [fromInput, setFromInput] = useState("");
-  const [toInput, setToInput] = useState("");
-  const [departureDate, setDepartureDate] = useState(""); // Untuk Departure
-  const [returnDate, setReturnDate] = useState("");
   const [activeModal, setActiveModal] = useState("");
   const [modalInputValue, setModalInputValue] = useState("");
   const [PassengerModalShow, setPassengerModalShow] = useState(false);
   const [classModalShow, setClassModalShow] = useState(false);
-  const [adultInput, setAdultInput] = useState(0);
-  const [childInput, setChildInput] = useState(0);
-  const [babyInput, setBabyInput] = useState(0);
-  const [totalPassengers, setTotalPassengers] = useState("");
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedElement, setSelectedElement] = useState(null);
   const [tempClassInput, setTempClassInput] = useState("");
-  const [classInput, setClassInput] = useState("");
   const [checkedSwitch, setCheckedSwitch] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
 
-  useEffect(() => {
-    setDepartureDate("");
-  }, [checkedSwitch]);
+  // State untuk form input ambil dari context
+  const { fromInput,
+    setFromInput,
+    toInput,
+    setToInput,
+    departureDate,
+    setDepartureDate,
+    returnDate,
+    setReturnDate,
+    adultInput,
+    setAdultInput,
+    childInput,
+    setChildInput,
+    babyInput,
+    setBabyInput,
+    totalPassengers,
+    setTotalPassengers,
+    classInput,
+    setClassInput,} = useContext(HomepageContext);
+
+  // Pagination
+  const [page, setPage] = useState(1);
 
   const handleButtonCardClick = (index) => {
     setActiveButton(index); // Set the active button index
@@ -149,7 +160,7 @@ const Homepage = () => {
         fromInput,
         toInput,
         departureDate,
-        returnDate: returnDate || "", // Kirim kosong jika null
+        returnDate: checkedSwitch ? returnDate : "", // Kirim kosong jika null
         totalPassengers,
         adultInput,
         childInput,
@@ -163,62 +174,61 @@ const Homepage = () => {
     }
   };
 
-  const [flights, setFlights] = useState([]);
-  const [flightsData, setFlightsData] = useState([]);
+  const [flightsData, setFlightsData] = useState([]); // data hasil fetch per page
 
-  const [state, setState] = useState("");
+  const [state, setState] = useState(""); // state pilihan dari user
+  const [notFound, setNotFound] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (state === "Asia") {
-      const flightsDataFilter = flights.filter(
-        (flight) => flight.arrival.state === state
-      );
-      setFlightsData(flightsDataFilter);
-    } else if (state === "Amerika") {
-      const flightsDataFilter = flights.filter(
-        (flight) => flight.arrival.state === state
-      );
-      setFlightsData(flightsDataFilter);
-    } else if (state === "Australia") {
-      const flightsDataFilter = flights.filter(
-        (flight) => flight.arrival.state === state
-      );
-      setFlightsData(flightsDataFilter);
-    } else if (state === "Eropa") {
-      const flightsDataFilter = flights.filter(
-        (flight) => flight.arrival.state === state
-      );
-      setFlightsData(flightsDataFilter);
-    } else if (state === "Afrika") {
-      const flightsDataFilter = flights.filter(
-        (flight) => flight.arrival.state === state
-      );
-      setFlightsData(flightsDataFilter);
-    } else {
-      setFlightsData(flights);
-    }
-  }, [state, flights]);
-
-  // Menggunakan react query
+  // Menggunakan react query untuk mengambil data per page
   const {
     data: flightData,
     isSuccess: isSuccessFlight,
     isPending: isPendingFlight,
     isError: isErrorFlight,
   } = useQuery({
-    queryKey: ["flights"],
-    queryFn: () => getFlights(),
+    queryKey: ["flights", page, state],
+    queryFn: () =>
+      getFlights({
+        ...(state !== "All" && { state: state }),
+        page,
+        limit: 10,
+      }),
+    enabled: !!page,
+  });
+
+  useEffect(() => {
+    if (isSuccessFlight) {
+      setFlightsData(flightData);
+      setLoading(false);
+      if (flightData.length == 0) {
+        setNotFound(true);
+      } else {
+        setNotFound(false);
+      }
+    } else if (isErrorFlight) {
+      console.log("flight error");
+    } else if (isPendingFlight) {
+      setLoading(true);
+    }
+  }, [flightData, isSuccessFlight, isErrorFlight, isPendingFlight]);
+
+  // use query untuk mengambil seluruh data flight
+  const [flightsDataAll, setFlightsDataALl] = useState([]);
+  const { data: flightDataAll, isSuccess: isSuccessFlightDataAll } = useQuery({
+    queryKey: ["all-flights", state],
+    queryFn: () =>
+      getFlights({
+        ...(state !== "All" && { state: state }),
+      }),
     enabled: true,
   });
 
-  if (isErrorFlight) {
-    console.log("flight error");
-  }
   useEffect(() => {
-    if (isSuccessFlight) {
-      setFlights(flightData);
+    if (isSuccessFlightDataAll) {
+      setFlightsDataALl(flightDataAll);
     }
-  }, [flightData, isSuccessFlight]);
+  }, [flightDataAll, isSuccessFlightDataAll]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -226,6 +236,33 @@ const Homepage = () => {
     const month = date.toLocaleString("en-US", { month: "long" }); // Mendapatkan bulan dalam bentuk teks (July)
     const year = date.getFullYear(); // Mendapatkan tahun (2024)
     return `${day} ${month} ${year}`;
+  };
+
+  const departureDateFormat = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0];
+  };
+  const classInputFormat = (flightClass) => {
+    if (flightClass === "FIRST") {
+      flightClass = "First Class";
+    } else if (flightClass === "PREMIUM_ECONOMY") {
+      flightClass = "Premium Economy";
+    }
+    return flightClass;
+  };
+
+  const handleFlightSelect = (flightSelect) => {
+    const fromInputSelect = `${flightSelect.departure.city}-${flightSelect.departure.code}`;
+    const toInputSelect = `${flightSelect.arrival.city}-${flightSelect.arrival.code}`;
+    const departureDateSelect = departureDateFormat(flightSelect.departureTime);
+    const classInputSelect = classInputFormat(flightSelect.class);
+    setFromInput(fromInputSelect);
+    setToInput(toInputSelect);
+    setDepartureDate(departureDateSelect);
+    setClassInput(classInputSelect);
+    toast("Form updated!", {
+      icon: "✈️",
+    });
   };
 
   return (
@@ -257,7 +294,7 @@ const Homepage = () => {
                     className="p-5 align-items-center d-none d-md-block"
                   >
                     <h1>
-                      <i>Diskon Hari ini</i>
+                      <i>Today{"`"}s Discount</i>
                     </h1>
                     <h1 className="text-primary">85%!</h1>
                   </Col>
@@ -266,7 +303,7 @@ const Homepage = () => {
                     <div className="d-block d-md-none d-flex position-relative">
                       <div className="position-absolute p-2">
                         <h2>
-                          <i>Diskon Hari ini</i>{" "}
+                          <i>Today{"`"}s Discount</i>{" "}
                           <span className="text-primary">85%!</span>
                         </h2>
                       </div>
@@ -302,8 +339,8 @@ const Homepage = () => {
             <Row>
               <Col>
                 <h3>
-                  Pilih Jadwal Penerbangan spesial di{" "}
-                  <span className="text-primary">Tiketku!</span>
+                  Choose a Special Flight Schedule with{" "}
+                  <span className="text-primary">AirFly!</span>
                 </h3>
               </Col>
             </Row>
@@ -332,7 +369,7 @@ const Homepage = () => {
                         <Form.Control
                           type="text"
                           placeholder="Jakarta"
-                          className="custom-placeholder form-input"
+                          className="form-input"
                           value={fromInput}
                           onClick={() => {
                             setActiveModal("from");
@@ -373,7 +410,7 @@ const Homepage = () => {
                         <Form.Control
                           type="text"
                           placeholder="Dubai"
-                          className="custom-placeholder form-input"
+                          className="form-input"
                           value={toInput}
                           onClick={() => {
                             setActiveModal("to");
@@ -413,6 +450,10 @@ const Homepage = () => {
                                   start: "Departure",
                                   end: "Return",
                                 }}
+                                value={[
+                                  departureDate ? dayjs(departureDate) : null,
+                                  returnDate ? dayjs(returnDate) : null,
+                                ]}
                                 onChange={(e) => {
                                   setDepartureDate(
                                     dayjs(e[0]).format("YYYY-MM-DD")
@@ -431,8 +472,7 @@ const Homepage = () => {
                             <FormLabel>Departure</FormLabel>
                             <Form.Control
                               type="date"
-                              placeholder="1 Maret 2023"
-                              className="custom-placeholder form-input"
+                              className="form-input"
                               value={departureDate}
                               onChange={(e) => setDepartureDate(e.target.value)}
                             />
@@ -473,8 +513,8 @@ const Homepage = () => {
                         <FormLabel>Passengers</FormLabel>
                         <Form.Control
                           type="text"
-                          placeholder="Tambah Penumpang"
-                          className="custom-placeholder form-input"
+                          placeholder="Add Passengers"
+                          className="form-input"
                           value={
                             totalPassengers
                               ? `${adultInput > 0 ? `${adultInput} Adult` : ""}${
@@ -496,8 +536,8 @@ const Homepage = () => {
                         <FormLabel>Seat Class</FormLabel>
                         <Form.Control
                           type="text"
-                          placeholder="Pilih Class"
-                          className="custom-placeholder form-input"
+                          placeholder="Select Class"
+                          className="form-input"
                           onClick={() => setClassModalShow(true)}
                           value={classInput}
                           readOnly
@@ -509,9 +549,10 @@ const Homepage = () => {
                 {/* button */}
                 <Button
                   type="submit"
-                  className="btn btn-block btn-primary w-100 mt-2 mx-0 animated-button"
+                  className="btn btn-block w-100 mt-2 mx-0 animated-button"
+                  style={{ backgroundColor: "#7126b5" }}
                 >
-                  Cari Penerbangan
+                  Search for Flights
                 </Button>
               </Form>
             </Row>
@@ -522,7 +563,7 @@ const Homepage = () => {
         <HomepageModal
           show={modalShow}
           activeModal={activeModal}
-          flights={flights}
+          flights={flightsDataAll}
           onHide={() => setModalShow(false)}
           inputValue={modalInputValue}
           setInputValue={setModalInputValue}
@@ -557,8 +598,8 @@ const Homepage = () => {
                     }}
                   />
                   <div className="ms-2">
-                    <p className="fw-bold mb-0">Dewasa</p>
-                    <p>(12 Tahun Keatas)</p>
+                    <p className="fw-bold mb-0">Adult</p>
+                    <p>(12 Years and Above)</p>
                   </div>
                 </Col>
                 {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
@@ -639,8 +680,8 @@ const Homepage = () => {
                     }}
                   />
                   <div className="ms-2">
-                    <p className="fw-bold mb-0">Anak</p>
-                    <p>(2 - 11 Tahun)</p>
+                    <p className="fw-bold mb-0">Child</p>
+                    <p>(2 - 11 Years Old)</p>
                   </div>
                 </Col>
                 {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
@@ -721,8 +762,8 @@ const Homepage = () => {
                     }}
                   />
                   <div className="ms-2">
-                    <p className="fw-bold mb-0">Bayi</p>
-                    <p>(Dibawah 2 Tahun)</p>
+                    <p className="fw-bold mb-0">Baby</p>
+                    <p>(Under 2 Years Old)</p>
                   </div>
                 </Col>
                 {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
@@ -798,8 +839,9 @@ const Homepage = () => {
               variant="primary"
               onClick={handleSavePassengers}
               className="animated-button"
+              style={{ backgroundColor: "#7126b5" }}
             >
-              Simpan
+              Save
             </Button>
           </Modal.Footer>
         </Modal>
@@ -808,7 +850,6 @@ const Homepage = () => {
         <Modal
           show={classModalShow}
           onHide={handleClassClose}
-          size="lg"
           aria-labelledby="contained-modal-title-vcenter"
           centered
         >
@@ -826,9 +867,8 @@ const Homepage = () => {
                   handleSelectClass("economy", "economyBtn", "Economy")
                 }
               >
-                <Col xs={9} sm={10}>
+                <Col xs={9} sm={10} className="p-2">
                   <h6>Economy</h6>
-                  <p>IDR 4.950.000</p>
                 </Col>
 
                 {selectedClass === "economy" && (
@@ -851,9 +891,8 @@ const Homepage = () => {
                   )
                 }
               >
-                <Col xs={9} sm={10}>
+                <Col xs={9} sm={10} className="p-2">
                   <h6>Premium Economy</h6>
-                  <p>IDR 8.950.000</p>
                 </Col>
 
                 {selectedClass === "premiumEconomy" && (
@@ -872,9 +911,8 @@ const Homepage = () => {
                   handleSelectClass("business", "businessBtn", "Business")
                 }
               >
-                <Col xs={9} sm={10}>
+                <Col xs={9} sm={10} className="p-2">
                   <h6>Business</h6>
-                  <p>IDR 14.950.000</p>
                 </Col>
 
                 {selectedClass === "business" && (
@@ -897,9 +935,8 @@ const Homepage = () => {
                   )
                 }
               >
-                <Col xs={9} sm={10}>
+                <Col xs={9} sm={10} className="p-2">
                   <h6>First Class</h6>
-                  <p>IDR 24.950.000</p>
                 </Col>
 
                 {selectedClass === "firstClass" && (
@@ -920,14 +957,15 @@ const Homepage = () => {
               onClick={handleClassClose}
               className="animated-button"
             >
-              Tutup
+              Close
             </Button>
             <Button
               variant="primary"
               onClick={handleSaveClass}
               className="animated-button"
+              style={{ backgroundColor: "#7126b5" }}
             >
-              Simpan
+              Save
             </Button>
           </Modal.Footer>
         </Modal>
@@ -936,11 +974,11 @@ const Homepage = () => {
       <section id="favorit">
         <Container className="mt-3">
           <Row className="mb-2">
-            <h2>Destinasi Favorit</h2>
+            <h2>Favorite Destinations</h2>
           </Row>
           <Row className="g-2 mb-2 flex-wrap">
             {/* Tombol dengan responsivitas */}
-            {["Semua", "Asia", "Amerika", "Australia", "Eropa", "Afrika"].map(
+            {["All", "Asia", "Amerika", "Australia", "Eropa", "Afrika"].map(
               (label, index) => (
                 <Col
                   key={index}
@@ -953,7 +991,9 @@ const Homepage = () => {
                   }`}
                   onClick={() => {
                     handleButtonCardClick(index);
+                    setNotFound(false);
                     setState(label);
+                    setPage(1);
                   }}
                 >
                   <FaSearch className="icon" />
@@ -962,65 +1002,112 @@ const Homepage = () => {
               )
             )}
           </Row>
-          <Row className="g-3 mb-5">
-            {flightsData?.map((flight, index) => (
-              <Col key={index} xs={12} sm={6} md={4} lg={2} className="d-flex">
-                <Card className="custom-card">
-                  <div className="badge-container">
-                    <span
-                      className={`badge ${index % 2 === 0 ? "badge-limited" : "badge-discount"}`}
-                    >
-                      {index % 2 === 0 ? "Limited!" : "50% OFF"}
-                    </span>
-                  </div>
-                  <Card.Img variant="top" src={flight?.arrival.imageUrl} className="img-fluid" />
-                  <Card.Body className="custom-card-body">
-                    <Card.Title
-                      className="card-title"
-                      style={{
-                        fontSize: "14px",
-                      }}
-                    >
-                      {flight?.departure.city} -{`>`} {flight?.arrival.city}
-                    </Card.Title>
-                    <p
-                      className="text-primary mb-1"
-                      style={{
-                        fontSize: "12px",
-                      }}
-                    >
-                      {flight?.airline.name}
-                    </p>
-                    <Card.Text>
-                      <p
-                        className="mb-1"
+          <Row className="g-3 mb-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5">
+            {loading ? (
+              <Col
+                className="text-center w-full mt-5"
+                style={{
+                  color: "#007bff",
+                  fontSize: "1.2rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Loading ...
+              </Col>
+            ) : notFound ? (
+              <Col
+                className="text-center w-full mt-5"
+                style={{
+                  color: "#ff4d4f",
+                  fontSize: "1.2rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Flight Not Found
+              </Col>
+            ) : (
+              flightsData?.map((flight, index) => (
+                <Col
+                  key={index}
+                  className="d-flex"
+                >
+                  <Card
+                    className="custom-card"
+                    onClick={() => handleFlightSelect(flight)}
+                  >
+                    <div className="badge-container">
+                      <span
+                        className={`badge ${index % 2 === 0 ? "badge-limited" : "badge-discount"}`}
+                      >
+                        {index % 2 === 0 ? "Limited!" : "50% OFF"}
+                      </span>
+                    </div>
+                    <Card.Img
+                      variant="top"
+                      src={flight?.arrival.imageUrl}
+                      className="img-fluid"
+                    />
+                    <Card.Body className="custom-card-body">
+                      <Card.Title
+                        className="card-title"
                         style={{
-                          fontSize: "10px",
+                          fontSize: "16px",
                         }}
                       >
-                        {formatDate(flight?.departureTime)}
-                      </p>
+                        {flight?.departure.city} <FaArrowRight />{" "}
+                        {flight?.arrival.city}
+                      </Card.Title>
                       <p
-                        className=""
+                        className="text-primary mb-1"
                         style={{
                           fontSize: "14px",
                         }}
                       >
-                        Mulai dari{" "}
-                        <span
-                          className="text-danger"
+                        {flight?.airline.name}
+                      </p>
+                      <Card.Text>
+                        <p
+                          className="mb-1"
                           style={{
-                            fontSize: "14px",
+                            fontSize: "12px",
                           }}
                         >
-                          IDR {flight?.price}
-                        </span>
-                      </p>
-                    </Card.Text>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
+                          {formatDate(flight?.departureTime)}
+                        </p>
+                        <p
+                          className=""
+                          style={{
+                            fontSize: "16px",
+                          }}
+                        >
+                          Starts from{" "}
+                          <span
+                            className="text-danger"
+                            style={{
+                              fontSize: "16px",
+                            }}
+                          >
+                            IDR {flight?.price}
+                          </span>
+                        </p>
+                      </Card.Text>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))
+            )}
+          </Row>
+          <Row className="d-flex w-full justify-content-right align-items-right">
+            <PaginationControl
+              page={page}
+              between={4}
+              total={flightsDataAll.length}
+              limit={10}
+              changePage={(page) => {
+                setPage(page);
+              }}
+              ellipsis={1}
+            />
           </Row>
         </Container>
       </section>
@@ -1030,9 +1117,6 @@ const Homepage = () => {
           position="top-right"
           containerStyle={{
             position: "fixed",
-            bottom: "20px",
-            left: "75%",
-            transform: "translateX(-50%)",
             zIndex: "9999",
           }}
           reverseOrder={false}

@@ -1,11 +1,11 @@
 //import * as React from "react";
 import { useEffect, useState } from "react";
-import { createLazyFileRoute, useLocation } from "@tanstack/react-router";
+import { useLocation } from "@tanstack/react-router";
 import { Container, Card, Button, Col, Form, Row } from "react-bootstrap";
 import "font-awesome/css/font-awesome.min.css";
-import NavbarBooking from "../components/NavbarBooking";
-import Footer from "../components/Footer";
-import NavigationBar from "../components/Navbar";
+import NavbarBooking from "../NavbarBooking";
+import Footer from "../Footer";
+import NavigationBar from "../Navbar";
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 import MenuItem from "@mui/material/MenuItem";
@@ -14,22 +14,18 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import TicketDetails from "../components/TicketDetails";
-import SeatMap from "../components/SeatMap";
-import SeatMapReturn from "../components/SeatMapReturn";
-import { createBooking } from "../service/booking";
+import TicketDetails from "../TicketDetails";
+import SeatMap from "../SeatMap";
+import SeatMapReturn from "../SeatMapReturn";
+import { createBooking } from "../../service/booking";
 import toast, { Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
-import { getFlightId } from "../service/flight/flightService";
+import { getFlightId } from "../../service/flight/flightService";
 import { PulseLoader } from "react-spinners";
 
-export const Route = createLazyFileRoute("/booking")({
-  component: Booking,
-});
-
-function Booking() {
+function BookingPage() {
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [selectedSeatsReturn, setSelectedSeatsReturn] = useState([]);
   const [isRoundtrip, setIsRoundtrip] = useState(false);
@@ -942,3 +938,4 @@ function Booking() {
     </>
   );
 }
+export default BookingPage;

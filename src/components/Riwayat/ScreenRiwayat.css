@@ -1,12 +1,12 @@
 @media (max-width: 426px) {
   .custom-card {
-    width: 90vw !important;
+    width: 85vw !important;
     position: relative !important;
-    left: -0.5rem !important;
+    left: 1vw !important;
   }
 
   .custom-airport-location {
-    font-size: 14px !important;
+    font-size: 10px !important;
     text-align: start;
     width: 5rem;
   }
@@ -16,34 +16,28 @@
   }
 
   .custom-date {
-    font-size: 20px;
+    font-size: 15px;
     position: relative !important;
-    left: -0.5rem !important;
+    left: 1vw !important;
   }
 
   .custom-date-deparr-date,
   .custom-date-deparr-time {
-    font-size: 12px !important;
+    font-size: 10px !important;
   }
 
   .custom-duration {
-    font-size: 15px;
+    font-size: 10px;
   }
 
   .arrow-right {
-    width: 6rem !important;
+    size: 10px;
   }
 
-  .custom-footer {
-    font-size: 14px !important;
-  }
-
-  .custom-price {
-    font-size: 14px !important;
-  }
-
+  .custom-footer,
+  .custom-price,
   .custom-status {
-    font-size: 13px;
+    font-size: 12px !important;
   }
 
   .detail-prompt {
@@ -58,13 +52,14 @@
 @media (min-width: 427px) and (max-width: 768px) {
   .custom-card,
   .custom-date {
-    width: 21rem !important;
+    width: 21.5rem !important;
     position: relative;
     left: 3rem !important;
   }
 
   .custom-airport-location {
-    font-size: 16px !important;
+    font-size: 13px !important;
+    width: 90px;
   }
 
   .location-icon {
@@ -116,7 +111,7 @@
   }
 
   .location-icon {
-    font-size: 20px !important;
+    font-size: 40px !important;
   }
 
   .search-not-found {
