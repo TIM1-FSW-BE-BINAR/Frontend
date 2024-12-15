@@ -26,6 +26,8 @@ import { id, enUS } from "date-fns/locale";
 import { Navigate, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getFlights, getFlightId } from "../../service/flight/flightService";
+import toast, { Toaster } from "react-hot-toast";
+import { useSelector } from "react-redux";
 
 const SearchFlightReturn = ({
   fromInput,
@@ -197,7 +199,7 @@ const SearchFlightReturn = ({
   // Tentang perfilteran dan fetch search selesai
 
   // Menuju halaman bookingPage
-
+   const { user, token } = useSelector((state) => state.auth);
   const handleBookingPage = async (flight) => {
     const flightDataById = await getFlightId(flight?.id);
     if (flightDataById.error?.message) {
@@ -214,9 +216,19 @@ const SearchFlightReturn = ({
           babyInput,
         }).toString();
 
-        navigate({
-          to: `/booking?${queryParams}`,
-        });
+        // cek apakah user sudah login, jika belum tidak bisa ke halaman booking
+        if(user && token){
+          navigate({
+            to: `/booking?${queryParams}`,
+          });
+        }else{
+          toast.error("You need to login first!")
+          setTimeout(() => {
+            navigate({
+              to: "/login",
+            });
+          }, 1000);
+        }
       
     }
   };
@@ -952,6 +964,14 @@ const SearchFlightReturn = ({
           </Modal.Footer>
         </Modal>
       </Container>
+      <Toaster
+        position="top-right"
+        containerStyle={{
+          position: "fixed",
+          zIndex: "9999",
+        }}
+        reverseOrder={false}
+      />
     </>
   );
 };
