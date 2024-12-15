@@ -455,26 +455,26 @@ const SearchFlightReturn = ({
               <div className="d-flex flex-column justify-content-center align-items-center">
                 <img src={notFoundImage} className="img-fluid w-25" />
                 <span className="fw-bold">
-                  Maaf, pencarian Anda tidak ditemukan
+                  Sorry, your search was not found.
                 </span>
                 <span
                   className="text-primary"
                   style={{ cursor: "pointer" }}
                   onClick={() => navigate({ to: "/" })}
                 >
-                  Coba cari perjalanan lainnya!
+                  Try searching for another trip!
                 </span>
               </div>
             ) : ticketSoldOut ? (
               <div className="d-flex flex-column justify-content-center align-items-center">
                 <img src={ticketSoldOutImage} className="img-fluid w-25" />
-                <span className="fw-bold">Maaf, Tiket terjual habis!</span>
+                <span className="fw-bold">Sorry, tickets are sold out!</span>
                 <span
                   className="text-primary"
                   style={{ cursor: "pointer" }}
                   onClick={() => navigate({ to: "/" })}
                 >
-                  Coba cari perjalanan lainnya!
+                  Try searching for another trip!
                 </span>
               </div>
             ) : (

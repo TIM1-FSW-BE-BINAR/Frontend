@@ -23,6 +23,8 @@ import babyIcon from "../../assets/homepage/icon/baby-icon.png";
 import plusIcon from "../../assets/homepage/icon/plus-icon.png";
 import minusIcon from "../../assets/homepage/icon/minus-icon.png";
 import selectedIcon from "../../assets/homepage/icon/selected-icon.png";
+import notFoundImage from "../../assets/homepage/not-found.png";
+import CardHomepageLoading from "../Loading/cardHomepageLoading";
 import { FaSearch,FaArrowRight } from "react-icons/fa";
 import HomepageModal from "./HomepageModal";
 import { useEffect, useState } from "react";
@@ -1002,35 +1004,23 @@ const Homepage = () => {
               )
             )}
           </Row>
-          <Row className="g-3 mb-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5">
+          <Row
+            className={`g-3 mb-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 ${
+              notFound ? "justify-content-center" : ""
+            }`}
+          >
             {loading ? (
-              <Col
-                className="text-center w-full mt-5"
-                style={{
-                  color: "#007bff",
-                  fontSize: "1.2rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Loading ...
-              </Col>
+              <CardHomepageLoading />
             ) : notFound ? (
-              <Col
-                className="text-center w-full mt-5"
-                style={{
-                  color: "#ff4d4f",
-                  fontSize: "1.2rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Flight Not Found
+              <Col className="d-flex flex-column justify-content-center align-items-center w-50 mt-3">
+                <img src={notFoundImage} className="img-fluid w-75 mt-5" />
+                <span className="text-center fw-bold fs-6 fs-sm-5 fs-md-4">
+                  Sorry, your search was not found.
+                </span>
               </Col>
             ) : (
               flightsData?.map((flight, index) => (
-                <Col
-                  key={index}
-                  className="d-flex"
-                >
+                <Col key={index} className="d-flex">
                   <Card
                     className="custom-card"
                     onClick={() => handleFlightSelect(flight)}
