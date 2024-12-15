@@ -147,7 +147,7 @@ const loginForm = () => {
                 <Form.Control
                   ref={emailRef}
                   type="email"
-                  placeholder="Contoh: johndee@gmail.com"
+                  placeholder="johndee@gmail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   isInvalid={!!errors.email}
@@ -167,7 +167,7 @@ const loginForm = () => {
                   <Form.Control
                     ref={passwordRef}
                     type={type}
-                    placeholder="Masukkan password"
+                    placeholder="Enter password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     isInvalid={!!errors.password}

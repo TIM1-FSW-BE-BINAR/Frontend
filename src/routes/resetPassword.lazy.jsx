@@ -1,5 +1,5 @@
 import React from "react";
-import "../styles/variables.scss";
+import "../components/Login/variables.scss";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useSelector } from "react-redux";
 import Background from "/img/Frame 1.svg";
