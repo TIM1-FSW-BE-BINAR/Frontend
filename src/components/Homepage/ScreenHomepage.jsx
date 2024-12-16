@@ -278,14 +278,10 @@ const Homepage = () => {
 
             {/* Kolom tengah */}
             <Col
-              xs={12}
-              sm={8}
-              md={8}
-              lg={6}
-              xl={6}
-              className="w-100 position-absolute top-0 start-50 translate-middle-x z-index-2"
+              className="w-full position-absolute top-0 start-50 translate-middle-x z-index-2 banner-img"
             >
               <Container
+                fluid
                 className="p-0 rounded"
                 style={{ backgroundColor: "#FFE9CA" }}
               >
@@ -295,10 +291,17 @@ const Homepage = () => {
                     md={4}
                     className="p-5 align-items-center d-none d-md-block"
                   >
-                    <h1>
+                    <h1 className="banner-text">
                       <i>Today{"`"}s Discount</i>
                     </h1>
-                    <h1 className="text-primary">85%!</h1>
+                    <h1
+                      className="banner-text"
+                      style={{
+                        color: "#7126b5",
+                      }}
+                    >
+                      85%!
+                    </h1>
                   </Col>
                   <Col xs={12} md={8}>
                     {/* Small screen */}
@@ -1005,7 +1008,7 @@ const Homepage = () => {
             )}
           </Row>
           <Row
-            className={`g-3 mb-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 ${
+            className={`g-2 mb-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 ${
               notFound ? "justify-content-center" : ""
             }`}
           >
