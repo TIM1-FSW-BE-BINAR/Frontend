@@ -236,7 +236,7 @@ const loginForm = () => {
                 Login
               </Button>
             </Form>
-            <h6 className="text-muted text-center mt-2"> or </h6>
+            <h6 className="text-muted text-center mt-2"> or continue with </h6>
             <Button
               variant=""
               type="submit"
@@ -250,7 +250,7 @@ const loginForm = () => {
               onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
             >
               <FcGoogle style={{ marginRight: "8px", fontSize: "20px" }} />
-              Login with Google
+               Google
             </Button>
 
             <div

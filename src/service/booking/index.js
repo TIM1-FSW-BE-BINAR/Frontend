@@ -30,7 +30,6 @@ export const getIdBooking = async (id) => {
 
   // get data
   const result = await response.json();
-  console.log(result);
   return result?.data;
 };
 
