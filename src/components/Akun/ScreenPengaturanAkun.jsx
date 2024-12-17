@@ -9,11 +9,13 @@ import { ToastContainer } from "react-toastify";
 import { Toaster, toast } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css"; // Import CSS untuk toast
 import "./ScreenPengaturanAkun.css";
+import ScreenPengaturanAkunLoading from "./Loading/ScreenPengaturanAkunLoading";
 
 const ScreenPengaturanAkun = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { token } = useSelector((state) => state.auth);
+  const [isLoading] = useState();
 
   // State untuk modal konfirmasi
   const [showModal, setShowModal] = useState(false);
@@ -31,6 +33,8 @@ const ScreenPengaturanAkun = () => {
     }
   };
 
+  if (isLoading) return <ScreenPengaturanAkunLoading />;
+
   return (
     <Container
       className="d-flex flex-column py-2 custom-pengaturan-profil"
@@ -38,7 +42,7 @@ const ScreenPengaturanAkun = () => {
     >
       <Card className="custom-card-pengaturan" style={{ width: "35rem" }}>
         <Card.Header className="text-white" style={{ background: "#A06ECE" }}>
-          <h5 className="mb-0 custom-h5">Hapus Akun</h5>
+          <h5 className="mb-0 custom-h5">Delete Account</h5>
         </Card.Header>
         <Card.Body>
           <p className="text-gray-600 mb-4 custom-p">
