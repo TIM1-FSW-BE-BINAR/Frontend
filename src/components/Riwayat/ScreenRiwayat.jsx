@@ -10,6 +10,8 @@ import { isWithinInterval, parseISO } from "date-fns";
 import { useRiwayatContext } from "./RiwayatContext";
 import DetailPesanan from "./Detail/DetailPesanan";
 import "./ScreenRiwayat.css";
+import arrowRight from "/src/assets/arrow-right.png";
+
 import { getIdPayment } from "../../service/payment";
 import ScreenRiwayatLoading from "./Loading/ScreenRiwayatLoading";
 
@@ -245,7 +247,7 @@ const ScreenRiwayat = (paymentId) => {
                               {durations[booking.id]}
                             </span>
                             <img
-                              src="/src/assets/homepage/icon/arrow-right.png"
+                              src={arrowRight}
                               alt="duration"
                               className="w-50 arrow-right"
                             />
