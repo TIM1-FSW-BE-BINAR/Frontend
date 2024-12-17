@@ -1,38 +1,33 @@
 import { useEffect, useState } from "react";
-import { createLazyFileRoute, useLocation } from "@tanstack/react-router";
-import { Container, Card, Button, Col, Form, Row } from "react-bootstrap";
-import "font-awesome/css/font-awesome.min.css";
-import NavbarBooking from "../components/NavbarBooking";
-import Footer from "../components/Footer";
-import NavigationBar from "../components/Navbar";
+import { useLocation } from "@tanstack/react-router";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import { PulseLoader } from "react-spinners";
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "dayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import TicketDetails from "../components/TicketDetails";
-import SeatMap from "../components/SeatMap";
-import SeatMapReturn from "../components/SeatMapReturn";
-import { createBooking } from "../service/booking";
 import toast, { Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
-import { getFlightId } from "../service/flight/flightService";
-import { PulseLoader } from "react-spinners";
+//import NavigationBar from "../Navbar";
+import SeatMapReturn from "../SeatMapReturn";
+import TicketDetails from "../TicketDetails";
+//import NavbarBooking from "../NavbarBooking";
+import SeatMap from "../SeatMap";
+import { createBooking } from "../../service/booking";
+import { getFlightId } from "../../service/flight/flightService";
+import dayjs from "dayjs";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { Container, Card, Button, Col, Form, Row } from "react-bootstrap";
+import "font-awesome/css/font-awesome.min.css";
+import PropTypes from "prop-types";
 
-export const Route = createLazyFileRoute("/booking")({
-  component: Booking,
-});
-
-function Booking() {
+function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [selectedSeatsReturn, setSelectedSeatsReturn] = useState([]);
   const [isRoundtrip, setIsRoundtrip] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -215,11 +210,11 @@ function Booking() {
       toast.success("Data successfully saved.", {
         autoClose: 3000,
       });
-      toast.success(`Seat ${seatNumbers} successfully booked.`, {
+      toast.success(`Seat ${seatNumbers} Successfully booked.`, {
         autoClose: 3000,
       });
       toast.success(
-        `Seat ${seatNumbersReturn} uccessfully booked for the return flight.`,
+        `Seat ${seatNumbersReturn} Successfully booked for the return flight.`,
         {
           autoClose: 3000,
         }
@@ -372,11 +367,17 @@ function Booking() {
   return (
     <>
       <Toaster position="top-right" />
-      <NavigationBar />
-      <NavbarBooking isSaved={isSaved} />
-      <Container className="py-4">
-        <Row className="justify-content-center">
-          <Col sm={12} md={12} lg={7} xl={6}>
+      {/* <NavigationBar />
+      <NavbarBooking isSaved={isSaved} /> */}
+      <Container className="py-4" style={{ maxWidth: "1320px" }}>
+        <Row className="justify-content-center" style={{ margin: "0" }}>
+          <Col
+            sm={12}
+            md={12}
+            lg={7}
+            xl={6}
+            style={{ margin: "0px", padding: "0px" }}
+          >
             <form onSubmit={onSubmit}>
               {/* Card Pemesan */}
               <div className="mb-3 shadow-sm">
@@ -938,13 +939,19 @@ function Booking() {
           <Col sm={12} md={12} lg={5} xl={4}>
             <Card className="shadow-sm mb-3">
               <Card.Body>
-                <TicketDetails isSaved={isSaved} />
+                <TicketDetails isSaved={isSaved} setIsPayment={setIsPayment} isPayment={isPayment}/>
               </Card.Body>
             </Card>
           </Col>
         </Row>
       </Container>
-      <Footer />
     </>
   );
 }
+BookingForm.propTypes = {
+  setIsSaved: PropTypes.func.isRequired,
+  isSaved: PropTypes.bool.isRequired,
+  setIsPayment: PropTypes.func.isRequired,
+  isPayment: PropTypes.bool.isRequired,
+};
+export default BookingForm;
