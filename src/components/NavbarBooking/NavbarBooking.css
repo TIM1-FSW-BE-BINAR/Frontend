@@ -13,6 +13,12 @@
   color: black;          
 }
 
+/* Gaya khusus untuk item yang aktif */
+.breadcrumb-item.active a {
+  font-weight: bold;
+  color: black;          
+}
+
 .breadcrumb-item + .breadcrumb-item::before {
   content: ">";
   color: #7126B5;

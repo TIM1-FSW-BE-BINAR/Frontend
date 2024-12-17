@@ -1,5 +1,5 @@
 import React from "react";
-import "../styles/variables.scss";
+import "../components/Login/variables.scss";
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -100,7 +100,7 @@ function Login() {
             style={{
               opacity: 0.9,
               filter: "blur(0.5px)",
-              height: "100px"  
+              height: "100px",
             }}
           />
         </div>
