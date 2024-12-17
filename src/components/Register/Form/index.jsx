@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import "../../../styles/variables.scss";
+import "../../Login/variables.scss";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Button, Form, Image } from "react-bootstrap";
@@ -190,7 +190,6 @@ const RegisterForm = () => {
         marginTop: "4rem",
         width: "100%",
         height: "100%",
-        
       }}
     >
       {" "}

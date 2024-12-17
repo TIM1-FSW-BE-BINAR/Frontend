@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../styles/variables.scss";
+import "../components/Login/variables.scss";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import PaymentLayout from "../layouts/paymentLayout";
 import SuccessPayment from "../components/Payment/Payment/SuccessPayment";

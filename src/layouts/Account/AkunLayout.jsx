@@ -20,8 +20,8 @@ function PageHeader() {
 
       {/* Tombol Beranda dan Filter */}
       <Row className="align-items-center justify-content-center mt-4">
-        <Col md={10} lg={9}>
-          <ListGroup className="w-100">
+        <Col md={10} lg={10}>
+          <ListGroup>
             <ListGroup.Item
               style={{
                 background: "#A06ECE",

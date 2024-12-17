@@ -23,6 +23,8 @@ import babyIcon from "../../assets/homepage/icon/baby-icon.png";
 import plusIcon from "../../assets/homepage/icon/plus-icon.png";
 import minusIcon from "../../assets/homepage/icon/minus-icon.png";
 import selectedIcon from "../../assets/homepage/icon/selected-icon.png";
+import notFoundImage from "../../assets/homepage/not-found.png";
+import CardHomepageLoading from "../Loading/cardHomepageLoading";
 import { FaSearch,FaArrowRight } from "react-icons/fa";
 import HomepageModal from "./HomepageModal";
 import { useEffect, useState } from "react";
@@ -276,14 +278,10 @@ const Homepage = () => {
 
             {/* Kolom tengah */}
             <Col
-              xs={12}
-              sm={8}
-              md={8}
-              lg={6}
-              xl={6}
-              className="w-100 position-absolute top-0 start-50 translate-middle-x z-index-2"
+              className="w-full position-absolute top-0 start-50 translate-middle-x z-index-2 banner-img"
             >
               <Container
+                fluid
                 className="p-0 rounded"
                 style={{ backgroundColor: "#FFE9CA" }}
               >
@@ -293,10 +291,17 @@ const Homepage = () => {
                     md={4}
                     className="p-5 align-items-center d-none d-md-block"
                   >
-                    <h1>
+                    <h1 className="banner-text">
                       <i>Today{"`"}s Discount</i>
                     </h1>
-                    <h1 className="text-primary">85%!</h1>
+                    <h1
+                      className="banner-text"
+                      style={{
+                        color: "#7126b5",
+                      }}
+                    >
+                      85%!
+                    </h1>
                   </Col>
                   <Col xs={12} md={8}>
                     {/* Small screen */}
@@ -1002,35 +1007,23 @@ const Homepage = () => {
               )
             )}
           </Row>
-          <Row className="g-3 mb-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5">
+          <Row
+            className={`g-2 mb-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 ${
+              notFound ? "justify-content-center" : ""
+            }`}
+          >
             {loading ? (
-              <Col
-                className="text-center w-full mt-5"
-                style={{
-                  color: "#007bff",
-                  fontSize: "1.2rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Loading ...
-              </Col>
+              <CardHomepageLoading />
             ) : notFound ? (
-              <Col
-                className="text-center w-full mt-5"
-                style={{
-                  color: "#ff4d4f",
-                  fontSize: "1.2rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Flight Not Found
+              <Col className="d-flex flex-column justify-content-center align-items-center w-50 mt-3">
+                <img src={notFoundImage} className="img-fluid w-75 mt-5" />
+                <span className="text-center fw-bold fs-6 fs-sm-5 fs-md-4">
+                  Sorry, your search was not found.
+                </span>
               </Col>
             ) : (
               flightsData?.map((flight, index) => (
-                <Col
-                  key={index}
-                  className="d-flex"
-                >
+                <Col key={index} className="d-flex">
                   <Card
                     className="custom-card"
                     onClick={() => handleFlightSelect(flight)}

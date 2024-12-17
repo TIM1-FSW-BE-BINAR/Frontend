@@ -166,7 +166,7 @@ const ForgetPasswordForm = ({ onBack }) => {
               disabled={isEmailSubmitted}
             />
             <Form.Text muted>
-              Enter your email address to reset password
+              Enter your registered email to reset password
             </Form.Text>
           </Form.Group>
 

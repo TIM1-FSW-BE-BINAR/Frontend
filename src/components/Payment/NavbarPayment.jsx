@@ -16,8 +16,8 @@ import {
 
 const NavbarPayment = ({ openPayment, openSuccess }) => {
   //const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [isPayment, setIsPayment] = useState(true);
+  const [isComplete, setIsComplete] = useState(false);
 
   const { token } = useSelector((state) => state.auth);
   const getDeadline = () => {
@@ -33,32 +33,6 @@ const NavbarPayment = ({ openPayment, openSuccess }) => {
     return now.toLocaleDateString("id-ID", options);
   };
 
-  // State untuk melacak penyelesaian
-  const [isDataDiriCompleted, setIsDataDiriCompleted] = useState(false);
-  const [isBayarCompleted, setIsBayarCompleted] = useState(false);
-
-  // Logika untuk menentukan apakah path aktif
-  const isActive = (path) => location.pathname === path;
-
-  // Fungsi untuk memvalidasi akses dan navigasi
-  const handleNavigation = (path) => {
-    if (
-      path === "/Pemesanan" ||
-      (path === "/bayar" && isDataDiriCompleted) ||
-      (path === "/selesai" && isBayarCompleted)
-    ) {
-      navigate({ to: path });
-    }
-  };
-
-  // Simulasikan penyelesaian tahap (di halaman lain, ini bisa diatur melalui props atau Redux)
-  const completeDataDiri = () => setIsDataDiriCompleted(true);
-  const completeBayar = () => setIsBayarCompleted(true);
-
-  const handleOverlayClose = () => {
-    navigate({ to: "/login" });
-  };
-
   return (
     <>
       <Navbar
@@ -70,71 +44,39 @@ const NavbarPayment = ({ openPayment, openSuccess }) => {
         }}
       >
         <Container>
-          {/* Row untuk Breadcrumb */}
           <Stack gap={0}>
             <Row>
               <Breadcrumb>
                 <Breadcrumb.Item
-                  active={isActive("/Pemesanan")}
-                  onClick={() => handleNavigation("/Pemesanan")}
-                  style={
-                    isActive("/Pemesanan")
-                      ? {
-                          fontWeight: "bold",
-                          color: "black",
-                          textDecoration: "none",
-                          cursor: "default",
-                        }
-                      : {
-                          color: "black",
-                          textDecoration: "none",
-                          cursor: "pointer",
-                        }
-                  }
+                  active
+                  style={{
+                    fontWeight: "bold",
+                    color: "#7126B5",
+                  }}
                 >
-                  Isi Data Diri
+                  <span style={{ textDecoration: "none", color: "#6c757d" }}>
+                    Personal Information
+                  </span>
                 </Breadcrumb.Item>
+                <span style={{ color: "#7126B5" }}>&gt;</span> {/* Separator */}
                 <Breadcrumb.Item
-                  active={isActive("/Bayar")}
-                  onClick={() => handleNavigation("/Bayar")}
-                  style={
-                    isActive("/Bayar")
-                      ? {
-                          fontWeight: "bold",
-                          color: "black",
-                          textDecoration: "none",
-                          cursor: "default",
-                        }
-                      : {
-                          color: isDataDiriCompleted ? "black" : "gray",
-                          textDecoration: "none",
-                          cursor: isDataDiriCompleted
-                            ? "pointer"
-                            : "not-allowed",
-                        }
-                  }
+                  active={isPayment}
+                  style={{
+                    fontWeight: isPayment ? "bold" : "normal",
+                    color: isPayment ? "#7126B5" : "#6c757d",
+                  }}
                 >
-                  Bayar
+                  <span style={{ textDecoration: "none" }}>Payment</span>
                 </Breadcrumb.Item>
+                <span style={{ color: "#7126B5" }}>&gt;</span> {/* Separator */}
                 <Breadcrumb.Item
-                  active={isActive("/selesai")}
-                  onClick={() => handleNavigation("/selesai")}
-                  style={
-                    isActive("/selesai")
-                      ? {
-                          fontWeight: "bold",
-                          color: "black",
-                          textDecoration: "none",
-                          cursor: "default",
-                        }
-                      : {
-                          color: isBayarCompleted ? "black" : "gray",
-                          textDecoration: "none",
-                          cursor: isBayarCompleted ? "pointer" : "not-allowed",
-                        }
-                  }
+                  active={isComplete}
+                  style={{
+                    fontWeight: isComplete ? "bold" : "normal",
+                    color: isComplete ? "#7126B5" : "#6c757d",
+                  }}
                 >
-                  Selesai
+                  <span style={{ textDecoration: "none" }}>Complete</span>
                 </Breadcrumb.Item>
               </Breadcrumb>
             </Row>
@@ -146,7 +88,7 @@ const NavbarPayment = ({ openPayment, openSuccess }) => {
                     className="text-white text-center mx-4"
                     style={{ background: "#FF0000", borderRadius: "14px" }}
                   >
-                    <Card.Body>
+                    <Card.Body style={{ padding: "12px", margin: "0px" }}>
                       Please complete your payment before {getDeadline()}
                     </Card.Body>
                   </Card>
@@ -161,7 +103,9 @@ const NavbarPayment = ({ openPayment, openSuccess }) => {
                     className="text-white text-center mx-4"
                     style={{ background: "#73CA5C", borderRadius: "14px" }}
                   >
-                    <Card.Body>Thank you for the transaction payment</Card.Body>
+                    <Card.Body style={{ padding: "12px", margin: "0px" }}>
+                      Thank you for the transaction payment
+                    </Card.Body>
                   </Card>
                 </Col>
               </Row>

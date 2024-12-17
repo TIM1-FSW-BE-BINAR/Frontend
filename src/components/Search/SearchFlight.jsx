@@ -26,6 +26,9 @@ import { id, enUS } from "date-fns/locale";
 import { Navigate, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getFlights, getFlightId } from "../../service/flight/flightService";
+import toast, { Toaster } from "react-hot-toast";
+
+import { useSelector } from "react-redux";
 
 import SearchFlightReturn from "./SearchFlightReturn";
 
@@ -200,6 +203,7 @@ const SearchFlight = ({
   // Menuju halaman bookingPage dan handle ketika ada return date nya
   const [returnScreen, setReturnScreen] = useState(false);
   const [flightSelect, setFlightSelect] = useState("");
+  const {user, token} = useSelector((state) => state.auth);
 
   const handleBookingPage = async (flight) => {
     const flightDataById = await getFlightId(flight?.id);
@@ -222,29 +226,39 @@ const SearchFlight = ({
           babyInput,
         }).toString();
 
-        navigate({
-          to: `/booking?${queryParams}`,
-        });
+        // cek apakah user sudah login, jika belum tidak bisa ke halaman booking
+        if (user && token) {
+          navigate({
+            to: `/booking?${queryParams}`,
+          });
+        } else {
+          toast.error("You need to login first!");
+          setTimeout(() => {
+            navigate({
+              to: "/login",
+            });
+          }, 1000);
+        }
       }
     }
   };
 
 
   return returnScreen ? (
-    <SearchFlightReturn 
-  fromInput={fromInput}
-  toInput={toInput}
-  departureDate={departureDate}
-  returnDate={returnDate}
-  passengers={passengers}
-  adultInput={adultInput}
-  childInput={childInput}
-  babyInput={babyInput}
-  classInput={seatClassValue}
-  departureAirportId={departureAirportId}
-  returnAirportId={returnAirportId}
-  flightSelect={flightSelect}
-/>
+    <SearchFlightReturn
+      fromInput={fromInput}
+      toInput={toInput}
+      departureDate={departureDate}
+      returnDate={returnDate}
+      passengers={passengers}
+      adultInput={adultInput}
+      childInput={childInput}
+      babyInput={babyInput}
+      classInput={seatClassValue}
+      departureAirportId={departureAirportId}
+      returnAirportId={returnAirportId}
+      flightSelect={flightSelect}
+    />
   ) : (
     <>
       <Container className="">
@@ -467,26 +481,26 @@ const SearchFlight = ({
               <div className="d-flex flex-column justify-content-center align-items-center">
                 <img src={notFoundImage} className="img-fluid w-25" />
                 <span className="fw-bold">
-                  Maaf, pencarian Anda tidak ditemukan
+                  Sorry, your search was not found.
                 </span>
                 <span
                   className="text-primary"
                   style={{ cursor: "pointer" }}
                   onClick={() => navigate({ to: "/" })}
                 >
-                  Coba cari perjalanan lainnya!
+                  Try searching for another trip!
                 </span>
               </div>
             ) : ticketSoldOut ? (
               <div className="d-flex flex-column justify-content-center align-items-center">
                 <img src={ticketSoldOutImage} className="img-fluid w-25" />
-                <span className="fw-bold">Maaf, Tiket terjual habis!</span>
+                <span className="fw-bold">Sorry, tickets are sold out!</span>
                 <span
                   className="text-primary"
                   style={{ cursor: "pointer" }}
                   onClick={() => navigate({ to: "/" })}
                 >
-                  Coba cari perjalanan lainnya!
+                  Try searching for another trip!
                 </span>
               </div>
             ) : (
@@ -976,6 +990,14 @@ const SearchFlight = ({
           </Modal.Footer>
         </Modal>
       </Container>
+      <Toaster
+        position="top-right"
+        containerStyle={{
+          position: "fixed",
+          zIndex: "9999",
+        }}
+        reverseOrder={false}
+      />
     </>
   );
 };

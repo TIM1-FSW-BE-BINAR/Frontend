@@ -163,9 +163,9 @@ export const profile = async () => {
   );
 
   const result = await response.json();
-  console.log(result);
   return result?.data;
 };
+
 
 export const profileMe = async () => {
   const token = localStorage.getItem("token");
@@ -197,14 +197,6 @@ export const sendEmail = async (request) => {
         },
       }
     );
-
-    // if (!response.ok) {
-    //   const errorBody = await response.text();
-    //   throw new Error(
-    //     `HTTP error! status: ${response.status}, message: ${errorBody}`
-    //   );
-    // }
-
     const result = await response.json();
     return result;
   } catch (error) {

@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getFlightId } from "../../service/flight/flightService";
 import PropTypes from "prop-types";
 import toast, { Toaster } from "react-hot-toast";
-import { PulseLoader } from "react-spinners";
+import SeatLoading from "../Loading/SeatLoading";
 
 const seatLayout = [
   {
@@ -99,21 +99,7 @@ const SeatMapReturn = ({
     }
   };
 
-  if (isLoading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          width: "100%",
-        }}
-      >
-        <PulseLoader color="#7126B5" size={15} />
-      </div>
-    );
-  }
+  if (isLoading) return <SeatLoading />;
 
   return (
     <>
@@ -159,7 +145,6 @@ const SeatMapReturn = ({
                 return seatStyle.default;
               };
 
-              // If the seat is a letter (row header)
               if (["A", "B", "C", "D", "E", "F"].includes(seatNumber)) {
                 return (
                   <div
@@ -175,7 +160,6 @@ const SeatMapReturn = ({
                 );
               }
 
-              // If the seat is a number (seat number)
               if (
                 [
                   "1",
