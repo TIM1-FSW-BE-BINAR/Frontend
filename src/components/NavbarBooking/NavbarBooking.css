@@ -13,10 +13,19 @@
   color: black;          
 }
 
+/* Gaya khusus untuk item yang aktif */
+.breadcrumb-item.active a {
+  font-weight: bold;
+  color: black;           /* Warna hitam untuk item yang aktif */
+}
+
+/* Mengatur separator breadcrumb */
 .breadcrumb-item + .breadcrumb-item::before {
   content: ">";
   color: #7126B5;
 }
+
+
 #black-overlay {
   position: fixed;
   top: 0;
