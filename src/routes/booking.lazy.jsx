@@ -1,4 +1,3 @@
-import "../styles/variables.scss";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import BookingForm from "../components/Booking/BookingForm";
 import Protected from "../components/Auth/Protected";
