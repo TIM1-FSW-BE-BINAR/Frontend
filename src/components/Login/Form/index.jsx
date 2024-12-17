@@ -147,7 +147,7 @@ const loginForm = () => {
                 <Form.Control
                   ref={emailRef}
                   type="email"
-                  placeholder="Contoh: johndee@gmail.com"
+                  placeholder="johndee@gmail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   isInvalid={!!errors.email}
@@ -167,7 +167,7 @@ const loginForm = () => {
                   <Form.Control
                     ref={passwordRef}
                     type={type}
-                    placeholder="Masukkan password"
+                    placeholder="Enter password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     isInvalid={!!errors.password}
@@ -236,7 +236,7 @@ const loginForm = () => {
                 Login
               </Button>
             </Form>
-            <h6 className="text-muted text-center mt-2"> or </h6>
+            <h6 className="text-muted text-center mt-2"> or continue with </h6>
             <Button
               variant=""
               type="submit"
@@ -250,7 +250,7 @@ const loginForm = () => {
               onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
             >
               <FcGoogle style={{ marginRight: "8px", fontSize: "20px" }} />
-              Login with Google
+               Google
             </Button>
 
             <div

@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import "../styles/variables.scss";
+import "../components/Login/variables.scss";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import PaymentLayout from "../layouts/paymentLayout";
 import PaymentOptions from "../components/Payment/Payment/Payment";
 import Protected from "../components/Auth/Protected";
-
 
 export const Route = createLazyFileRoute("/payment")({
   component: () => (
