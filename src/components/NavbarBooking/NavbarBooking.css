@@ -8,12 +8,15 @@
   color: black;          
 }
 
+.breadcrumb-item.active a {
+  font-weight: bold;
+  color: black;          
+}
+
 .breadcrumb-item + .breadcrumb-item::before {
   content: ">";
   color: #7126B5;
 }
-
-
 #black-overlay {
   position: fixed;
   top: 0;

@@ -145,7 +145,6 @@ const SeatMapReturn = ({
                 return seatStyle.default;
               };
 
-              // If the seat is a letter (row header)
               if (["A", "B", "C", "D", "E", "F"].includes(seatNumber)) {
                 return (
                   <div
@@ -161,7 +160,6 @@ const SeatMapReturn = ({
                 );
               }
 
-              // If the seat is a number (seat number)
               if (
                 [
                   "1",

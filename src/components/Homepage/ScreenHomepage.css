@@ -1,4 +1,4 @@
-body{
+body {
   overflow-x: hidden;
 }
 
@@ -31,13 +31,13 @@ body{
 }
 
 @media (max-width: 576px) {
-  .form-section { 
-    margin-top: 50px; 
+  .form-section {
+    margin-top: 50px;
   }
 
   .form-container {
     margin: 0 auto;
-    transform: none; 
+    transform: none;
   }
 }
 
@@ -115,12 +115,10 @@ body{
 
 /* Styling Card */
 .custom-card {
-  width: 18rem;
+  width: 16rem;
   border: 1px solid #ddd;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
   transition: transform 0.2s ease-in-out;
 }
 
@@ -177,9 +175,9 @@ body{
 .custom-card-body {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;  /* Untuk membuat teks terpisah dengan jarak */
-  align-items: flex-start;         /* Posisi sejajar di kiri */
-  gap: 2px; 
+  justify-content: space-between; /* Untuk membuat teks terpisah dengan jarak */
+  align-items: flex-start; /* Posisi sejajar di kiri */
+  gap: 2px;
 }
 
 /* Responsiveness */
@@ -230,7 +228,7 @@ body{
 
 .responsive-button:hover .icon,
 .responsive-button:hover .button-label {
-  color: #fff; 
+  color: #fff;
 }
 
 /* Warna tombol saat aktif (clicked) */
@@ -240,7 +238,7 @@ body{
 
 .responsive-button.active .icon,
 .responsive-button.active .button-label {
-  color: #fff !important; 
+  color: #fff !important;
 }
 
 /* Media Query untuk layar kecil */
@@ -279,8 +277,6 @@ body{
   }
 }
 
-
-
 @media (max-width: 768px) {
   .responsive-button {
     padding: 12px;
@@ -288,7 +284,7 @@ body{
 
   .responsive-button .icon {
     font-size: 17px;
-     width: 15px;
+    width: 15px;
     height: 15px;
   }
 
@@ -298,7 +294,9 @@ body{
 }
 
 .animated-button {
-  transition: transform 0.2s ease, background-color 0.3s ease;
+  transition:
+    transform 0.2s ease,
+    background-color 0.3s ease;
 }
 
 .animated-button:hover {
@@ -309,11 +307,116 @@ body{
   transform: scale(0.9);
 }
 
-.list-item-city-modal:hover{
+.list-item-city-modal:hover {
   background-color: #f1f1f1;
   transition: background-color 0.2s ease;
 }
 
+/* Responsiveness for banner-text */
+.banner-text {
+  font-size: 1rem; /* Default size */
+}
 
+@media (min-width: 576px) {
+  .banner-text {
+    font-size: 1.5rem;
+  }
+  .banner-img {
+    max-width: 800px;
+  }
+}
 
+@media (min-width: 768px) {
+  .banner-text {
+    font-size: 2rem;
+  }
+  .banner-img {
+    max-width: 750px;
+  }
+}
 
+@media (min-width: 992px) {
+  .banner-text {
+    font-size: 2rem;
+  }
+  .banner-img {
+    max-width: 900px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .banner-text {
+    font-size: 2rem;
+  }
+  .banner-img {
+    max-width: 1100px;
+  }
+}
+
+@media (min-width: 1500px) {
+  .banner-text {
+    font-size: 2.5rem;
+  }
+  .banner-img {
+    max-width: 1300px;
+  }
+}
+
+@media (min-width: 1800px) {
+  .banner-text {
+    font-size: 2.5rem;
+  }
+  .banner-img {
+    max-width: 1400px;
+  }
+}
+
+@media (min-width: 2000px) {
+  .banner-text {
+    font-size: 2.5rem;
+  }
+  .banner-img {
+    max-width: 2000px;
+  }
+}
+
+@media (min-width: 2200px) {
+  .banner-text {
+    font-size: 4rem;
+  }
+  .banner-img {
+    max-width: 2200px;
+  }
+}
+
+@media (min-width: 3000px) {
+  .banner-text {
+    font-size: 6rem;
+  }
+  .banner-img {
+    max-width: 3000px;
+  }
+}
+
+@media (min-width: 3500px) {
+  .banner-text {
+    font-size: 6rem;
+  }
+  .banner-img {
+    max-width: 3000px;
+  }
+}
+
+@media (min-width: 3900px) {
+  .banner-text {
+    font-size: 7rem;
+  }
+  .banner-img {
+    max-width: 4000px;
+  }
+}
+
+/* Small screen text styling */
+.small-screen-text {
+  font-size: 1.5rem;
+}

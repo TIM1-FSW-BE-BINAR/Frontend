@@ -1,7 +1,7 @@
-import {  useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { Navbar, Container, Row, Col, Card, Stack } from "react-bootstrap";
 import { useEffect } from "react";
-import {  useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useState } from "react";
 import { Breadcrumb } from "react-bootstrap";
 import "./NavbarBooking.css";
