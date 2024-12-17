@@ -9,6 +9,7 @@ import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { BeatLoader } from "react-spinners";
 import "./ScreenUbahProfil.css";
+import ScreenUbahProfilLoading from "./Loading/ScreenUbahProfilLoading";
 
 const ScreenUbahProfil = () => {
   const { token } = useSelector((state) => state.auth);
@@ -20,6 +21,8 @@ const ScreenUbahProfil = () => {
     lastName: "",
     phone: "",
   });
+
+  // State untuk melacak kartu yang sedang diklik
 
   // Fetch profil data
   const { data, isSuccess, isLoading } = useQuery({
@@ -74,12 +77,7 @@ const ScreenUbahProfil = () => {
     updateProfile(formData);
   };
 
-  if (isLoading)
-    return (
-      <div className="d-flex justify-content-center ">
-        <BeatLoader style={{ position: "relative", marginTop: "15rem" }} />
-      </div>
-    );
+  if (isLoading) return <ScreenUbahProfilLoading />;
 
   return (
     <Container
@@ -96,15 +94,18 @@ const ScreenUbahProfil = () => {
           color: "#000000",
         }}
       >
-        Ubah Data Profil
+        User Profile
       </h1>
 
       <Card
         className="custom-card-ubah"
-        style={{ width: "37rem", marginLeft: "-5rem" }}
+        style={{
+          width: "37rem",
+          marginLeft: "-5rem",
+        }}
       >
         <Card.Header className="text-white" style={{ background: "#A06ECE" }}>
-          <h5 className="mb-0 custom-h5-ubah">Data Diri</h5>
+          <h5 className="mb-0 custom-h5-ubah">Profile</h5>
         </Card.Header>
         <Card.Body>
           {isLoading ? (
@@ -112,10 +113,10 @@ const ScreenUbahProfil = () => {
           ) : (
             <Form onSubmit={handleSubmit}>
               <Form.Group controlId="formFirstName" className="mb-3">
-                <Form.Label className="custom-h5-ubah">Nama Depan</Form.Label>
+                <Form.Label className="custom-h5-ubah">First Name</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Nama Depan"
+                  placeholder="First Name"
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleChange}
@@ -124,12 +125,10 @@ const ScreenUbahProfil = () => {
               </Form.Group>
 
               <Form.Group controlId="formLastName" className="mb-3">
-                <Form.Label className="custom-h5-ubah">
-                  Nama Belakang
-                </Form.Label>
+                <Form.Label className="custom-h5-ubah">Last Name</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Nama Belakang"
+                  placeholder="Last Name"
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleChange}
@@ -138,9 +137,7 @@ const ScreenUbahProfil = () => {
               </Form.Group>
 
               <Form.Group controlId="formPhone" className="mb-3">
-                <Form.Label className="custom-h5-ubah">
-                  Nomor Telepon
-                </Form.Label>
+                <Form.Label className="custom-h5-ubah">Phone Number</Form.Label>
                 <PhoneInput
                   placeholder="Masukkan nomor telepon"
                   value={formData.phone}

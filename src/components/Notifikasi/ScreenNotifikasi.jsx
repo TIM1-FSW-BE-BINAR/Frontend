@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { BeatLoader } from "react-spinners";
 import "./ScreenNotification.css";
+import ScreenNotifikasiLoading from "./Loading/ScreenNotifikasiLoading";
 
 const ScreenNotifikasi = () => {
   const { token } = useSelector((state) => state.auth);
@@ -77,12 +78,7 @@ const ScreenNotifikasi = () => {
     }
   };
 
-  if (isLoading)
-    return (
-      <div className="d-flex justify-content-center ">
-        <BeatLoader style={{ position: "relative", marginTop: "15rem" }} />
-      </div>
-    );
+  if (isLoading) return <ScreenNotifikasiLoading />;
 
   return (
     <Container fluid className=" py-3" style={{ background: "#FFFFFF" }}>

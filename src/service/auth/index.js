@@ -166,6 +166,7 @@ export const profile = async () => {
   return result?.data;
 };
 
+
 export const profileMe = async () => {
   const token = localStorage.getItem("token");
   const response = await fetch(
