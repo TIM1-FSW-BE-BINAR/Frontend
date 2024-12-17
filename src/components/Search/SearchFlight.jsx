@@ -31,6 +31,8 @@ import toast, { Toaster } from "react-hot-toast";
 import SearchFlightReturn from "./SearchFlightReturn";
 import { useSelector } from "react-redux";
 
+import SearchFlightReturn from "./SearchFlightReturn";
+
 const SearchFlight = ({
   fromInput,
   toInput,
