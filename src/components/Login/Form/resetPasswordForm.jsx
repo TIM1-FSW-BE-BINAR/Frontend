@@ -35,7 +35,17 @@ const ResetPasswordForm = ({ email, otp, onBack }) => {
         });
         window.location.reload();
       } else {
-        toast.error(result?.error?.message || "Failed changing password!");
+        toast.error(result?.error?.message || "Failed changing password!", {
+          style: {
+            padding: "16px",
+            background: "#FF0000",
+            color: "#FFFFFF",
+          },
+          iconTheme: {
+            primary: "#fff",
+            secondary: "#FF0000",
+          },
+        });
       }
     },
     onError: () => {

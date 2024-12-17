@@ -17,7 +17,6 @@ import { Route as rootRoute } from "./routes/__root";
 // Create Virtual Routes
 
 const SearchLazyImport = createFileRoute("/search")();
-const ResetPasswordLazyImport = createFileRoute("/resetPassword")();
 const RegisterLazyImport = createFileRoute("/register")();
 const PaymentLazyImport = createFileRoute("/payment")();
 const OtpLazyImport = createFileRoute("/otp")();
@@ -36,14 +35,6 @@ const SearchLazyRoute = SearchLazyImport.update({
   path: "/search",
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import("./routes/search.lazy").then((d) => d.Route));
-
-const ResetPasswordLazyRoute = ResetPasswordLazyImport.update({
-  id: "/resetPassword",
-  path: "/resetPassword",
-  getParentRoute: () => rootRoute,
-} as any).lazy(() =>
-  import("./routes/resetPassword.lazy").then((d) => d.Route)
-);
 
 const RegisterLazyRoute = RegisterLazyImport.update({
   id: "/register",
@@ -179,13 +170,6 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof RegisterLazyImport;
       parentRoute: typeof rootRoute;
     };
-    "/resetPassword": {
-      id: "/resetPassword";
-      path: "/resetPassword";
-      fullPath: "/resetPassword";
-      preLoaderRoute: typeof ResetPasswordLazyImport;
-      parentRoute: typeof rootRoute;
-    };
     "/search": {
       id: "/search";
       path: "/search";
@@ -209,7 +193,6 @@ export interface FileRoutesByFullPath {
   "/otp": typeof OtpLazyRoute;
   "/payment": typeof PaymentLazyRoute;
   "/register": typeof RegisterLazyRoute;
-  "/resetPassword": typeof ResetPasswordLazyRoute;
   "/search": typeof SearchLazyRoute;
 }
 
@@ -224,7 +207,6 @@ export interface FileRoutesByTo {
   "/otp": typeof OtpLazyRoute;
   "/payment": typeof PaymentLazyRoute;
   "/register": typeof RegisterLazyRoute;
-  "/resetPassword": typeof ResetPasswordLazyRoute;
   "/search": typeof SearchLazyRoute;
 }
 
@@ -240,7 +222,6 @@ export interface FileRoutesById {
   "/otp": typeof OtpLazyRoute;
   "/payment": typeof PaymentLazyRoute;
   "/register": typeof RegisterLazyRoute;
-  "/resetPassword": typeof ResetPasswordLazyRoute;
   "/search": typeof SearchLazyRoute;
 }
 
@@ -257,7 +238,6 @@ export interface FileRouteTypes {
     | "/otp"
     | "/payment"
     | "/register"
-    | "/resetPassword"
     | "/search";
   fileRoutesByTo: FileRoutesByTo;
   to:
@@ -271,7 +251,6 @@ export interface FileRouteTypes {
     | "/otp"
     | "/payment"
     | "/register"
-    | "/resetPassword"
     | "/search";
   id:
     | "__root__"
@@ -285,7 +264,6 @@ export interface FileRouteTypes {
     | "/otp"
     | "/payment"
     | "/register"
-    | "/resetPassword"
     | "/search";
   fileRoutesById: FileRoutesById;
 }
@@ -301,7 +279,6 @@ export interface RootRouteChildren {
   OtpLazyRoute: typeof OtpLazyRoute;
   PaymentLazyRoute: typeof PaymentLazyRoute;
   RegisterLazyRoute: typeof RegisterLazyRoute;
-  ResetPasswordLazyRoute: typeof ResetPasswordLazyRoute;
   SearchLazyRoute: typeof SearchLazyRoute;
 }
 
@@ -316,7 +293,6 @@ const rootRouteChildren: RootRouteChildren = {
   OtpLazyRoute: OtpLazyRoute,
   PaymentLazyRoute: PaymentLazyRoute,
   RegisterLazyRoute: RegisterLazyRoute,
-  ResetPasswordLazyRoute: ResetPasswordLazyRoute,
   SearchLazyRoute: SearchLazyRoute,
 };
 
@@ -340,7 +316,6 @@ export const routeTree = rootRoute
         "/otp",
         "/payment",
         "/register",
-        "/resetPassword",
         "/search"
       ]
     },
@@ -373,9 +348,6 @@ export const routeTree = rootRoute
     },
     "/register": {
       "filePath": "register.lazy.jsx"
-    },
-    "/resetPassword": {
-      "filePath": "resetPassword.lazy.jsx"
     },
     "/search": {
       "filePath": "search.lazy.jsx"

@@ -30,7 +30,6 @@ export const getIdBooking = async (id) => {
 
   // get data
   const result = await response.json();
-  console.log("booking id:", result);
   return result?.data;
 };
 
@@ -85,23 +84,23 @@ export const createBooking = async (request) => {
 
   const result = await response.json();
   console.log(response);
- if (result.meta?.statusCode === 401) {
-   throw new Error(result.error?.message || "Token expired, please relogin.");
- }
+  if (result.meta?.statusCode === 401) {
+    throw new Error(result.error?.message || "Token expired, please relogin.");
+  }
 
- if (result.meta?.statusCode === 201) {
-   console.log(result.meta?.message || "Booking Created.");
+  if (result.meta?.statusCode === 201) {
+    console.log(result.meta?.message || "Booking Created.");
 
-   const bookingId = result.data?.bookingId;
-   console.log("Booking ID dari service:", bookingId); 
+    const bookingId = result.data?.bookingId;
+    console.log("Booking ID dari service:", bookingId);
 
-   if (bookingId) {
-     localStorage.setItem("bookingId", bookingId);
-     console.log("Booking ID disimpan di localStorage:", bookingId); 
-   }
+    if (bookingId) {
+      localStorage.setItem("bookingId", bookingId);
+      console.log("Booking ID disimpan di localStorage:", bookingId);
+    }
 
-   return result.data;
- }
+    return result.data;
+  }
 
   return result?.data;
 };

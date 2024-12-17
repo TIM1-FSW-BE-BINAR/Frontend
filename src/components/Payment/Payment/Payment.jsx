@@ -7,10 +7,14 @@ import DetailPesanan from "./DetailPesanan";
 import { useMutation } from "@tanstack/react-query";
 import { createSnap } from "../../../service/payment/snap";
 
-const PaymentOptions = (bookingId) => {
+const PaymentOptions = () => {
   const [snapLoaded, setSnapLoaded] = useState(false);
   const [snapToken, setSnapToken] = useState("");
   const [paymentInitiated, setPaymentInitiated] = useState(false);
+  const searchParams = new URLSearchParams(location.search);
+  const bookingId = parseInt(searchParams.get("bookingId") || "0", 10);
+  // const bookingId = 56;
+  console.log("ini booking id", bookingId);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -73,7 +77,7 @@ const PaymentOptions = (bookingId) => {
     },
     onSuccess: (result) => {
       if (result?.data) {
-        const snaptoken = result?.data?.snapToken?.snapToken;
+        const snaptoken = result?.data?.token;
         setSnapToken(snaptoken);
         console.log("P berhasil", snaptoken);
       } else {
@@ -98,7 +102,7 @@ const PaymentOptions = (bookingId) => {
 
   useEffect(() => {
     const request = {
-      bookingId: 27, //janlupa di set booking id!!!!
+      bookingId,
     };
     snapCreate(request);
   }, [snapCreate]);
