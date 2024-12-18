@@ -31,7 +31,6 @@ const NavbarPayment = ({ openPayment, openSuccess }) => {
     return now.toLocaleDateString("id-ID", options);
 };
 
-
   return (
     <>
       <Navbar

@@ -18,7 +18,6 @@ const DetailPesanan = ({ bookingId, amount }) => {
 
   useEffect(() => {
     if (isSuccess) {
-      console.log("Booking details fetched successfully:", data);
       setBookingDetail(data);
     }
 
