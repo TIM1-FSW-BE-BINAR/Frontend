@@ -89,7 +89,7 @@ function PageHeader() {
       {/* Header Notifikasi */}
       <Row className="align-items-center justify-content-center">
         <Col md={10} lg={10} className="text-start">
-          <h1 className="fw-bold fs-4 title-header text-wrap text-start text-dark">
+          <h1 className="mt-4 fw-bold fs-4 title-header text-wrap text-start text-dark">
             History
           </h1>
         </Col>
