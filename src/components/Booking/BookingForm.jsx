@@ -9,10 +9,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import toast, { Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
-//import NavigationBar from "../Navbar";
 import SeatMapReturn from "../SeatMapReturn";
 import TicketDetails from "../TicketDetails";
-//import NavbarBooking from "../NavbarBooking";
 import SeatMap from "../SeatMap";
 import { createBooking } from "../../service/booking";
 import { getFlightId } from "../../service/flight/flightService";
@@ -157,7 +155,13 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
 
   const validateForm = () => {
     for (let { index } of passengers) {
-      let requiredFields = ["name", "title", "dob"];
+      let requiredFields = [
+        "name",
+        "title",
+        "dob",
+        "citizenship",
+        "identityNumber",
+      ];
 
       if (passengerData[`hasFamilyName_${index}`]) {
         requiredFields.push("familyName");
@@ -201,7 +205,7 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
     selectedSeats?.map((seat) => seat.seatNumber).join(", ") ||
     "No seat selected.";
   const seatNumbersReturn =
-    selectedSeats?.map((seat) => seat.seatNumber).join(", ") ||
+    selectedSeatsReturn?.map((seat) => seat.seatNumber).join(", ") ||
     "No seat selected.";
 
   const { mutate: booking, isLoading } = useMutation({
@@ -367,8 +371,6 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
   return (
     <>
       <Toaster position="top-right" />
-      {/* <NavigationBar />
-      <NavbarBooking isSaved={isSaved} /> */}
       <Container className="py-4" style={{ maxWidth: "1320px" }}>
         <Row className="justify-content-center" style={{ margin: "0" }}>
           <Col

@@ -10,36 +10,49 @@ import PropTypes from "prop-types";
 const NavbarBooking = ({ isSaved, isPayment, isComplete }) => {
   const navigate = useNavigate();
   const { user, token } = useSelector((state) => state.auth);
-  const initialTime = 15 * 60;
-  const [timeLeft, setTimeLeft] = useState(initialTime);
-  const [isTimerActive, setIsTimerActive] = useState(true);
+  const [timeLeft, setTimeLeft] = useState(() => {
+    const savedTime = localStorage.getItem("timeLeft");
+    return savedTime ? parseInt(savedTime, 10) : 0;
+  });
+const [isTimerActive, setIsTimerActive] = useState(true);
 
-  useEffect(() => {
-    if (!token) {
-      setIsTimerActive(false);
-      return;
-    }
-    let interval;
-    if (isTimerActive && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
-      }, 1000);
-    } else if (timeLeft === 0) {
-      setIsTimerActive(false);
-    }
+useEffect(() => {
+      let interval;
 
-    return () => clearInterval(interval);
-  }, [isTimerActive, timeLeft, token]);
+      if (isTimerActive && timeLeft > 0) {
+        interval = setInterval(() => {
+          setTimeLeft((prev) => {
+            const newTime = prev > 0 ? prev - 1 : 0;
+            localStorage.getItem("timeLeft", newTime);
+            localStorage.setItem("timeLeft", newTime); 
+            console.log("Updated timeLeft:", newTime);
+            return newTime;
+          });
+        }, 1000);
+      } else if (timeLeft === 0) {
+        setIsTimerActive(false);
+      }
 
-  const formatTime = (seconds) => {
-    const hours = String(Math.floor(seconds / 3600)).padStart(2, "0");
-    const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
-    const secs = String(seconds % 60).padStart(2, "0");
-    return `${hours}:${minutes}:${secs}`;
-  };
+      return () => clearInterval(interval);
+    }, [isTimerActive, timeLeft]);
+
+    
+    const formatTime = (seconds) => {
+      const hours = String(Math.floor(seconds / 3600)).padStart(2, "0");
+      const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(
+        2,
+        "0"
+      );
+      const secs = String(seconds % 60).padStart(2, "0");
+      return `${hours}:${minutes}:${secs}`;
+    };
 
   const handleOverlayClose = () => {
     navigate({ to: "/login" });
+  };
+
+  const handleExpierdTimer = () => {
+    navigate({ to: "/" });
   };
 
   const getDeadline = () => {
@@ -104,24 +117,31 @@ const NavbarBooking = ({ isSaved, isPayment, isComplete }) => {
             <Row>
               <div>
                 {!user && !token ? (
-                  <Row>
-                    <Col xs={12} md={12} lg={12}>
-                      <Card
-                        className="text-white text-center mx-4"
-                        style={{ background: "#FF0000", borderRadius: "14px" }}
-                      >
-                        <Card.Body style={{ padding: "12px", margin: "0px" }}>
-                          {"You must log in first!"}
-                          <button
-                            onClick={handleOverlayClose}
-                            id="close-button"
-                          >
-                            X
-                          </button>
-                        </Card.Body>
-                      </Card>
-                    </Col>
-                  </Row>
+                  <>
+                    <div id="black-overlay"></div>
+                    <Row>
+                      <Col xs={12} md={12} lg={12}>
+                        <Card
+                          className="text-white text-center mx-4"
+                          style={{
+                            background: "#FF0000",
+                            borderRadius: "14px",
+                            zIndex: "3",
+                          }}
+                        >
+                          <Card.Body style={{ padding: "12px", margin: "0px" }}>
+                            {"You must log in first!"}
+                            <button
+                              onClick={handleOverlayClose}
+                              id="close-button"
+                            >
+                              X
+                            </button>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                    </Row>
+                  </>
                 ) : isComplete ? (
                   <Row>
                     <Col xs={12} md={12} lg={12}>
@@ -191,6 +211,7 @@ const NavbarBooking = ({ isSaved, isPayment, isComplete }) => {
                               style={{
                                 background: "#FF0000",
                                 borderRadius: "14px",
+                                zIndex: "3",
                               }}
                             >
                               <Card.Body
@@ -199,6 +220,12 @@ const NavbarBooking = ({ isSaved, isPayment, isComplete }) => {
                                 {
                                   "Sorry, the booking time has expired. Please try again."
                                 }
+                                <button
+                                  onClick={handleExpierdTimer}
+                                  id="close-button"
+                                >
+                                  X
+                                </button>
                               </Card.Body>
                             </Card>
                           </Col>

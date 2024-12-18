@@ -123,7 +123,7 @@ const TicketDetails = ({ isSaved, setIsPayment }) => {
     totalDiscount +
     ((returnFlight?.data?.price || 0) * adultInput +
       (returnFlight?.data?.price || 0) * childInput +
-      10 * totalSeat -
+      (isRoundtrip ? 10 * totalSeat : 0) -
       totalDiscount);
 
   return (
