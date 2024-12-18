@@ -19,9 +19,7 @@ const PaymentOptions = () => {
     const queryParams = new URLSearchParams(location.search);
     setSnapToken(queryParams.get("snapToken") || "");
     setAmount(queryParams.get("amount") || "");
-    if (!snapToken) {
-      navigate({ to: "/" });
-    }
+
     const storedBookingId = localStorage.getItem("bookingId");
     if (storedBookingId) {
       setBookingId(storedBookingId);
@@ -29,27 +27,25 @@ const PaymentOptions = () => {
   }, []);
 
   useEffect(() => {
-    if (snapToken) {
-      const script = document.createElement("script");
-      script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
-      script.setAttribute("data-client-key", "SB-Mid-client-sWHHfn6Rjgzxjvrc");
-      script.async = true;
+    const script = document.createElement("script");
+    script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
+    script.setAttribute("data-client-key", "SB-Mid-client-sWHHfn6Rjgzxjvrc");
+    script.async = true;
 
-      script.onload = () => {
-        toast.success("Payment successfully created");
-        setSnapLoaded(true);
-      };
+    script.onload = () => {
+      toast.success("Payment successfully created");
+      setSnapLoaded(true);
+    };
 
-      script.onerror = () => {
-        toast.error("Payment failed to create");
-      };
+    script.onerror = () => {
+      toast.error("Payment failed to create");
+    };
 
-      document.body.appendChild(script);
+    document.body.appendChild(script);
 
-      return () => {
-        document.body.removeChild(script);
-      };
-    }
+    return () => {
+      document.body.removeChild(script);
+    };
   }, []);
 
   useEffect(() => {
