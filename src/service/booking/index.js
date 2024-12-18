@@ -12,7 +12,7 @@ export const getAllBookings = async () => {
 
   // get data
   const result = await response.json();
-  console.log(result);
+  console.log("booking:", result);
   return result?.data;
 };
 
@@ -30,7 +30,6 @@ export const getIdBooking = async (id) => {
 
   // get data
   const result = await response.json();
-  console.log(result);
   return result?.data;
 };
 
@@ -69,7 +68,7 @@ export const getGroupBooking = async () => {
 };
 
 export const createBooking = async (request) => {
-  console.log("ini consoleloge service coyy",request);
+  console.log("ini consoleloge service coyy", request);
   const token = localStorage.getItem("token");
   const response = await fetch(
     `${import.meta.env.VITE_API_URL}/api/v1/booking`,

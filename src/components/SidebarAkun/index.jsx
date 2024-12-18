@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { BeatLoader } from "react-spinners";
 import { Toaster, toast } from "react-hot-toast";
 import "./SidebarAkun.css";
+import SidebarAkunLoading from "./Loading/SidebarAkunLoading";
 
 export default function SidebarAkun({
   openUbahProfil,
@@ -51,12 +52,7 @@ export default function SidebarAkun({
     }
   }, [isSuccess, isError, data, dispatch, handleLogout]);
 
-  if (isLoading)
-    return (
-      <div className="d-flex justify-content-center align-items-center vh-100">
-        <BeatLoader />
-      </div>
-    );
+  if (isLoading) return <SidebarAkunLoading />;
 
   const logoutConfirmation = (event) => {
     event.preventDefault();
@@ -65,7 +61,7 @@ export default function SidebarAkun({
     toast(
       (t) => (
         <div className="text-center logout-toast">
-          <p>Apakah Anda yakin ingin keluar?</p>
+          <p>Are You sure you want to logout?</p>
           <div>
             <button
               onClick={() => {
@@ -75,7 +71,7 @@ export default function SidebarAkun({
               }}
               className="btn btn-danger me-2"
             >
-              Ya
+              Yes
             </button>
             <button
               onClick={() => {
@@ -84,7 +80,7 @@ export default function SidebarAkun({
               }}
               className="btn btn-secondary"
             >
-              Tidak
+              No
             </button>
           </div>
         </div>
@@ -136,7 +132,7 @@ export default function SidebarAkun({
                     className="me-3 custom-nav-icon"
                     style={{ color: "#7126B5" }}
                   />
-                  <span className="custom-span">Ubah Profil</span>
+                  <span className="custom-span">User Profile</span>
                 </Nav.Link>
               </Nav.Item>
 
@@ -159,7 +155,7 @@ export default function SidebarAkun({
                     className="me-3 custom-nav-icon"
                     style={{ color: "#7126B5" }}
                   />
-                  <span className="custom-span">Pengaturan Akun</span>
+                  <span className="custom-span">Account Setting</span>
                 </Nav.Link>
               </Nav.Item>
 
@@ -175,7 +171,7 @@ export default function SidebarAkun({
                     className="me-3 custom-nav-icon"
                     style={{ color: "#7126B5" }}
                   />
-                  <span className="custom-span"> Keluar</span>
+                  <span className="custom-span"> Logout</span>
                 </Nav.Link>
               </Nav.Item>
             </Nav>

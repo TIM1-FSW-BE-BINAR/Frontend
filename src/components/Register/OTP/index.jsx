@@ -158,7 +158,7 @@ const OTPForm = () => {
         <h2 className="fw-bold text-end">Confirm OTP</h2>
       </div>
       <p className="text-muted m-4">
-        A One-Time Password has been sent to <b>{maskEmail(email)}</b>
+        We have sent the authentication code to <b>{maskEmail(email)}</b>
       </p>
       <Form onSubmit={handleSubmit} className="w-100 justify-content-center">
         <Row className="justify-content-center m-4">
@@ -190,7 +190,7 @@ const OTPForm = () => {
               style={{ color: "red", fontWeight: "bold", cursor: "pointer" }}
               onClick={handleResendOtp}
             >
-              Resend Code
+              Haven't received it? Resend Code
             </p>
           )}
         </Row>
@@ -209,7 +209,7 @@ const OTPForm = () => {
             onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.5")}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
           >
-            Submit
+            Verify
           </Button>
         </Row>
       </Form>

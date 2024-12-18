@@ -7,13 +7,13 @@ import { format } from "date-fns";
 import { enUS } from "date-fns/locale";
 import PaymentDetailsLoading from "../../Loading/paymentDetailsLoading";
 
-const DetailPesanan = ({ id = "22" }) => {  // JANGAN LUPA MATIINN ID !!!!!!!!!
+const DetailPesanan = ({ bookingId }) => {
   const { token } = useSelector((state) => state.auth);
   const [booking, setBookingDetail] = useState(null);
   const { data, isLoading, isSuccess, isError, error } = useQuery({
-    queryKey: ["getIdBooking", id],
-    queryFn: () => getIdBooking(id),
-    enabled: !!id && !!token,
+    queryKey: ["getIdBooking", bookingId],
+    queryFn: () => getIdBooking(bookingId),
+    enabled: !!bookingId && !!token,
   });
 
   const groupedPassengers = booking?.bookingDetail?.reduce((acc, detail) => {
@@ -28,7 +28,6 @@ const DetailPesanan = ({ id = "22" }) => {  // JANGAN LUPA MATIINN ID !!!!!!!!!
 
   useEffect(() => {
     if (isSuccess) {
-      console.log("Booking details fetched successfully:", data);
       setBookingDetail(data);
     }
 
@@ -43,7 +42,7 @@ const DetailPesanan = ({ id = "22" }) => {  // JANGAN LUPA MATIINN ID !!!!!!!!!
   return (
     <Card.Body>
       {/* Booking Code */}
-      <div className="d-flex align-items-center mb-3">
+      <div className="d-flex align-items-center mb-3 h4">
         <span className="fw-bold me-2">Booking Code:</span>
         <span style={{ color: "#7126B5", fontWeight: "bold" }}>
           {booking?.code || "N/A"}
