@@ -39,9 +39,10 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
     onSuccess: (result) => {
       console.log("Snap creation success:", result); // Debug log
       if (result?.data) {
-        const snapData = result?.data;
+        const snapToken = result?.data?.token;
+        const amount = result?.data?.payment?.amount;
         setIsPayment(true);
-        navigate({ to: `/payment?snapData=${snapData}` });
+        navigate({ to: `/payment?snapToken=${snapToken}&amount=${amount}` });
       } else {
         toast.error("Failed to create payment token");
       }
@@ -79,7 +80,7 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
       toast.error(`Error: ${error.message}`);
     },
   });
-  
+
   const { data: flight, isLoading } = useQuery({
     queryKey: ["flight", flightId],
     queryFn: () => getFlightId(flightId),
