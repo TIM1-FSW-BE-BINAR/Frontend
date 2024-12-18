@@ -10,6 +10,7 @@ import { createSnap } from "../../../service/payment/snap";
 const PaymentOptions = () => {
   const [snapLoaded, setSnapLoaded] = useState(false);
   const [snapToken, setSnapToken] = useState("");
+  const [amount, setAmount] = useState("");
   const [paymentInitiated, setPaymentInitiated] = useState(false);
   const searchParams = new URLSearchParams(location.search);
   const bookingId = parseInt(searchParams.get("bookingId") || "0", 10);
@@ -79,6 +80,8 @@ const PaymentOptions = () => {
       if (result?.data) {
         const snaptoken = result?.data?.token;
         setSnapToken(snaptoken);
+        const amount = result?.data?.payment?.amount;
+        setAmount(amount);
         console.log("P berhasil", snaptoken);
       } else {
         handleApiError(result.message);
@@ -141,7 +144,7 @@ const PaymentOptions = () => {
                 Ticket Details
               </Card.Title>
               {/* Tambahkan detail tiket di sini */}
-              <DetailPesanan bookingId={bookingId} />
+              <DetailPesanan bookingId={bookingId} amount={amount} />
             </Card.Body>
           </Card>
         </Col>

@@ -44,7 +44,7 @@ const NavbarBooking = ({ isSaved, isPayment, isComplete }) => {
 
   const getDeadline = () => {
     const now = new Date();
-    now.setHours(now.getHours() + 24);
+    now.setHours(now.getMinutes() + 15);
     const options = {
       year: "numeric",
       month: "long",
@@ -73,7 +73,7 @@ const NavbarBooking = ({ isSaved, isPayment, isComplete }) => {
                   active
                   style={{
                     fontWeight: "bold",
-                    color: "#7126B5",
+                    color: isComplete ? "#7126B5" : "#7126B5",
                   }}
                 >
                   <span style={{ textDecoration: "none" }}>
@@ -81,10 +81,10 @@ const NavbarBooking = ({ isSaved, isPayment, isComplete }) => {
                   </span>
                 </Breadcrumb.Item>
                 <Breadcrumb.Item
-                  active={isPayment}
+                  active={isPayment || isComplete}
                   style={{
-                    fontWeight: isPayment ? "bold" : "normal",
-                    color: isPayment ? "#7126B5" : "#6c757d",
+                    fontWeight: (isPayment || isComplete) ? "bold" : "normal",
+                    color: (isPayment || isComplete) ? "#7126B5" : "#6c757d",
                   }}
                 >
                   <span style={{ textDecoration: "none" }}>Payment</span>
