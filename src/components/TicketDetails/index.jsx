@@ -9,8 +9,11 @@ import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import TicketDetailsLoading from "../Loading/ticketDetailsLoading";
 import { getAllDiscounts } from "../../service/discount";
+import { useMutation } from "@tanstack/react-query";
+import { createSnap } from "../../service/payment/snap";
+import { createBooking } from "../../service/booking";
 
-const TicketDetails = ({ isSaved, setIsPayment }) => {
+const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
   const [totalDiscount, setTotalDiscount] = useState(0);
   const [selectedDiscount, setSelectedDiscount] = useState(null);
   const [activeKey, setActiveKey] = useState(null);
@@ -28,6 +31,55 @@ const TicketDetails = ({ isSaved, setIsPayment }) => {
   const returnFlightId = parseInt(searchParams.get("returnFlightId"), 10) || 0;
   const [isRoundtrip, setIsRoundtrip] = useState(false);
 
+  const { mutate: snapCreate } = useMutation({
+    mutationFn: (data) => {
+      console.log("Calling createSnap with data:", data); // Debug log
+      return createSnap(data);
+    },
+    onSuccess: (result) => {
+      console.log("Snap creation success:", result); // Debug log
+      if (result?.data) {
+        const snapData = result?.data;
+        setIsPayment(true);
+        navigate({ to: `/payment?snapData=${snapData}` });
+      } else {
+        toast.error("Failed to create payment token");
+      }
+    },
+    onError: (err) => {
+      console.error("Snap creation error:", err); // Debug log
+      toast.error(err?.message);
+    },
+  });
+
+  const { mutate: booking } = useMutation({
+    mutationFn: (data) => {
+      console.log("Calling createBooking with data:", data);
+      return createBooking(data);
+    },
+    onSuccess: (response) => {
+      console.log("Booking success response:", response);
+      toast.success("Data successfully saved.", {
+        autoClose: 3000,
+      });
+      if (response?.bookingId) {
+        const bookingId = response.bookingId;
+        console.log("Got bookingId:", bookingId);
+        localStorage.setItem("bookingId", bookingId);
+        snapCreate({
+          bookingId: bookingId,
+        });
+      } else {
+        console.error("No bookingId in response:", response);
+      }
+      setIsPayment(true);
+    },
+    onError: (error) => {
+      console.error("Booking error:", error);
+      toast.error(`Error: ${error.message}`);
+    },
+  });
+  
   const { data: flight, isLoading } = useQuery({
     queryKey: ["flight", flightId],
     queryFn: () => getFlightId(flightId),
@@ -101,16 +153,16 @@ const TicketDetails = ({ isSaved, setIsPayment }) => {
         toast.error("You must enter form first!");
         return;
       }
-      const bookingId = localStorage.getItem("bookingId");
 
-      if (!bookingId) {
-        throw new Error("Booking ID not found. Please create a booking first.");
+      if (!dataBooking) {
+        throw new Error("Booking data not found. Please fill the form first.");
       }
-      setIsPayment(true);
-      navigate({ to: `/payment?bookingId=${bookingId}` });
+
+      console.log("Starting payment process with data:", dataBooking); // Debug log
+      booking(dataBooking);
     } catch (error) {
-      console.error("An error occurred:", error.message);
-      if (error.message.includes("Token expierd")) {
+      console.error("Payment error:", error); // Debug log
+      if (error.message.includes("Token expired")) {
         navigate({ to: "/login" });
       }
     }
@@ -539,5 +591,6 @@ TicketDetails.propTypes = {
   isSaved: PropTypes.bool.isRequired,
   isPayment: PropTypes.bool.isRequired,
   setIsPayment: PropTypes.func.isRequired,
+  dataBooking: PropTypes.object,
 };
 export default TicketDetails;

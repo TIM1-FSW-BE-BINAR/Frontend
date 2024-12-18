@@ -12,7 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 import SeatMapReturn from "../SeatMapReturn";
 import TicketDetails from "../TicketDetails";
 import SeatMap from "../SeatMap";
-import { createBooking } from "../../service/booking";
+//import { createBooking } from "../../service/booking";
 import { getFlightId } from "../../service/flight/flightService";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -29,6 +29,7 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
   const { user } = useSelector((state) => state.auth);
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
+  const [dataBooking, setDataBooking] = useState(null);
 
   const flightId = parseInt(searchParams.get("flightId") || "0", 10);
   const returnFlightId = parseInt(
@@ -208,44 +209,44 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
     selectedSeatsReturn?.map((seat) => seat.seatNumber).join(", ") ||
     "No seat selected.";
 
-  const { mutate: booking, isLoading } = useMutation({
-    mutationFn: (request) => createBooking(request),
-    onSuccess: () => {
-      toast.success("Data successfully saved.", {
-        autoClose: 3000,
-      });
-      toast.success(`Seat ${seatNumbers} Successfully booked.`, {
-        autoClose: 3000,
-      });
-      toast.success(
-        `Seat ${seatNumbersReturn} Successfully booked for the return flight.`,
-        {
-          autoClose: 3000,
-        }
-      );
-      setIsSaved(true);
-    },
-    onError: (error) => {
-      toast.error(`Error: ${error.message}`);
-      setIsSaved(false);
-    },
-  });
+  // const { mutate: booking, isLoading } = useMutation({
+  //   mutationFn: (request) => createBooking(request),
+  //   onSuccess: () => {
+  //     toast.success("Data successfully saved.", {
+  //       autoClose: 3000,
+  //     });
+  //     toast.success(`Seat ${seatNumbers} Successfully booked.`, {
+  //       autoClose: 3000,
+  //     });
+  //     toast.success(
+  //       `Seat ${seatNumbersReturn} Successfully booked for the return flight.`,
+  //       {
+  //         autoClose: 3000,
+  //       }
+  //     );
+  //     setIsSaved(true);
+  //   },
+  //   onError: (error) => {
+  //     toast.error(`Error: ${error.message}`);
+  //     setIsSaved(false);
+  //   },
+  // });
 
-  if (isLoading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          width: "100%",
-        }}
-      >
-        <PulseLoader color="#7126B5" size={15} />
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div
+  //       style={{
+  //         display: "flex",
+  //         justifyContent: "center",
+  //         alignItems: "center",
+  //         height: "100vh",
+  //         width: "100%",
+  //       }}
+  //     >
+  //       <PulseLoader color="#7126B5" size={15} />
+  //     </div>
+  //   );
+  // }
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -301,7 +302,8 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
 
     console.log("Request in JSON format:", JSON.stringify(request, null, 2));
 
-    booking(request);
+    //booking(request);
+    setDataBooking(request);
   };
 
   const IOSSwitch = styled((props) => (
@@ -941,7 +943,12 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
           <Col sm={12} md={12} lg={5} xl={4}>
             <Card className="shadow-sm mb-3">
               <Card.Body>
-                <TicketDetails isSaved={isSaved} setIsPayment={setIsPayment} isPayment={isPayment}/>
+                <TicketDetails
+                  isSaved={isSaved}
+                  setIsPayment={setIsPayment}
+                  isPayment={isPayment}
+                  dataBooking={dataBooking}
+                />
               </Card.Body>
             </Card>
           </Col>
