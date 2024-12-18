@@ -6,13 +6,11 @@ import {
   Row,
   Col,
   Card,
-  Spinner,
   Breadcrumb,
   Navbar,
   Stack,
 } from "react-bootstrap";
 
-// import "../../app.css";
 
 const NavbarPayment = ({ openPayment, openSuccess }) => {
   //const dispatch = useDispatch();
@@ -22,7 +20,7 @@ const NavbarPayment = ({ openPayment, openSuccess }) => {
   const { token } = useSelector((state) => state.auth);
   const getDeadline = () => {
     const now = new Date();
-    now.setHours(now.getHours() + 24);
+    now.setMinutes(now.getMinutes() + 15);
     const options = {
       year: "numeric",
       month: "long",
@@ -31,7 +29,8 @@ const NavbarPayment = ({ openPayment, openSuccess }) => {
       minute: "2-digit",
     };
     return now.toLocaleDateString("id-ID", options);
-  };
+};
+
 
   return (
     <>
