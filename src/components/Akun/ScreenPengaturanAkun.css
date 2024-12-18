@@ -1,7 +1,7 @@
-@media (max-width: 426px) {
+@media (max-width: 450px) {
   .custom-pengaturan-profil {
     position: relative !important;
-    margin-top: -43rem !important;
+    top: -105vh !important;
     /* bottom: 42rem !important; */
     right: 15rem !important;
   }

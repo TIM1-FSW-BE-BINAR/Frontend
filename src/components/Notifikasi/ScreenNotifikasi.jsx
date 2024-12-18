@@ -94,7 +94,7 @@ const ScreenNotifikasi = () => {
                 className="img-search-not-found"
               />
               <span className="mt-3 text-center">
-                Maaf, pencarian Anda tidak ditemukan
+                Sorry, your search input is not found, please try search again!
               </span>
             </div>
           ) : (

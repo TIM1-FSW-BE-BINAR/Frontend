@@ -10,8 +10,8 @@ import { isWithinInterval, parseISO } from "date-fns";
 import { useRiwayatContext } from "./RiwayatContext";
 import DetailPesanan from "./Detail/DetailPesanan";
 import "./ScreenRiwayat.css";
-import arrowRight from "/src/assets/arrow-right.png";
-
+import arrowRight from "../../assets/arrow-right.png";
+import notFound from "../../assets/homepage/not-found.png";
 import { getIdPayment } from "../../service/payment";
 import ScreenRiwayatLoading from "./Loading/ScreenRiwayatLoading";
 
@@ -323,13 +323,13 @@ const ScreenRiwayat = (paymentId) => {
               }}
             >
               <img
-                src="src/assets/homepage/not-found.png"
+                src={notFound}
                 alt="tidak-ditemukan"
                 style={{ width: "100%", maxWidth: "25rem" }}
                 className="img-search-not-found"
               />
               <span className="mt-3 text-center">
-                Maaf, pencarian Anda tidak ditemukan
+                Sorry, your search input is not found, please try search again!
               </span>
             </div>
           )}
