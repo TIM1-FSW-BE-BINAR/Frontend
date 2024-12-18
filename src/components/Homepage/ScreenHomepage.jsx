@@ -1028,13 +1028,6 @@ const Homepage = () => {
                     className="custom-card"
                     onClick={() => handleFlightSelect(flight)}
                   >
-                    <div className="badge-container">
-                      <span
-                        className={`badge ${index % 2 === 0 ? "badge-limited" : "badge-discount"}`}
-                      >
-                        {index % 2 === 0 ? "Limited!" : "50% OFF"}
-                      </span>
-                    </div>
                     <Card.Img
                       variant="top"
                       src={flight?.arrival.imageUrl}
