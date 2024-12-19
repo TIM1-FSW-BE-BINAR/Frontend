@@ -43,7 +43,8 @@ const TicketDetails = ({
     },
     onSuccess: (result) => {
       if (result?.data) {
-        const snapData = result?.data;
+        const snapToken = result?.data?.token;
+        const amount = result?.data?.payment?.amount;
         setIsPayment(true);
         localStorage.setItem("timeLeft", "0");
         navigate({ to: `/payment?snapToken=${snapToken}&amount=${amount}` });
@@ -132,7 +133,7 @@ const TicketDetails = ({
   const { date: returnArrivalDate, time: returnArrivalTime } = parseDateAndTime(
     returnFlight?.data?.arrivalTime
   );
-  
+
   const handleDiscount = (discountId, discountValue) => {
     if (selectedDiscount === discountId) {
       setTotalDiscount(0);
