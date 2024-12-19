@@ -92,9 +92,13 @@ const SearchFlightReturn = ({
   };
 
   const handleDateBtnActiveReturn = (index, date) => {
-    setDateBtnActiveReturn(index);
-    setreturnDateActive(date);
-    setTicketSoldOut(false);
+    if(date < departureDate){
+      toast.error("Cannot select return date before departure date!");
+    }else{
+      setDateBtnActiveReturn(index);
+      setreturnDateActive(date);
+      setTicketSoldOut(false);
+    }
   };
 
   const formatTime = (dateString) => {

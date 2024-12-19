@@ -27,6 +27,7 @@ import { Navigate, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getFlights, getFlightId } from "../../service/flight/flightService";
 import toast, { Toaster } from "react-hot-toast";
+import dayjs from "dayjs";
 
 import { useSelector } from "react-redux";
 
@@ -46,6 +47,27 @@ const SearchFlight = ({
   returnAirportId,
 }) => {
   const navigate = useNavigate();
+
+   const departureDateFormat = (dateString) => {
+     const date = new Date(dateString);
+     return date.toISOString().split("T")[0];
+   };
+
+    const [today, setToday] = useState("");
+      useEffect(() => {
+        // Mendapatkan tanggal hari ini dalam format UTC
+        const now = new Date();
+        const utcDate = now.toISOString(); // Format ISO 8601 dalam UTC
+        console.log("hari ni: ", utcDate);
+        setToday(utcDate);
+      }, []);
+
+        useEffect(() => {
+          if (today && departureDate < departureDateFormat(today)) {
+            toast.error("Cannot select date before today!");
+            navigate({ to: "/" });
+          }
+        }, [today, departureDate, navigate]);
 
   // Tentang kondisi hasil search
   const [loading, setLoading] = useState(false);
@@ -92,11 +114,17 @@ const SearchFlight = ({
     setCurrentWeek((prevDate) => subWeeks(prevDate, 1)); // Kurangi 1 Minggu
   };
 
+ 
+
   const handleDateBtnActive = (index, date) => {
-    setDateBtnActive(index);
-    setDepartureDateActive(date);
-    console.log(departureDateActive);
-    setTicketSoldOut(false);
+    if (date < departureDateFormat(today)) {
+      toast.error("Cannot select date before today!");
+    }else {
+       setDateBtnActive(index);
+       setDepartureDateActive(date);
+       console.log(departureDateActive);
+       setTicketSoldOut(false);
+     }
   };
 
   const formatTime = (dateString) => {
