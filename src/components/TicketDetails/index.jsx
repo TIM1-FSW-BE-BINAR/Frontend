@@ -14,7 +14,13 @@ import { createSnap } from "../../service/payment/snap";
 import { createBooking } from "../../service/booking";
 import discountIcon from "../../assets/discount-icon.png";
 
-const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
+const TicketDetails = ({
+  isSaved,
+  setIsPayment,
+  dataBooking,
+  seatNumber,
+  seatNumberReturn,
+}) => {
   const [totalDiscount, setTotalDiscount] = useState(0);
   const [selectedDiscount, setSelectedDiscount] = useState(null);
   const [activeKey, setActiveKey] = useState(null);
@@ -37,8 +43,7 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
     },
     onSuccess: (result) => {
       if (result?.data) {
-        const snapToken = result?.data?.token;
-        const amount = result?.data?.payment?.amount;
+        const snapData = result?.data;
         setIsPayment(true);
         localStorage.setItem("timeLeft", "0");
         navigate({ to: `/payment?snapToken=${snapToken}&amount=${amount}` });
@@ -127,7 +132,7 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
   const { date: returnArrivalDate, time: returnArrivalTime } = parseDateAndTime(
     returnFlight?.data?.arrivalTime
   );
-
+  
   const handleDiscount = (discountId, discountValue) => {
     if (selectedDiscount === discountId) {
       setTotalDiscount(0);
@@ -643,5 +648,7 @@ TicketDetails.propTypes = {
   isPayment: PropTypes.bool.isRequired,
   setIsPayment: PropTypes.func.isRequired,
   dataBooking: PropTypes.object,
+  seatNumber: PropTypes.object,
+  seatNumberReturn: PropTypes.object,
 };
 export default TicketDetails;
