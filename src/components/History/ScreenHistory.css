@@ -1,0 +1,120 @@
+@media (max-width: 450px) {
+  .custom-card {
+    width: 85vw !important;
+    position: relative !important;
+    left: 1vw !important;
+  }
+
+  .custom-airport-location {
+    font-size: 10px !important;
+    text-align: start;
+    width: 5rem;
+  }
+
+  .location-icon {
+    display: none;
+  }
+
+  .custom-date {
+    font-size: 15px;
+    position: relative !important;
+    left: 1vw !important;
+  }
+
+  .custom-date-deparr-date,
+  .custom-date-deparr-time {
+    font-size: 10px !important;
+  }
+
+  .custom-duration {
+    font-size: 10px;
+  }
+
+  .arrow-right {
+    size: 10px;
+  }
+
+  .custom-footer,
+  .custom-price,
+  .custom-status {
+    font-size: 12px !important;
+  }
+
+  .detail-prompt {
+    display: none;
+  }
+
+  .search-not-found {
+    left: 0 !important;
+  }
+}
+
+@media (min-width: 427px) and (max-width: 768px) {
+  .custom-card,
+  .custom-date {
+    width: 21.5rem !important;
+    position: relative;
+    left: 3rem !important;
+  }
+
+  .custom-airport-location {
+    font-size: 13px !important;
+    width: 90px;
+  }
+
+  .location-icon {
+    display: none;
+  }
+
+  .custom-date-deparr-date,
+  .custom-date-deparr-time {
+    font-size: 12px !important;
+  }
+
+  .custom-duration {
+    font-size: 15px;
+  }
+
+  .arrow-right {
+    width: 7rem !important;
+  }
+
+  .custom-footer {
+    font-size: 14px !important;
+  }
+
+  .custom-price {
+    font-size: 14px !important;
+
+    position: relative;
+  }
+
+  .custom-status {
+    font-size: 13px;
+  }
+
+  .detail-prompt {
+    display: none;
+  }
+
+  .search-not-found {
+    left: 10rem !important;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .custom-card,
+  .custom-date {
+    width: 30rem !important;
+    position: relative;
+    left: 4rem !important;
+  }
+
+  .location-icon {
+    font-size: 40px !important;
+  }
+
+  .search-not-found {
+    left: 12rem !important;
+  }
+}

@@ -1,0 +1,75 @@
+@media (max-width: 426px) {
+  .custom-card {
+    width: 90vw !important;
+    font-size: 12px !important;
+  }
+
+  .custom-h6 {
+    font-size: 12px !important;
+  }
+
+  .custom-status {
+    margin-bottom: 0 !important;
+  }
+  .back-button {
+    display: unset !important;
+  }
+
+  .custom-flight,
+  .custom-flight-info,
+  .custom-payment {
+    font-size: 12px !important;
+  }
+
+  .print-button,
+  .cancel-button,
+  .customh6-qr {
+    font-size: 12px !important;
+  }
+
+  .custom-btn1,
+  .custom-btn2 {
+    height: 2rem !important;
+    font-size: 12px !important;
+  }
+
+  .qr-ticket {
+    height: 10rem !important;
+  }
+}
+
+@media (min-width: 427px) and (max-width: 768px) {
+  .custom-card.customized-style {
+    width: 35vw !important;
+    position: relative !important;
+    left: -2rem !important;
+    font-size: 13px !important;
+  }
+
+  .custom-h6 {
+    font-size: 13px !important;
+  }
+
+  .custom-status {
+    margin-bottom: 0 !important;
+  }
+
+  .custom-flight,
+  .custom-flight-info,
+  .custom-payment {
+    font-size: 13px !important;
+  }
+
+  .print-button,
+  .cancel-button {
+    font-size: 13px !important;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .custom-card.customized-style {
+    width: 35vw !important;
+    position: relative !important;
+    left: -1rem !important;
+  }
+}
