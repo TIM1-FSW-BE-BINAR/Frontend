@@ -177,21 +177,37 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
         .filter(Boolean);
 
       if (passengerRequiredFields.length > 0) {
-        passengerRequiredFields.forEach((field) =>
+        passengerRequiredFields.forEach((field) => {
+          const fieldNames = {
+            name: "Name",
+            familyName: "Family Name",
+            title: "Title",
+            dob: "Date of Birth",
+            citizenship: "Citizenship",
+            identityNumber: "Identity Number",
+            countryOfIssue: "Country of Issue",
+            expiredDate: "Expiry Date",
+          };
+
           toast.error(
-            `Field ${field} untuk Penumpang ${index + 1} tidak boleh kosong!`
-          )
-        );
+            `${fieldNames[field]} for Passenger ${index + 1} is required!`
+          );
+        });
         return false;
       }
-
-      if (selectedSeats.length !== totalSeat) {
-        toast.error(`Anda harus memilih ${totalSeat} kursi!`);
-        return false;
-      }
-
-      return true;
     }
+
+    if (selectedSeats.length !== totalSeat) {
+      toast.error(`You must select ${totalSeat} seats!`);
+      return false;
+    }
+
+    if (isRoundtrip && selectedSeatsReturn.length !== totalSeat) {
+      toast.error(`You must select ${totalSeat} return seats!`);
+      return false;
+    }
+
+    return true;
   };
 
   useEffect(() => {
@@ -201,7 +217,6 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
   }, [returnFlightId]);
 
   const [seatNumber, setSeatNumber] = useState();
-
   useEffect(() => {
     setSeatNumber(
       selectedSeats?.map((seat) => seat.seatNumber).join(", ") ||
@@ -210,7 +225,6 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
   }, [selectedSeats]);
 
   const [seatNumberReturn, setSeatNumberReturn] = useState();
-
   useEffect(() => {
     setSeatNumberReturn(
       selectedSeatsReturn?.map((seat) => seat.seatNumber).join(", ") ||
@@ -219,7 +233,7 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
   }, [selectedSeatsReturn]);
 
   const onSubmit = async (event) => {
-    event.preventDefault();
+    event.preventDefault(seatNumber, seatNumberReturn);
     const bookingDate = new Date().toISOString();
 
     const finalReturnFlightId = returnFlightId || null;
@@ -227,6 +241,19 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
     if (!validateForm()) {
       return;
     }
+
+    toast.success(`Seat ${seatNumber} Successfully booked.`, {
+      autoClose: 3000,
+    });
+
+    if (isRoundtrip) {
+      toast.success(
+        `Seat ${seatNumberReturn} Successfully booked for the return flight.`,
+        {
+          autoClose: 3000,
+        }
+      );
+    };
 
     setIsSaved(true);
 
@@ -921,8 +948,8 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
                   isPayment={isPayment}
                   dataBooking={dataBooking}
                   setDataBooking={setDataBooking}
-                  seatNumber={seatNumber}
-                  seatNumberReturn={seatNumberReturn}
+                  seatNumber={selectedSeats.join(", ")}
+                  seatNumberReturn={selectedSeatsReturn.join(", ")}
                 />
               </Card.Body>
             </Card>
