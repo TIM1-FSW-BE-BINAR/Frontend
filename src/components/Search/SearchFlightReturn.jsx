@@ -186,7 +186,6 @@ const SearchFlightReturn = ({
       } else {
         setNotFound(false);
       }
-      console.log("fetch search berhasil ", data);
     } else if (isError) {
       console.log("fetch search nya error");
     } else if (isPending) {

@@ -166,26 +166,28 @@ const Homepage = () => {
     ) {
       toast.error("Please fill out all fields in the form!");
     } else {
-      console.log(departureDate);
-      console.log(today);
       if(departureDate < departureDateFormat(today)){
         toast.error("Cannot select date before today!");
       }else{
-        const queryParams = new URLSearchParams({
-          fromInput,
-          toInput,
-          departureDate,
-          returnDate: checkedSwitch ? returnDate : "", // Kirim kosong jika null
-          totalPassengers,
-          adultInput,
-          childInput,
-          babyInput,
-          classInput,
-        }).toString();
-  
-        navigate({
-          to: `/search?${queryParams}`,
-        });
+        if(adultInput == 0 && childInput == 0 && babyInput > 0){
+          toast.error("You cannot select a flight for infants without an accompanying adult.");
+        }else{
+          const queryParams = new URLSearchParams({
+            fromInput,
+            toInput,
+            departureDate,
+            returnDate: checkedSwitch ? returnDate : "", // Kirim kosong jika null
+            totalPassengers,
+            adultInput,
+            childInput,
+            babyInput,
+            classInput,
+          }).toString();
+    
+          navigate({
+            to: `/search?${queryParams}`,
+          });
+        }
       }
     }
   };

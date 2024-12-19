@@ -58,7 +58,6 @@ const SearchFlight = ({
         // Mendapatkan tanggal hari ini dalam format UTC
         const now = new Date();
         const utcDate = now.toISOString(); // Format ISO 8601 dalam UTC
-        console.log("hari ni: ", utcDate);
         setToday(utcDate);
       }, []);
 
@@ -122,7 +121,6 @@ const SearchFlight = ({
     }else {
        setDateBtnActive(index);
        setDepartureDateActive(date);
-       console.log(departureDateActive);
        setTicketSoldOut(false);
      }
   };
@@ -212,7 +210,6 @@ const SearchFlight = ({
       } else {
         setNotFound(false);
       }
-      console.log("fetch search berhasil ", data);
     } else if (isError) {
       console.log("fetch search nya error");
     } else if (isPending) {
@@ -241,7 +238,6 @@ const SearchFlight = ({
     } else {
       // cek di params apakah ada nilai dari returnDate nya, jika ada render halaman return ticket
       if (returnDate !== "") {
-        console.log("ada return date");
         setFlightSelect(flight.id);
         setReturnScreen(true);
       } else {
