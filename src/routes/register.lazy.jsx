@@ -4,6 +4,8 @@ import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { useSelector } from "react-redux";
 import Background from "/img/Frame 1.svg";
 import RegisterForm from "../components/Register/Form";
+import { useSpring, animated } from "@react-spring/web";
+import { Image } from "react-bootstrap";
 
 export const Route = createLazyFileRoute("/register")({
   component: Register,
@@ -16,6 +18,48 @@ function Register() {
   if (token) {
     navigate({ to: "/" });
   }
+  const waveStyles = useSpring({
+    from: { transform: "translate(0px, 0px) scale(1) rotate(0deg)" },
+    to: async (next) => {
+      while (true) {
+        await next({
+          transform: "translate(-5px, -15px) scale(1.03) rotate(-4deg)",
+        });
+        await next({
+          transform: "translate(0px, -30px) scale(1.05) rotate(-2deg)",
+        });
+        await next({
+          transform: "translate(2px, -25px) scale(1.03) rotate(0deg)",
+        });
+        await next({
+          transform: "translate(5px, -20px) scale(1.02) rotate(5deg)",
+        });
+        await next({
+          transform: "translate(10px, -15px) scale(1.04) rotate(5deg)",
+        });
+        await next({
+          transform: "translate(15px, -15px) scale(1.04) rotate(10deg)",
+        });
+        await next({
+          transform: "translate(20px, -10px) scale(1.03) rotate(15deg)",
+        });
+        await next({
+          transform: "translate(15px, 0px) scale(1) rotate(10deg)",
+        });
+        await next({
+          transform: "translate(13px, 0px) scale(1) rotate(5deg)",
+        });
+        await next({
+          transform: "translate(10px, 0px) scale(1) rotate(0deg)",
+        });
+        await next({
+          transform: "translate(0px, 0px) scale(1) rotate(0deg)",
+        });
+      }
+    },
+    config: { duration: 3500 },
+    loop: true,
+  });
 
   return (
     <section
@@ -34,7 +78,27 @@ function Register() {
           backgroundSize: "cover",
           height: "100%",
         }}
-      ></div>
+      >
+        <animated.div style={waveStyles}>
+          <Image
+            src="/img/plane.svg"
+            alt="Airfly Icon"
+            style={{
+              opacity: 0.9,
+              filter: "blur(0.5px)",
+            }}
+          />
+        </animated.div>
+        <Image
+          src="/img/airfly.png"
+          alt="Airfly"
+          style={{
+            opacity: 0.9,
+            filter: "blur(0.5px)",
+            height: "100px",
+          }}
+        />
+      </div>
 
       <div
         className="d-flex flex-column justify-content-center align-items-center"

@@ -243,6 +243,36 @@ const SearchFlight = ({
     }
   };
 
+    const initialTime = 15 * 60; 
+    const [timeLeft, setTimeLeft] = useState(() => {
+      const savedTime = localStorage.getItem("timeLeft");
+      return savedTime ? parseInt(savedTime, 10) : initialTime;
+    });
+    const [isTimerActive, setIsTimerActive] = useState(true);
+
+    useEffect(() => {
+      let interval;
+      if (isTimerActive && timeLeft > 0) {
+        interval = setInterval(() => {
+          setTimeLeft((prev) => {
+            const newTime = prev > 0 ? prev - 1 : 0;
+            localStorage.setItem("timeLeft", newTime); 
+            return newTime;
+          });
+        }, 1000);
+      } else if (timeLeft === 0) {
+        setIsTimerActive(false); 
+      }
+
+      return () => clearInterval(interval); 
+    }, [isTimerActive, timeLeft]);
+
+    const handleResetTimer = () => {
+      setTimeLeft(initialTime); 
+      localStorage.setItem("timeLeft", initialTime); 
+      setIsTimerActive(true);
+    };
+
 
   return returnScreen ? (
     <SearchFlightReturn
@@ -654,6 +684,7 @@ const SearchFlight = ({
                               onClick={(event) => {
                                 event.stopPropagation(); // Prevent Accordion from toggling
                                 handleBookingPage(flight);
+                                handleResetTimer();
                               }}
                             >
                               Select

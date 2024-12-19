@@ -1,20 +1,16 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "@tanstack/react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
-import { PulseLoader } from "react-spinners";
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import toast, { Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
-//import NavigationBar from "../Navbar";
 import SeatMapReturn from "../SeatMapReturn";
 import TicketDetails from "../TicketDetails";
-//import NavbarBooking from "../NavbarBooking";
 import SeatMap from "../SeatMap";
-import { createBooking } from "../../service/booking";
 import { getFlightId } from "../../service/flight/flightService";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -31,6 +27,7 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
   const { user } = useSelector((state) => state.auth);
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
+  const [dataBooking, setDataBooking] = useState(null);
 
   const flightId = parseInt(searchParams.get("flightId") || "0", 10);
   const returnFlightId = parseInt(
@@ -157,7 +154,13 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
 
   const validateForm = () => {
     for (let { index } of passengers) {
-      let requiredFields = ["name", "title", "dob"];
+      let requiredFields = [
+        "name",
+        "title",
+        "dob",
+        "citizenship",
+        "identityNumber",
+      ];
 
       if (passengerData[`hasFamilyName_${index}`]) {
         requiredFields.push("familyName");
@@ -197,51 +200,23 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
     }
   }, [returnFlightId]);
 
-  const seatNumbers =
-    selectedSeats?.map((seat) => seat.seatNumber).join(", ") ||
-    "No seat selected.";
-  const seatNumbersReturn =
-    selectedSeats?.map((seat) => seat.seatNumber).join(", ") ||
-    "No seat selected.";
+  const [seatNumber, setSeatNumber] = useState();
 
-  const { mutate: booking, isLoading } = useMutation({
-    mutationFn: (request) => createBooking(request),
-    onSuccess: () => {
-      toast.success("Data successfully saved.", {
-        autoClose: 3000,
-      });
-      toast.success(`Seat ${seatNumbers} Successfully booked.`, {
-        autoClose: 3000,
-      });
-      toast.success(
-        `Seat ${seatNumbersReturn} Successfully booked for the return flight.`,
-        {
-          autoClose: 3000,
-        }
-      );
-      setIsSaved(true);
-    },
-    onError: (error) => {
-      toast.error(`Error: ${error.message}`);
-      setIsSaved(false);
-    },
-  });
-
-  if (isLoading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          width: "100%",
-        }}
-      >
-        <PulseLoader color="#7126B5" size={15} />
-      </div>
+  useEffect(() => {
+    setSeatNumber(
+      selectedSeats?.map((seat) => seat.seatNumber).join(", ") ||
+        "No seat selected."
     );
-  }
+  }, [selectedSeats]);
+
+  const [seatNumberReturn, setSeatNumberReturn] = useState();
+
+  useEffect(() => {
+    setSeatNumberReturn(
+      selectedSeatsReturn?.map((seat) => seat.seatNumber).join(", ") ||
+        "No seat selected."
+    );
+  }, [selectedSeatsReturn]);
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -253,9 +228,6 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
       return;
     }
 
-    console.log("Passenger Data:", passengerData);
-    console.log("Selected seat:", selectedSeats);
-    console.log("Selected seat return flight:", selectedSeatsReturn);
     setIsSaved(true);
 
     const bookingDetailOneWay = passengers.map(
@@ -297,7 +269,10 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
 
     console.log("Request in JSON format:", JSON.stringify(request, null, 2));
 
-    booking(request);
+    setDataBooking(request);
+    toast.success("Data successfully saved.", {
+      autoClose: 3000,
+    });
   };
 
   const IOSSwitch = styled((props) => (
@@ -367,8 +342,6 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
   return (
     <>
       <Toaster position="top-right" />
-      {/* <NavigationBar />
-      <NavbarBooking isSaved={isSaved} /> */}
       <Container className="py-4" style={{ maxWidth: "1320px" }}>
         <Row className="justify-content-center" style={{ margin: "0" }}>
           <Col
@@ -939,7 +912,18 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
           <Col sm={12} md={12} lg={5} xl={4}>
             <Card className="shadow-sm mb-3">
               <Card.Body>
-                <TicketDetails isSaved={isSaved} setIsPayment={setIsPayment} isPayment={isPayment}/>
+                <Card.Title className="text-secondary text-center">
+                  Ticket Details
+                </Card.Title>
+                <TicketDetails
+                  isSaved={isSaved}
+                  setIsPayment={setIsPayment}
+                  isPayment={isPayment}
+                  dataBooking={dataBooking}
+                  setDataBooking={setDataBooking}
+                  seatNumber={seatNumber}
+                  seatNumberReturn={seatNumberReturn}
+                />
               </Card.Body>
             </Card>
           </Col>
