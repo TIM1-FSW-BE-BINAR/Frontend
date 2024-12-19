@@ -12,8 +12,15 @@ import { getAllDiscounts } from "../../service/discount";
 import { useMutation } from "@tanstack/react-query";
 import { createSnap } from "../../service/payment/snap";
 import { createBooking } from "../../service/booking";
+import discountIcon from "../../assets/discount-icon.png";
 
-const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
+const TicketDetails = ({
+  isSaved,
+  setIsPayment,
+  dataBooking,
+  seatNumber,
+  seatNumberReturn,
+}) => {
   const [totalDiscount, setTotalDiscount] = useState(0);
   const [selectedDiscount, setSelectedDiscount] = useState(null);
   const [activeKey, setActiveKey] = useState(null);
@@ -26,46 +33,44 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
   const adultInput = parseInt(searchParams.get("adultInput") || "0", 10);
   const childInput = parseInt(searchParams.get("childInput") || "0", 10);
   const babyInput = parseInt(searchParams.get("babyInput") || "0", 10);
-  const totalSeat = adultInput + childInput;
   const flightId = parseInt(searchParams.get("flightId"), 10) || 0;
   const returnFlightId = parseInt(searchParams.get("returnFlightId"), 10) || 0;
   const [isRoundtrip, setIsRoundtrip] = useState(false);
 
   const { mutate: snapCreate } = useMutation({
     mutationFn: (data) => {
-      console.log("Calling createSnap with data:", data); // Debug log
       return createSnap(data);
     },
     onSuccess: (result) => {
-      console.log("Snap creation success:", result); // Debug log
       if (result?.data) {
-        const snapToken = result?.data?.token;
-        const amount = result?.data?.payment?.amount;
+        const snapData = result?.data;
         setIsPayment(true);
-        navigate({ to: `/payment?snapToken=${snapToken}&amount=${amount}` });
+        navigate({ to: `/payment?snapData=${snapData}` });
       } else {
         toast.error("Failed to create payment token");
       }
     },
     onError: (err) => {
-      console.error("Snap creation error:", err); // Debug log
       toast.error(err?.message);
     },
   });
 
   const { mutate: booking } = useMutation({
     mutationFn: (data) => {
-      console.log("Calling createBooking with data:", data);
       return createBooking(data);
     },
     onSuccess: (response) => {
-      console.log("Booking success response:", response);
-      toast.success("Data successfully saved.", {
+      toast.success(`Seat ${seatNumber} Successfully booked.`, {
         autoClose: 3000,
       });
+      toast.success(
+        `Seat ${seatNumberReturn} Successfully booked for the return flight.`,
+        {
+          autoClose: 3000,
+        }
+      );
       if (response?.bookingId) {
         const bookingId = response.bookingId;
-        console.log("Got bookingId:", bookingId);
         localStorage.setItem("bookingId", bookingId);
         snapCreate({
           bookingId: bookingId,
@@ -135,7 +140,7 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
   const { date: returnArrivalDate, time: returnArrivalTime } = parseDateAndTime(
     returnFlight?.data?.arrivalTime
   );
-
+  
   const handleDiscount = (discountId, discountValue) => {
     if (selectedDiscount === discountId) {
       setTotalDiscount(0);
@@ -159,430 +164,477 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
         throw new Error("Booking data not found. Please fill the form first.");
       }
 
-      console.log("Starting payment process with data:", dataBooking); // Debug log
-      booking(dataBooking);
+      localStorage.setItem("timeLeft", "0");
+      
+      const updatedBookingDetail = dataBooking.bookingDetail.map((detail) => {
+        const basePrice = detail.price;
+        const discountedPrice = basePrice - (basePrice * totalDiscount / 100);
+
+        return {
+          ...detail,
+          price: discountedPrice,
+        };
+      });
+
+      const updatedDataBooking = {
+        ...dataBooking,
+        bookingDetail: updatedBookingDetail,
+      };
+
+      booking(updatedDataBooking);
     } catch (error) {
-      console.error("Payment error:", error); // Debug log
+      console.error("Payment error:", error);
       if (error.message.includes("Token expired")) {
         navigate({ to: "/login" });
       }
     }
   };
 
-  const totalPrice =
+  const priceDeparture =
     (flight?.data?.price || 0) * adultInput +
-    (flight?.data?.price || 0) * childInput +
-    10 * totalSeat -
-    totalDiscount +
-    ((returnFlight?.data?.price || 0) * adultInput +
-      (returnFlight?.data?.price || 0) * childInput +
-      (isRoundtrip ? 10 * totalSeat : 0) -
-      totalDiscount);
+    (flight?.data?.price || 0) * childInput;
+  const priceReturn =
+    (returnFlight?.data?.price || 0) * adultInput +
+    (returnFlight?.data?.price || 0) * childInput;
+
+  const taxDeparture = priceDeparture * 0.03;
+  const taxReturn = priceReturn * 0.03;
+  
+  const totalPriceDeparture = priceDeparture + taxDeparture;
+  const totalPriceReturn = priceReturn + taxReturn;
+
+  const discountDeparture = (priceDeparture) * (totalDiscount / 100);
+  const discountReturn = (priceReturn * totalDiscount) / 100; 
+
+  const Total =
+    totalPriceDeparture + totalPriceReturn - discountDeparture - discountReturn;
 
   return (
     <>
       <Toaster position="top-right" />
-      <Card.Body>
-        <Card.Title className="text-secondary text-center">
-          Ticket Details
-        </Card.Title>
+      <Card.Body
+        style={{
+          margin: "1px",
+          padding: "1px",
+        }}
+      >
         <style>
           {`.bold-line {
             border: 3px solid black;
             }
           `}
         </style>
-        <div className="d-flex justify-content-between align-items-center mb-1 mt-2">
-          <h5 className="fw-bold">
-            {isRoundtrip ? "Departure Flight Details" : "Flight Details"}
-          </h5>
-          <b></b>
-        </div>
-
-        <div className="mb-3 d-flex align-items-start justify-content-between">
-          <div>
-            <p className="m-0 fw-bold">{departureTime}</p>
-            <p className="m-0 fw-">{departureDate}</p>
-            <p className="m-0">
-              {`${flight?.data?.departure?.name} - Terminal ${flight?.data?.terminal}`}
-            </p>
-          </div>
-          <span
-            className="fw-bold"
-            style={{
-              color: "#A06ECE",
-              fontWeight: "bold",
-              fontSize: "14px",
-            }}
-          >
-            Departure
-          </span>
-        </div>
-
-        <hr />
-
-        <div className="mb-3 d-flex align-items-center">
-          <img
-            className="me-4"
-            src={flight?.data?.airline?.imageUrl}
-            style={{ width: "40px", height: "40px" }}
-          ></img>
-          <div>
-            <h6 className="m-0 fw-bold">{flight?.data?.airline?.name}</h6>
-            <p className="m-0 fw-bold">{flight?.data?.flightNumber}</p>
-            <div className="mt-4">
-              <h6 className="fw-bolder mb-0">Information</h6>
-              {flight?.data?.information}
-            </div>
-          </div>
-        </div>
-
-        <hr />
-
-        <div className="mb-3 d-flex align-items-start justify-content-between">
-          <div>
-            <p className="m-0 fw-bold">{arrivalTime}</p>
-            <p className="m-0 ">{arrivalDate}</p>
-            <p className="m-0 ">{flight?.data?.arrival?.name}</p>
-          </div>
-          <span
-            style={{
-              color: "#A06ECE",
-              fontWeight: "bold",
-              fontSize: "14px",
-            }}
-          >
-            Arrival
-          </span>
-        </div>
-
-        <hr />
-
-        <div>
-          <b>Price Detail</b>
-
-          {/* Harga untuk Adult */}
-          {adultInput > 0 && (
-            <div className="d-flex justify-content-between">
-              <span>
-                <h6>{adultInput} Adults</h6>
-              </span>
-              <span
-                style={{
-                  fontSize: "16px",
-                }}
-              >
-                IDR {flight?.data?.price * adultInput || 0}
-              </span>
-            </div>
-          )}
-
-          {/* Harga untuk Child */}
-          {childInput > 0 && (
-            <div className="d-flex justify-content-between">
-              <span>
-                <h6>{childInput} Child</h6>
-              </span>
-              <span
-                style={{
-                  fontSize: "16px",
-                }}
-              >
-                IDR {flight?.data?.price * childInput || 0}
-              </span>
-            </div>
-          )}
-
-          {/* Harga untuk Baby */}
-          {babyInput > 0 && (
-            <div className="d-flex justify-content-between">
-              <span>
-                <h6>{babyInput} Baby</h6>
-              </span>
-              <span
-                style={{
-                  fontSize: "16px",
-                }}
-              >
-                IDR 0
-              </span>
-            </div>
-          )}
-
-          {/* Tax */}
-          <div className="d-flex justify-content-between">
-            <span>
-              <h6>Tax</h6>
-            </span>
-            <span
-              style={{
-                fontSize: "16px",
-              }}
-            >
-              IDR {10 * totalSeat}
-            </span>
+        <Card.Body className="border rounded mb-3 shadow-sm">
+          <div className="d-flex justify-content-between align-items-center mb-1 mt-1">
+            <h5 className="fw-bold">
+              {isRoundtrip ? "Departure Flight Details" : "Flight Details"}
+            </h5>
+            <b></b>
           </div>
 
-          {/* Discount */}
-          <div className="d-flex justify-content-between">
-            <span>
-              <h6>Discount</h6>
-            </span>
-            <span
-              style={{
-                fontSize: "16px",
-              }}
-            >
-              IDR {totalDiscount}
-            </span>
-          </div>
-        </div>
-
-        {isRoundtrip ? (
-          <>
-            <hr className="bold-line" />
-            <div className="d-flex justify-content-between align-items-center mb-1 mt-3">
-              <h5 className="fw-bold">Return Flight Details</h5>
-            </div>
-            <div className="mb-3 d-flex align-items-start justify-content-between">
-              <div>
-                <p className="m-0 fw-bold">{returnDepartureTime}</p>
-                <p className="m-0 fw-">{returnDepartureDate}</p>
-                <p className="m-0">
-                  {`${returnFlight?.data?.departure?.name} - Terminal ${returnFlight?.data?.terminal}`}
-                </p>
-              </div>
-              <span
-                className="fw-bold"
-                style={{
-                  color: "#A06ECE",
-                  fontWeight: "bold",
-                  fontSize: "14px",
-                }}
-              >
-                Departure
-              </span>
-            </div>
-            <hr />
-            <div className="mb-3 d-flex align-items-center">
-              <img
-                className="me-4"
-                src={returnFlight?.data?.airline?.imageUrl}
-                style={{ width: "40px", height: "40px" }}
-              ></img>
-              <div>
-                <h6 className="m-0 fw-bold">
-                  {returnFlight?.data?.airline?.name}
-                </h6>
-                <p className="m-0 fw-bold">
-                  {returnFlight?.data?.flightNumber}
-                </p>
-                <div className="mt-4">
-                  <h6 className="fw-bolder mb-0">Information</h6>
-                  {returnFlight?.data?.information}
-                </div>
-              </div>
-            </div>
-            <hr />
-            <div className="mb-3 d-flex align-items-start justify-content-between">
-              <div>
-                <p className="m-0 fw-bold">{returnArrivalTime}</p>
-                <p className="m-0 ">{returnArrivalDate}</p>
-                <p className="m-0 ">{returnFlight?.data?.arrival?.name}</p>
-              </div>
-              <span
-                style={{
-                  color: "#A06ECE",
-                  fontWeight: "bold",
-                  fontSize: "14px",
-                }}
-              >
-                Arrival
-              </span>
-            </div>
-
-            <hr />
-
+          <div className="mb-3 d-flex align-items-start justify-content-between">
             <div>
-              <b>Price Detail</b>
+              <p className="m-0 fw-bold">{departureTime}</p>
+              <p className="m-0 fw-">{departureDate}</p>
+              <p className="m-0">
+                {`${flight?.data?.departure?.name} - Terminal ${flight?.data?.terminal}`}
+              </p>
+            </div>
+            <span
+              className="fw-bold"
+              style={{
+                color: "#A06ECE",
+                fontWeight: "bold",
+                fontSize: "14px",
+              }}
+            >
+              Departure
+            </span>
+          </div>
 
-              {/* Harga untuk Adult */}
-              {adultInput > 0 && (
-                <div className="d-flex justify-content-between">
-                  <span>
-                    <h6>{adultInput} Adults</h6>
-                  </span>
-                  <span
-                    style={{
-                      fontSize: "16px",
-                    }}
-                  >
-                    IDR {returnFlight?.data?.price * adultInput || 0}
-                  </span>
-                </div>
-              )}
+          <hr />
 
-              {/* Harga untuk Child */}
-              {childInput > 0 && (
-                <div className="d-flex justify-content-between">
-                  <span>
-                    <h6>{childInput} Child</h6>
-                  </span>
-                  <span
-                    style={{
-                      fontSize: "16px",
-                    }}
-                  >
-                    IDR {returnFlight?.data?.price * childInput || 0}
-                  </span>
-                </div>
-              )}
-
-              {/* Harga untuk Baby */}
-              {babyInput > 0 && (
-                <div className="d-flex justify-content-between">
-                  <span>
-                    <h6>{babyInput} Baby</h6>
-                  </span>
-                  <span
-                    style={{
-                      fontSize: "16px",
-                    }}
-                  >
-                    IDR 0
-                  </span>
-                </div>
-              )}
-
-              {/* Tax */}
-              <div className="d-flex justify-content-between">
-                <span>
-                  <h6>Tax</h6>
-                </span>
-                <span
-                  style={{
-                    fontSize: "16px",
-                  }}
-                >
-                  IDR {10 * totalSeat}
-                </span>
-              </div>
-
-              {/* Discount */}
-              <div className="d-flex justify-content-between">
-                <span>
-                  <h6>Discount</h6>
-                </span>
-                <span
-                  style={{
-                    fontSize: "16px",
-                  }}
-                >
-                  IDR {totalDiscount}
-                </span>
+          <div className="mb-3 d-flex align-items-center">
+            <img
+              className="me-4"
+              src={flight?.data?.airline?.imageUrl}
+              style={{ width: "40px", height: "40px" }}
+            ></img>
+            <div>
+              <h6 className="m-0 fw-bold">{flight?.data?.airline?.name}</h6>
+              <p className="m-0 fw-bold">{flight?.data?.flightNumber}</p>
+              <div className="mt-4">
+                <h6 className="fw-bolder mb-0">Information</h6>
+                {flight?.data?.information}
               </div>
             </div>
-            <hr className="bold-line" />
-          </>
-        ) : (
+          </div>
+
           <hr />
+
+          <div className="mb-3 d-flex align-items-start justify-content-between">
+            <div>
+              <p className="m-0 fw-bold">{arrivalTime}</p>
+              <p className="m-0 ">{arrivalDate}</p>
+              <p className="m-0 ">{flight?.data?.arrival?.name}</p>
+            </div>
+            <span
+              style={{
+                color: "#A06ECE",
+                fontWeight: "bold",
+                fontSize: "14px",
+              }}
+            >
+              Arrival
+            </span>
+          </div>
+
+          <hr />
+
+          <div>
+            <b>Price Detail</b>
+
+            {/* Harga untuk Adult */}
+            {adultInput > 0 && (
+              <div className="d-flex justify-content-between">
+                <span>
+                  <h6>{adultInput} Adults</h6>
+                </span>
+                <span
+                  style={{
+                    fontSize: "16px",
+                  }}
+                >
+                  IDR {flight?.data?.price * adultInput || 0}
+                </span>
+              </div>
+            )}
+
+            {/* Harga untuk Child */}
+            {childInput > 0 && (
+              <div className="d-flex justify-content-between">
+                <span>
+                  <h6>{childInput} Child</h6>
+                </span>
+                <span
+                  style={{
+                    fontSize: "16px",
+                  }}
+                >
+                  IDR {flight?.data?.price * childInput || 0}
+                </span>
+              </div>
+            )}
+
+            {/* Harga untuk Baby */}
+            {babyInput > 0 && (
+              <div className="d-flex justify-content-between">
+                <span>
+                  <h6>{babyInput} Baby</h6>
+                </span>
+                <span
+                  style={{
+                    fontSize: "16px",
+                  }}
+                >
+                  IDR 0
+                </span>
+              </div>
+            )}
+
+            {/* Tax */}
+            <div className="d-flex justify-content-between">
+              <span>
+                <h6>Tax (3%)</h6>
+              </span>
+              <span
+                style={{
+                  fontSize: "16px",
+                }}
+              >
+                IDR {taxDeparture}
+              </span>
+            </div>
+
+            {/* Discount */}
+            <div className="d-flex justify-content-between">
+              <span>
+                <h6>Discount ({totalDiscount}%)</h6>
+              </span>
+              <span
+                style={{
+                  fontSize: "16px",
+                }}
+              >
+                IDR {discountDeparture}
+              </span>
+            </div>
+          </div>
+        </Card.Body>
+
+        {isRoundtrip && (
+          <>
+            <Card.Body className="border rounded mb-3 shadow-sm">
+              <div className="d-flex justify-content-between align-items-center mb-1 mt-1">
+                <h5 className="fw-bold">Return Flight Details</h5>
+              </div>
+              <div className="mb-3 d-flex align-items-start justify-content-between">
+                <div>
+                  <p className="m-0 fw-bold">{returnDepartureTime}</p>
+                  <p className="m-0 fw-">{returnDepartureDate}</p>
+                  <p className="m-0">
+                    {`${returnFlight?.data?.departure?.name} - Terminal ${returnFlight?.data?.terminal}`}
+                  </p>
+                </div>
+                <span
+                  className="fw-bold"
+                  style={{
+                    color: "#A06ECE",
+                    fontWeight: "bold",
+                    fontSize: "14px",
+                  }}
+                >
+                  Departure
+                </span>
+              </div>
+              <hr />
+              <div className="mb-3 d-flex align-items-center">
+                <img
+                  className="me-4"
+                  src={returnFlight?.data?.airline?.imageUrl}
+                  style={{ width: "40px", height: "40px" }}
+                ></img>
+                <div>
+                  <h6 className="m-0 fw-bold">
+                    {returnFlight?.data?.airline?.name}
+                  </h6>
+                  <p className="m-0 fw-bold">
+                    {returnFlight?.data?.flightNumber}
+                  </p>
+                  <div className="mt-4">
+                    <h6 className="fw-bolder mb-0">Information</h6>
+                    {returnFlight?.data?.information}
+                  </div>
+                </div>
+              </div>
+              <hr />
+              <div className="mb-3 d-flex align-items-start justify-content-between">
+                <div>
+                  <p className="m-0 fw-bold">{returnArrivalTime}</p>
+                  <p className="m-0 ">{returnArrivalDate}</p>
+                  <p className="m-0 ">{returnFlight?.data?.arrival?.name}</p>
+                </div>
+                <span
+                  style={{
+                    color: "#A06ECE",
+                    fontWeight: "bold",
+                    fontSize: "14px",
+                  }}
+                >
+                  Arrival
+                </span>
+              </div>
+
+              <hr />
+
+              <div>
+                <b>Price Detail</b>
+
+                {/* Harga untuk Adult */}
+                {adultInput > 0 && (
+                  <div className="d-flex justify-content-between">
+                    <span>
+                      <h6>{adultInput} Adults</h6>
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "16px",
+                      }}
+                    >
+                      IDR {returnFlight?.data?.price * adultInput || 0}
+                    </span>
+                  </div>
+                )}
+
+                {/* Harga untuk Child */}
+                {childInput > 0 && (
+                  <div className="d-flex justify-content-between">
+                    <span>
+                      <h6>{childInput} Child</h6>
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "16px",
+                      }}
+                    >
+                      IDR {returnFlight?.data?.price * childInput || 0}
+                    </span>
+                  </div>
+                )}
+
+                {/* Harga untuk Baby */}
+                {babyInput > 0 && (
+                  <div className="d-flex justify-content-between">
+                    <span>
+                      <h6>{babyInput} Baby</h6>
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "16px",
+                      }}
+                    >
+                      IDR 0
+                    </span>
+                  </div>
+                )}
+
+                {/* Tax */}
+                <div className="d-flex justify-content-between">
+                  <span>
+                    <h6>Tax (3%)</h6>
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "16px",
+                    }}
+                  >
+                    IDR {taxReturn}
+                  </span>
+                </div>
+
+                {/* Discount */}
+                <div className="d-flex justify-content-between">
+                  <span>
+                    <h6>Discount ({totalDiscount}%)</h6>
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "16px",
+                    }}
+                  >
+                    IDR {discountReturn}
+                  </span>
+                </div>
+              </div>
+            </Card.Body>
+          </>
         )}
 
-        <Accordion
-          activeKey={activeKey}
-          onSelect={(key) => setActiveKey(key === activeKey ? null : key)}
-          className="mb-3"
-        >
-          <Accordion.Item eventKey="0">
-            <Accordion.Header>Discount</Accordion.Header>
-            {discount?.length > 0 ? (
-              discount.map((discount) => {
-                const isExpired =
-                  new Date(discount.endDate) < new Date() || !discount.isActive;
-                const isSelected = selectedDiscount === discount.id;
-
-                return (
-                  <Accordion.Body
-                    key={discount.id}
-                    onClick={() =>
-                      !isExpired && handleDiscount(discount.id, discount.value)
-                    }
-                    style={{
-                      position: "relative",
-                      margin: 0,
-                      padding: "0.5rem 1rem",
-                      backgroundColor: isSelected
-                        ? "#D1E7DD"
-                        : isExpired
-                          ? "#f0f0f0"
-                          : "white",
-                      border: isSelected ? "1px solid #0F5132" : "none",
-                      borderRadius: isSelected ? "12px" : "0px",
-                      cursor: !isExpired ? "pointer" : "not-allowed",
-                      opacity: isExpired ? 0.5 : 1,
-                    }}
-                  >
-                    <h6>{discount.name}</h6>
-                    <p>{discount.description}</p>
-                    <span>
-                      discount : IDR {discount.value}
-                      <br />
-                      minimum order : IDR {discount.minPurchase} <br />
-                      expired at : {discount.endDate} <br />
-                    </span>
-                    {isSelected && (
-                      <div
-                        className="fa fa-check-circle"
-                        style={{
-                          color: "#73CA5C",
-                          fontSize: "20px",
-                          position: "absolute",
-                          top: "10px",
-                          right: "10px",
-                        }}
-                      ></div>
-                    )}
-
-                    {isExpired && (
-                      <small style={{ color: "red" }}>
-                        This discount not available
-                      </small>
-                    )}
-                    <hr style={{ margin: "0px", padding: "0px" }} />
-                  </Accordion.Body>
-                );
-              })
-            ) : (
-              <p>No discounts available</p>
-            )}
-          </Accordion.Item>
-        </Accordion>
-
-        <div className="d-flex justify-content-between">
-          <span>
-            <h4>
-              <b>Total</b>
-            </h4>
-          </span>
-          <span
-            style={{
-              color: "#7126B5",
-              fontWeight: "bold",
-              fontSize: "20px",
-            }}
+        <Card.Body className="border rounded shadow-sm">
+          <Accordion
+            activeKey={activeKey}
+            onSelect={(key) => setActiveKey(key === activeKey ? null : key)}
+            className="mb-3"
           >
-            IDR {totalPrice}
-          </span>
-        </div>
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>
+                <div className="d-flex align-items-center">
+                  <img
+                    src={discountIcon}
+                    alt="Discount"
+                    style={{
+                      width: "24px",
+                      height: "24px",
+                      marginRight: "8px", 
+                    }}
+                  />
+                  Discount
+                </div>
+              </Accordion.Header>
+              {discount?.length > 0 ? (
+                discount.map((discount) => {
+                  const isExpired =
+                    new Date(discount.endDate) < new Date() ||
+                    !discount.isActive;
+                  const isSelected = selectedDiscount === discount.id;
 
-        <Button
-          variant="danger"
-          id="box-timer"
-          style={{ zIndex: "1", marginTop: "1rem" }}
-          onClick={handlePayment}
-        >
-          Payment
-        </Button>
+                  return (
+                    <Accordion.Body
+                      key={discount.id}
+                      onClick={() =>
+                        !isExpired &&
+                        handleDiscount(discount.id, discount.value)
+                      }
+                      style={{
+                        position: "relative",
+                        margin: 0,
+                        padding: "0.5rem 1rem",
+                        backgroundColor: isSelected
+                          ? "#D1E7DD"
+                          : isExpired
+                            ? "#f0f0f0"
+                            : "white",
+                        border: isSelected ? "1px solid #0F5132" : "none",
+                        borderRadius: isSelected ? "12px" : "0px",
+                        cursor: !isExpired ? "pointer" : "not-allowed",
+                        opacity: isExpired ? 0.5 : 1,
+                      }}
+                    >
+                      <h6>{discount.name}</h6>
+                      <p>{discount.description}</p>
+                      <span>
+                        discount : {discount.value} %
+                        <br />
+                        minimum order : IDR {discount.minPurchase} <br />
+                        expired at : {
+                          parseDateAndTime(discount.endDate).date
+                        }{" "}
+                        <br />
+                      </span>
+                      {isSelected && (
+                        <div
+                          className="fa fa-check-circle"
+                          style={{
+                            color: "#73CA5C",
+                            fontSize: "20px",
+                            position: "absolute",
+                            top: "10px",
+                            right: "10px",
+                          }}
+                        ></div>
+                      )}
+
+                      {isExpired && (
+                        <small style={{ color: "red" }}>
+                          This discount not available
+                        </small>
+                      )}
+                      <hr style={{ margin: "0px", padding: "0px" }} />
+                    </Accordion.Body>
+                  );
+                })
+              ) : (
+                <p>No discounts available</p>
+              )}
+            </Accordion.Item>
+          </Accordion>
+
+          <div className="d-flex justify-content-between">
+            <span>
+              <h4>
+                <b>Total</b>
+              </h4>
+            </span>
+            <span
+              style={{
+                color: "#7126B5",
+                fontWeight: "bold",
+                fontSize: "20px",
+              }}
+            >
+              IDR {Total}
+            </span>
+          </div>
+
+          <Button
+            variant="danger"
+            id="box-timer"
+            style={{ zIndex: "1", marginTop: "1rem" }}
+            onClick={handlePayment}
+          >
+            Payment
+          </Button>
+        </Card.Body>
       </Card.Body>
     </>
   );
@@ -593,5 +645,7 @@ TicketDetails.propTypes = {
   isPayment: PropTypes.bool.isRequired,
   setIsPayment: PropTypes.func.isRequired,
   dataBooking: PropTypes.object,
+  seatNumber: PropTypes.object,
+  seatNumberReturn: PropTypes.object,
 };
 export default TicketDetails;
