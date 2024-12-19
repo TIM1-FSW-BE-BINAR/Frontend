@@ -40,7 +40,6 @@ export const deleteUser = async (id) => {
     method: "DELETE",
   });
 
-  // get data
   const result = await response.json();
   return result?.data;
 };
