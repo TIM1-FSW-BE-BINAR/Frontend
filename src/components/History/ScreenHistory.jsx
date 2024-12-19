@@ -9,13 +9,14 @@ import isSameDay from "date-fns/isSameDay";
 import { isWithinInterval, parseISO } from "date-fns";
 import { useHistoryContext } from "./HistoryContext";
 import DetailPesanan from "./Detail/DetailHistory";
+import { getAllPayment } from "../../service/payment";
 import "./ScreenHistory.css";
 import arrowRight from "../../assets/arrow-right.png";
 import notFound from "../../assets/homepage/not-found.png";
-import { getIdPayment } from "../../service/payment";
+
 import ScreenRiwayatLoading from "./Loading/ScreenHistoryLoading";
 
-const ScreenHistory = (paymentId) => {
+const ScreenHistory = () => {
   const { token } = useSelector((state) => state.auth);
   const { filterDate, searchQuery } = useHistoryContext();
   const [groupedBookings, setGroupedBookings] = useState([]);
@@ -24,13 +25,12 @@ const ScreenHistory = (paymentId) => {
   const [isDetailVisible, setIsDetailVisible] = useState(false);
   const [showDetailPrompt, setShowDetailPrompt] = useState(true);
 
-  // Track screen width
   const [isMobile, setIsMobile] = useState(
-    window.matchMedia("(max-width: 426px)").matches
+    window.matchMedia("(max-width: 450px)").matches
   );
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 426px)");
+    const mediaQuery = window.matchMedia("(max-width: 450px)");
 
     const handleResize = () => setIsMobile(mediaQuery.matches);
 
@@ -44,10 +44,10 @@ const ScreenHistory = (paymentId) => {
     enabled: !!token,
   });
 
-  const { dataPay, isSuccessPay, isLoadingPay } = useQuery({
-    queryKey: ["getIdPayment", paymentId],
-    queryFn: getIdPayment,
-    enabled: !!token && !!paymentId,
+  const { data: paymentData } = useQuery({
+    queryKey: ["payment"],
+    queryFn: getAllPayment,
+    enabled: !!token,
   });
 
   useEffect(() => {
@@ -127,6 +127,42 @@ const ScreenHistory = (paymentId) => {
     }
   }, [data]);
 
+  useEffect(() => {
+    if (isSuccess && paymentData?.payments && data) {
+      let matchedPayment = null;
+
+      for (let booking of data) {
+        matchedPayment = paymentData.payments.find(
+          (payment) => payment.bookingId === booking.id
+        );
+
+        if (matchedPayment) {
+          // Logika status dan bgColor dari matchedPayment.status
+          let bgColor = "#73CA5C";
+          let status = "ACTIVE";
+
+          if (matchedPayment.status === "cancel") {
+            bgColor = "#FF0000";
+            status = "CANCELED";
+          } else if (matchedPayment.status === "expire") {
+            bgColor = "#8A8A8A";
+            status = "EXPIRED";
+          } else if (
+            matchedPayment.status === "pending" ||
+            matchedPayment.status === "settlement" ||
+            !["cancel", "expire"].includes(matchedPayment.status)
+          ) {
+            bgColor = "#73CA5C";
+            status = "ACTIVE";
+          }
+
+          booking.status = status;
+          booking.bgColor = bgColor;
+        }
+      }
+    }
+  }, [isSuccess, paymentData, data, isLoading]);
+
   const handleCardClickMobile = (id) => {
     setSelectedId(id);
     setIsDetailVisible((prev) => !prev);
@@ -178,9 +214,8 @@ const ScreenHistory = (paymentId) => {
                 </h5>
                 {bookings.map((booking) => {
                   const isSelected = booking.id === selectedId;
-                  let bgColor = "#73CA5C";
-                  if (booking.status === "CANCELED") bgColor = "#FF0000";
-                  if (booking.status === "EXPIRED") bgColor = "#8A8A8A";
+                  const bgColor = booking.bgColor || "#73CA5C";
+                  const status = booking.status || "ACTIVE";
 
                   return (
                     <Card

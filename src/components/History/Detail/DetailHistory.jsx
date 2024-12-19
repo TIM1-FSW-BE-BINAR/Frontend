@@ -1,21 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query"; // Tambahkan useMutation
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, Button, Row, Col, Image } from "react-bootstrap";
 import { getIdBooking } from "../../../service/booking";
 import { tickets } from "../../../service/ticket";
+import { getAllDiscounts } from "../../../service/discount";
 import { useSelector } from "react-redux";
 import { VscChromeClose } from "react-icons/vsc";
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale";
 import toast, { Toaster } from "react-hot-toast";
 import "./DetailHistory.css";
-import { getIdPayment, cancelPayment } from "../../../service/payment";
+import {
+  getIdPayment,
+  cancelPayment,
+  getAllPayment,
+} from "../../../service/payment";
 import DetailPesananLoading from "../Loading/DetailHistoryLoading";
+import { useNavigate } from "@tanstack/react-router";
 
-const DetailHistory = ({ id, paymentId, onBack }) => {
+const DetailHistory = ({ id, onBack }) => {
   const { token } = useSelector((state) => state.auth);
   const [booking, setBookingDetail] = useState(null);
   const [qrCodeImage, setQrCodeImage] = useState(null);
+  const [matchedPayment, setMatchedPayment] = useState(null);
+  const navigate = useNavigate();
 
   const { data, isLoading, isSuccess, isError, error } = useQuery({
     queryKey: ["getIdBooking", id],
@@ -23,16 +31,15 @@ const DetailHistory = ({ id, paymentId, onBack }) => {
     enabled: !!id && !!token,
   });
 
-  const { dataPay, isSuccessPay, isLoadingPay } = useQuery({
-    queryKey: ["getIdPayment", paymentId],
-    queryFn: () => getIdPayment(paymentId),
-    enabled: !!token && !!paymentId,
+  const { data: paymentData } = useQuery({
+    queryKey: ["payment"],
+    queryFn: getAllPayment,
+    enabled: !!token,
   });
 
   const mutation = useMutation({
     mutationFn: (request) => tickets(id, request),
     onSuccess: (result) => {
-      console.log("result:", result);
       if (result?.data?.[0]?.qrCodeImage) {
         setQrCodeImage(result.qrCodeImage);
         toast.success("Ticket printed successfully!", {
@@ -46,7 +53,7 @@ const DetailHistory = ({ id, paymentId, onBack }) => {
             secondary: "#73CA5C",
           },
         });
-        console.log("Print ticket result:", result);
+
         setTimeout(() => {
           window.location.reload();
         }, 750);
@@ -90,26 +97,33 @@ const DetailHistory = ({ id, paymentId, onBack }) => {
     },
   });
 
-  const cancelPaymentMutation = useMutation({
-    mutationFn: (orderId) => cancelPayment(orderId),
-    onSuccess: (result) => {
-      toast.success("Payment successfully canceled!");
-      console.log("Cancel payment result:", result);
+  const handlePaymentNavigation = () => {
+    if (matchedPayment?.status === "pending") {
+      const snapToken = matchedPayment?.snapToken;
+      const amount = matchedPayment?.amount;
 
-      onBack();
-    },
-    onError: (err) => {
-      toast.error("Failed to cancel payment. Please try again.");
-      console.error("Cancel payment error:", err);
-    },
-  });
+      if (snapToken && amount) {
+        navigate({
+          to: `/payment?snapToken=${snapToken}&amount=${amount}`,
+        });
+      } else {
+        toast.error("Data pembayaran tidak lengkap.");
+      }
+    } else {
+      const flightId = booking?.flight?.id;
+      const totalPassengers = booking?.totalPassengers || 1;
+      const adultInput = booking?.adultInput || 1;
+      const childInput = booking?.childInput || 0;
+      const babyInput = booking?.babyInput || 0;
 
-  const handleCancelPayment = () => {
-    if (!paymentId) {
-      toast.error("Payment ID not found.");
-      return;
+      if (flightId) {
+        navigate({
+          to: `/booking?flightId=${flightId}&totalPassengers=${totalPassengers}&adultInput=${adultInput}&childInput=${childInput}&babyInput=${babyInput}`,
+        });
+      } else {
+        toast.error("Data penerbangan tidak ditemukan.");
+      }
     }
-    cancelPaymentMutation.mutate(paymentId);
   };
 
   const groupedPassengers = booking?.bookingDetail?.reduce((acc, detail) => {
@@ -123,8 +137,49 @@ const DetailHistory = ({ id, paymentId, onBack }) => {
   }, {});
 
   useEffect(() => {
+    if (isSuccess && paymentData?.payments && booking?.bookingDetail) {
+      let matchedPayment = null;
+
+      for (let detail of booking.bookingDetail) {
+        matchedPayment = paymentData.payments.find(
+          (payment) => payment.bookingId === detail.bookingId
+        );
+
+        if (matchedPayment) {
+          console.log("matched payment: ", matchedPayment);
+          break;
+        }
+      }
+    }
+
+    if (isError) {
+      console.error("Error fetching booking details:", error);
+    }
+  }, [isSuccess, paymentData, booking, isError, error]);
+
+  useEffect(() => {
+    if (isSuccess && paymentData?.payments && booking?.bookingDetail) {
+      let foundPayment = null;
+
+      for (let detail of booking.bookingDetail) {
+        foundPayment = paymentData.payments.find(
+          (payment) => payment.bookingId === detail.bookingId
+        );
+
+        if (foundPayment) {
+          setMatchedPayment(foundPayment);
+          break;
+        }
+      }
+    }
+
+    if (isError) {
+      console.error("Error fetching booking details:", error);
+    }
+  }, [isSuccess, paymentData, booking, isError, error]);
+
+  useEffect(() => {
     if (isSuccess) {
-      console.log("Booking details fetched successfully:", data);
       setBookingDetail(data);
     }
 
@@ -166,6 +221,16 @@ const DetailHistory = ({ id, paymentId, onBack }) => {
     });
   };
 
+  useEffect(() => {
+    if (isSuccess) {
+      setBookingDetail(data);
+    }
+
+    if (isError) {
+      console.error("Error fetching booking details:", error);
+    }
+  }, [isSuccess, data, isError, error]);
+
   if (isLoading) return <DetailPesananLoading />;
   if (isError) return <p>Error fetching details: {error.message}</p>;
 
@@ -193,14 +258,31 @@ const DetailHistory = ({ id, paymentId, onBack }) => {
           <div className="d-flex justify-content-between align-items-center mb-3 custom-status">
             <h6 className="fw-bold custom-h6">Booking Detail</h6>
             <span
-              className="px-3 py-1 text-white "
+              className="px-3 py-1 text-white"
               style={{
-                backgroundColor: "#73CA5C",
+                backgroundColor:
+                  matchedPayment?.status === "pending"
+                    ? "#FF0000"
+                    : matchedPayment?.status === "settlement"
+                      ? "#73CA5C"
+                      : matchedPayment?.status === "expire"
+                        ? "#8A8A8A"
+                        : matchedPayment?.status === "cancel"
+                          ? "#dbd807"
+                          : "#73CA5C",
                 borderRadius: "10px",
                 fontSize: "12px",
               }}
             >
-              {booking?.status}
+              {matchedPayment?.status === "pending"
+                ? "UNPAID"
+                : matchedPayment?.status === "settlement"
+                  ? "PAID"
+                  : matchedPayment?.status === "expire"
+                    ? "EXPIRED"
+                    : matchedPayment?.status === "cancel"
+                      ? "CANCELED"
+                      : booking?.status}{" "}
             </span>
           </div>
 
@@ -341,46 +423,64 @@ const DetailHistory = ({ id, paymentId, onBack }) => {
             </div>
           </div>
 
-          {/* Tombol Cetak Tiket */}
-          {!booking?.bookingDetail[0]?.qrCodeImage && (
-            <>
-              <Button
-                style={{
-                  backgroundColor: "#4B1979",
-                  border: "none",
-                  borderRadius: "10px",
-                  width: "100%",
-                }}
-                className="mb-2 print-button"
-                onClick={handlePrintTicket}
-                disabled={mutation.isLoading}
-              >
-                {mutation.isLoading ? "Printing..." : "Print Ticket"}
-              </Button>
+          {/* Tombol Lanjut Bayar atau Print Ticket */}
 
-              {/* <Button
-                style={{
-                  backgroundColor: "#FF0000",
-                  border: "none",
-                  borderRadius: "10px",
-                  width: "100%",
-                }}
-                className="cancel-button"
-                onClick={handleCancelPayment}
-                disabled={cancelPaymentMutation.isLoading}
-              >
-                {cancelPaymentMutation.isLoading
-                  ? "Canceling..."
-                  : "Cancel Payment"}
-              </Button> */}
-            </>
-          )}
+          <div className="mt-3 d-flex justify-content-center align-items-center flex-column">
+            <Button
+              variant="none"
+              className="mb-3 text-white rounded-pill custom-btn1"
+              style={{
+                width: "15rem",
+                height: "3rem",
+                backgroundColor:
+                  matchedPayment?.status === "cancel" ||
+                  matchedPayment?.status === "expire" ||
+                  booking?.bookingDetail[0]?.qrCodeImage
+                    ? "transparent"
+                    : matchedPayment?.status === "pending" || !matchedPayment
+                      ? "#73CA5C"
+                      : "#4B1979",
+
+                display:
+                  matchedPayment?.status === "cancel" ||
+                  matchedPayment?.status === "expire" ||
+                  booking?.bookingDetail[0]?.qrCodeImage
+                    ? "none"
+                    : "block",
+              }}
+              onClick={() => {
+                if (matchedPayment?.status === "pending" || !matchedPayment) {
+                  handlePaymentNavigation();
+                } else if (
+                  matchedPayment?.status !== "cancel" &&
+                  matchedPayment?.status !== "expire" &&
+                  !booking?.bookingDetail[0]?.qrCodeImage
+                ) {
+                  handlePrintTicket();
+                }
+              }}
+              disabled={
+                matchedPayment?.status === "cancel" ||
+                matchedPayment?.status === "expire" ||
+                booking?.bookingDetail[0]?.qrCodeImage ||
+                mutation?.isLoading
+              }
+            >
+              {matchedPayment?.status === "pending" || !matchedPayment
+                ? "Continue Payment"
+                : !booking?.bookingDetail[0]?.qrCodeImage
+                  ? mutation.isLoading
+                    ? "Printing..."
+                    : "Print Ticket"
+                  : ""}
+            </Button>
+          </div>
 
           {booking?.bookingDetail[0]?.qrCodeImage && (
             <div className="mt-3 text-center">
               <Button
                 variant="none"
-                className="mb-3 text-white rounded-pill "
+                className="mb-3 text-white rounded-pill custom-btn2"
                 style={{
                   backgroundColor: "#4B1979",
                   height: "3rem",
@@ -389,11 +489,11 @@ const DetailHistory = ({ id, paymentId, onBack }) => {
               >
                 Download QR Ticket
               </Button>
-              <h6>Scan QR Ticket:</h6>
+              <h6 className="custom-h6-qr">Scan QR Ticket:</h6>
               <Image
                 src={booking?.bookingDetail[0]?.qrCodeImage}
                 alt="QR Code"
-                className="img-fluid"
+                className="img-fluid qr-ticket"
                 style={{ maxWidth: "200px" }}
               />
             </div>

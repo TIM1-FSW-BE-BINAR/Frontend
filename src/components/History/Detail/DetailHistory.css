@@ -22,8 +22,19 @@
   }
 
   .print-button,
-  .cancel-button {
+  .cancel-button,
+  .customh6-qr {
     font-size: 12px !important;
+  }
+
+  .custom-btn1,
+  .custom-btn2 {
+    height: 2rem !important;
+    font-size: 12px !important;
+  }
+
+  .qr-ticket {
+    height: 10rem !important;
   }
 }
 
