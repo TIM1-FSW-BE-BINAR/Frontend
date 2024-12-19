@@ -7,9 +7,9 @@ const Footer = () => {
         <Container className="py-1">
           <Row className="d-flex flex-column flex-lg-row">
             <Col>
-              <p>Jalan Suroyo No. 161 Mayangan Kota Probolonggo 672000</p>
+              <p>Suroyo Street No. 161, Mayangan, Probolinggo City, 672000</p>
               <p>binarEticket@gmail.com</p>
-              <p>081-233-334-808</p>
+              <p>+62 81-233-334-808</p>
             </Col>
             <Col className="fw-medium">
               <a className="nav-link active" href="#our-service">

@@ -12,7 +12,7 @@ export const Route = createRootRoute({
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID}>
       <HomepageProvider>
         <Outlet />
-        <TanStackRouterDevtools />
+         <TanStackRouterDevtools />
         <ToastContainer theme="colored" />
       </HomepageProvider>
     </GoogleOAuthProvider>
