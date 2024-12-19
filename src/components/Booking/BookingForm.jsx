@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "@tanstack/react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
-import { PulseLoader } from "react-spinners";
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 import MenuItem from "@mui/material/MenuItem";
@@ -12,7 +11,6 @@ import "react-toastify/dist/ReactToastify.css";
 import SeatMapReturn from "../SeatMapReturn";
 import TicketDetails from "../TicketDetails";
 import SeatMap from "../SeatMap";
-//import { createBooking } from "../../service/booking";
 import { getFlightId } from "../../service/flight/flightService";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -202,51 +200,23 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
     }
   }, [returnFlightId]);
 
-  const seatNumbers =
-    selectedSeats?.map((seat) => seat.seatNumber).join(", ") ||
-    "No seat selected.";
-  const seatNumbersReturn =
-    selectedSeatsReturn?.map((seat) => seat.seatNumber).join(", ") ||
-    "No seat selected.";
+  const [seatNumber, setSeatNumber] = useState();
 
-  // const { mutate: booking, isLoading } = useMutation({
-  //   mutationFn: (request) => createBooking(request),
-  //   onSuccess: () => {
-  //     toast.success("Data successfully saved.", {
-  //       autoClose: 3000,
-  //     });
-  //     toast.success(`Seat ${seatNumbers} Successfully booked.`, {
-  //       autoClose: 3000,
-  //     });
-  //     toast.success(
-  //       `Seat ${seatNumbersReturn} Successfully booked for the return flight.`,
-  //       {
-  //         autoClose: 3000,
-  //       }
-  //     );
-  //     setIsSaved(true);
-  //   },
-  //   onError: (error) => {
-  //     toast.error(`Error: ${error.message}`);
-  //     setIsSaved(false);
-  //   },
-  // });
+  useEffect(() => {
+    setSeatNumber(
+      selectedSeats?.map((seat) => seat.seatNumber).join(", ") ||
+        "No seat selected."
+    );
+  }, [selectedSeats]);
 
-  // if (isLoading) {
-  //   return (
-  //     <div
-  //       style={{
-  //         display: "flex",
-  //         justifyContent: "center",
-  //         alignItems: "center",
-  //         height: "100vh",
-  //         width: "100%",
-  //       }}
-  //     >
-  //       <PulseLoader color="#7126B5" size={15} />
-  //     </div>
-  //   );
-  // }
+  const [seatNumberReturn, setSeatNumberReturn] = useState();
+
+  useEffect(() => {
+    setSeatNumberReturn(
+      selectedSeatsReturn?.map((seat) => seat.seatNumber).join(", ") ||
+        "No seat selected."
+    );
+  }, [selectedSeatsReturn]);
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -258,9 +228,6 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
       return;
     }
 
-    console.log("Passenger Data:", passengerData);
-    console.log("Selected seat:", selectedSeats);
-    console.log("Selected seat return flight:", selectedSeatsReturn);
     setIsSaved(true);
 
     const bookingDetailOneWay = passengers.map(
@@ -302,8 +269,10 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
 
     console.log("Request in JSON format:", JSON.stringify(request, null, 2));
 
-    //booking(request);
     setDataBooking(request);
+    toast.success("Data successfully saved.", {
+      autoClose: 3000,
+    });
   };
 
   const IOSSwitch = styled((props) => (
@@ -943,11 +912,17 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
           <Col sm={12} md={12} lg={5} xl={4}>
             <Card className="shadow-sm mb-3">
               <Card.Body>
+                <Card.Title className="text-secondary text-center">
+                  Ticket Details
+                </Card.Title>
                 <TicketDetails
                   isSaved={isSaved}
                   setIsPayment={setIsPayment}
                   isPayment={isPayment}
                   dataBooking={dataBooking}
+                  setDataBooking={setDataBooking}
+                  seatNumber={seatNumber}
+                  seatNumberReturn={seatNumberReturn}
                 />
               </Card.Body>
             </Card>

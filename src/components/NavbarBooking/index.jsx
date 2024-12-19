@@ -25,7 +25,6 @@ useEffect(() => {
             const newTime = prev > 0 ? prev - 1 : 0;
             localStorage.getItem("timeLeft", newTime);
             localStorage.setItem("timeLeft", newTime); 
-            console.log("Updated timeLeft:", newTime);
             return newTime;
           });
         }, 1000);
