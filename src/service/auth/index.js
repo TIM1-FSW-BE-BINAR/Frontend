@@ -152,17 +152,19 @@ export const resetPassword = async (request) => {
 
 export const profile = async () => {
   const token = localStorage.getItem("token");
-  const response = await fetch(`${import.meta.env.VITE_API_URL}`, {
-    headers: {
-      authorization: `Bearer ${token}`,
-    },
-    method: "GET",
-  });
+  const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/v1/auth/me`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+      method: "GET",
+    }
+  );
 
   const result = await response.json();
   return result?.data;
 };
-
 
 export const profileMe = async () => {
   const token = localStorage.getItem("token");

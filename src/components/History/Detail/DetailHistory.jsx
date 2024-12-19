@@ -338,7 +338,9 @@ const DetailHistory = ({ id, onBack }) => {
               {/* Detail Maskapai */}
               <h6 className="fw-bolder m-0 custom-flight">
                 {booking?.flight?.airline?.name || "Airline not available"} -{" "}
-                {booking?.flight?.class || "N/A"}
+                {booking.flight?.class
+                  ? booking.flight.class.replace(/_/g, " ")
+                  : "Class not available"}
               </h6>
               <p className="m-0 fw-bold">
                 {booking?.flight?.flightNumber || "Flight Number N/A"}

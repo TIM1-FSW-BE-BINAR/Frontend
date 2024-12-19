@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Container, Button, Card, Form, Row, Col } from "react-bootstrap";
+import {
+  Container,
+  Button,
+  Card,
+  Form,
+  Row,
+  Col,
+  InputGroup,
+} from "react-bootstrap";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { profileMe } from "../../service/auth";
@@ -10,6 +18,8 @@ import "react-phone-number-input/style.css";
 import { BeatLoader } from "react-spinners";
 import "./ScreenUserProfil.css";
 import ScreenUserProfilLoading from "./Loading/ScreenUserProfilLoading";
+import { IoPersonOutline, IoPeopleOutline } from "react-icons/io5";
+import { LuPhone, LuMail } from "react-icons/lu";
 
 const ScreenUserProfil = () => {
   const { token } = useSelector((state) => state.auth);
@@ -105,50 +115,70 @@ const ScreenUserProfil = () => {
             <Form onSubmit={handleSubmit}>
               <Form.Group controlId="formFirstName" className="mb-3">
                 <Form.Label className="custom-h5-ubah">First Name</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="First Name"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  className="form-control-data-diri"
-                />
+                <InputGroup>
+                  <Form.Control
+                    type="text"
+                    placeholder="First Name"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="form-control-data-diri"
+                  />
+                  <InputGroup.Text>
+                    <IoPersonOutline />
+                  </InputGroup.Text>
+                </InputGroup>
               </Form.Group>
 
               <Form.Group controlId="formLastName" className="mb-3">
                 <Form.Label className="custom-h5-ubah">Last Name</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Last Name"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  className="form-control-data-diri"
-                />
+                <InputGroup>
+                  <Form.Control
+                    type="text"
+                    placeholder="Last Name"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="form-control-data-diri"
+                  />
+                  <InputGroup.Text>
+                    <IoPeopleOutline />
+                  </InputGroup.Text>
+                </InputGroup>
               </Form.Group>
 
               <Form.Group controlId="formPhone" className="mb-3">
                 <Form.Label className="custom-h5-ubah">Phone Number</Form.Label>
-                <PhoneInput
-                  placeholder="Masukkan nomor telepon"
-                  value={formData.phone}
-                  onChange={handlePhoneChange}
-                  defaultCountry="ID"
-                  international
-                  className="form-control form-control-data-diri"
-                />
+                <InputGroup>
+                  <PhoneInput
+                    placeholder="Masukkan nomor telepon"
+                    value={formData.phone}
+                    onChange={handlePhoneChange}
+                    defaultCountry="ID"
+                    international
+                    className="form-control form-control-data-diri"
+                  />
+                  <InputGroup.Text>
+                    <LuPhone />
+                  </InputGroup.Text>
+                </InputGroup>
               </Form.Group>
 
               <Form.Group controlId="formEmail" className="mb-3">
                 <Form.Label className="custom-h5-ubah">Email</Form.Label>
-                <Form.Control
-                  type="email"
-                  placeholder="johndoe@gmail.com"
-                  name="email"
-                  value={data.email}
-                  readOnly
-                  className="form-control-data-diri"
-                />
+                <InputGroup>
+                  <Form.Control
+                    type="email"
+                    placeholder="johndoe@gmail.com"
+                    name="email"
+                    value={data.email}
+                    readOnly
+                    className="form-control-data-diri"
+                  />
+                  <InputGroup.Text>
+                    <LuMail />
+                  </InputGroup.Text>
+                </InputGroup>
               </Form.Group>
 
               <Button

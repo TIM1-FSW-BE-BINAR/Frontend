@@ -321,7 +321,9 @@ const ScreenHistory = () => {
                             </span>
                             <br />
                             <span className="fw-normal ms-2 custom-footer">
-                              {booking.flight?.class || "Class not available"}
+                              {booking.flight?.class
+                                ? booking.flight.class.replace(/_/g, " ")
+                                : "Class not available"}
                             </span>
                           </div>
                           <span
