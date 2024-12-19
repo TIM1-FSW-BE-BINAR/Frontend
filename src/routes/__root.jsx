@@ -1,5 +1,5 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
+//import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "react-toastify/dist/ReactToastify.css";
 import "react-confirm-alert/src/react-confirm-alert.css";
@@ -12,7 +12,7 @@ export const Route = createRootRoute({
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID}>
       <HomepageProvider>
         <Outlet />
-         <TanStackRouterDevtools />
+         {/* <TanStackRouterDevtools /> */}
         <ToastContainer theme="colored" />
       </HomepageProvider>
     </GoogleOAuthProvider>

@@ -12,6 +12,7 @@ import { getAllDiscounts } from "../../service/discount";
 import { useMutation } from "@tanstack/react-query";
 import { createSnap } from "../../service/payment/snap";
 import { createBooking } from "../../service/booking";
+import discountIcon from "../../assets/discount-icon.png";
 
 const TicketDetails = ({
   isSaved,
@@ -139,7 +140,7 @@ const TicketDetails = ({
   const { date: returnArrivalDate, time: returnArrivalTime } = parseDateAndTime(
     returnFlight?.data?.arrivalTime
   );
-
+  
   const handleDiscount = (discountId, discountValue) => {
     if (selectedDiscount === discountId) {
       setTotalDiscount(0);
@@ -526,7 +527,20 @@ const TicketDetails = ({
             className="mb-3"
           >
             <Accordion.Item eventKey="0">
-              <Accordion.Header>Discount</Accordion.Header>
+              <Accordion.Header>
+                <div className="d-flex align-items-center">
+                  <img
+                    src={discountIcon}
+                    alt="Discount"
+                    style={{
+                      width: "24px",
+                      height: "24px",
+                      marginRight: "8px", 
+                    }}
+                  />
+                  Discount
+                </div>
+              </Accordion.Header>
               {discount?.length > 0 ? (
                 discount.map((discount) => {
                   const isExpired =
@@ -562,7 +576,10 @@ const TicketDetails = ({
                         discount : {discount.value} %
                         <br />
                         minimum order : IDR {discount.minPurchase} <br />
-                        expired at : {discount.endDate} <br />
+                        expired at : {
+                          parseDateAndTime(discount.endDate).date
+                        }{" "}
+                        <br />
                       </span>
                       {isSelected && (
                         <div
