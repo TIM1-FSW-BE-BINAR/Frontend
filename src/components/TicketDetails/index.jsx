@@ -180,7 +180,6 @@ const TicketDetails = ({
         bookingDetail: updatedBookingDetail,
       };
 
-      console.log("Starting payment process with data:", updatedDataBooking);
       booking(updatedDataBooking);
     } catch (error) {
       console.error("Payment error:", error);

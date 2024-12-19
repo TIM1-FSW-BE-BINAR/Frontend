@@ -218,52 +218,6 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
     );
   }, [selectedSeatsReturn]);
 
-  // const seatNumbers =
-  //   selectedSeats?.map((seat) => seat.seatNumber).join(", ") ||
-  //   "No seat selected.";
-  // const seatNumbersReturn =
-  //   selectedSeatsReturn?.map((seat) => seat.seatNumber).join(", ") ||
-  //   "No seat selected.";
-
-  // const { mutate: booking, isLoading } = useMutation({
-  //   mutationFn: (request) => createBooking(request),
-  //   onSuccess: () => {
-  //     toast.success("Data successfully saved.", {
-  //       autoClose: 3000,
-  //     });
-  //     toast.success(`Seat ${seatNumbers} Successfully booked.`, {
-  //       autoClose: 3000,
-  //     });
-  //     toast.success(
-  //       `Seat ${seatNumbersReturn} Successfully booked for the return flight.`,
-  //       {
-  //         autoClose: 3000,
-  //       }
-  //     );
-  //     setIsSaved(true);
-  //   },
-  //   onError: (error) => {
-  //     toast.error(`Error: ${error.message}`);
-  //     setIsSaved(false);
-  //   },
-  // });
-
-  // if (isLoading) {
-  //   return (
-  //     <div
-  //       style={{
-  //         display: "flex",
-  //         justifyContent: "center",
-  //         alignItems: "center",
-  //         height: "100vh",
-  //         width: "100%",
-  //       }}
-  //     >
-  //       <PulseLoader color="#7126B5" size={15} />
-  //     </div>
-  //   );
-  // }
-
   const onSubmit = async (event) => {
     event.preventDefault();
     const bookingDate = new Date().toISOString();
@@ -274,9 +228,6 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
       return;
     }
 
-    console.log("Passenger Data:", passengerData);
-    console.log("Selected seat:", selectedSeats);
-    console.log("Selected seat return flight:", selectedSeatsReturn);
     setIsSaved(true);
 
     const bookingDetailOneWay = passengers.map(
@@ -318,7 +269,6 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
 
     console.log("Request in JSON format:", JSON.stringify(request, null, 2));
 
-    //booking(request);
     setDataBooking(request);
     toast.success("Data successfully saved.", {
       autoClose: 3000,
