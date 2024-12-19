@@ -253,7 +253,7 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
           autoClose: 3000,
         }
       );
-    };
+    }
 
     setIsSaved(true);
 

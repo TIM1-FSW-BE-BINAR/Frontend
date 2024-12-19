@@ -147,6 +147,14 @@ const Homepage = () => {
 
   const navigate = useNavigate();
 
+  const [today, setToday] = useState("");
+    useEffect(() => {
+      // Mendapatkan tanggal hari ini dalam format UTC
+      const now = new Date();
+      const utcDate = now.toISOString(); // Format ISO 8601 dalam UTC
+      setToday(utcDate);
+    }, []);
+
   const handleSearchPage = (e) => {
     e.preventDefault();
     if (
@@ -158,21 +166,29 @@ const Homepage = () => {
     ) {
       toast.error("Please fill out all fields in the form!");
     } else {
-      const queryParams = new URLSearchParams({
-        fromInput,
-        toInput,
-        departureDate,
-        returnDate: checkedSwitch ? returnDate : "", // Kirim kosong jika null
-        totalPassengers,
-        adultInput,
-        childInput,
-        babyInput,
-        classInput,
-      }).toString();
-
-      navigate({
-        to: `/search?${queryParams}`,
-      });
+      if(departureDate < departureDateFormat(today)){
+        toast.error("Cannot select date before today!");
+      }else{
+        if(adultInput == 0 && childInput == 0 && babyInput > 0){
+          toast.error("You cannot select a flight for infants without an accompanying adult.");
+        }else{
+          const queryParams = new URLSearchParams({
+            fromInput,
+            toInput,
+            departureDate,
+            returnDate: checkedSwitch ? returnDate : "", // Kirim kosong jika null
+            totalPassengers,
+            adultInput,
+            childInput,
+            babyInput,
+            classInput,
+          }).toString();
+    
+          navigate({
+            to: `/search?${queryParams}`,
+          });
+        }
+      }
     }
   };
 
@@ -193,10 +209,11 @@ const Homepage = () => {
     queryFn: () =>
       getFlights({
         ...(state !== "All" && { state: state }),
+        startDeparture: today,
         page,
         limit: 10,
       }),
-    enabled: !!page,
+    enabled: !!page && !!today,
   });
 
   useEffect(() => {
@@ -222,8 +239,9 @@ const Homepage = () => {
     queryFn: () =>
       getFlights({
         ...(state !== "All" && { state: state }),
+        startDeparture: today,
       }),
-    enabled: true,
+    enabled: !!today,
   });
 
   useEffect(() => {
@@ -232,14 +250,16 @@ const Homepage = () => {
     }
   }, [flightDataAll, isSuccessFlightDataAll]);
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = date.getDate(); // Mendapatkan hari (15)
-    const month = date.toLocaleString("en-US", { month: "long" }); // Mendapatkan bulan dalam bentuk teks (July)
-    const year = date.getFullYear(); // Mendapatkan tahun (2024)
-    return `${day} ${month} ${year}`;
-  };
-
+ const formatDate = (dateString) => {
+   const date = new Date(dateString);
+   const day = date.getUTCDate(); // Mendapatkan hari dalam UTC
+   const month = date.toLocaleString("en-US", {
+     month: "long",
+     timeZone: "UTC",
+   }); // Mendapatkan bulan dalam teks dalam UTC
+   const year = date.getUTCFullYear(); // Mendapatkan tahun dalam UTC
+   return `${day} ${month} ${year}`;
+ };
   const departureDateFormat = (dateString) => {
     const date = new Date(dateString);
     return date.toISOString().split("T")[0];
@@ -1028,13 +1048,6 @@ const Homepage = () => {
                     className="custom-card"
                     onClick={() => handleFlightSelect(flight)}
                   >
-                    <div className="badge-container">
-                      <span
-                        className={`badge ${index % 2 === 0 ? "badge-limited" : "badge-discount"}`}
-                      >
-                        {index % 2 === 0 ? "Limited!" : "50% OFF"}
-                      </span>
-                    </div>
                     <Card.Img
                       variant="top"
                       src={flight?.arrival.imageUrl}
