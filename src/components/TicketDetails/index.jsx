@@ -45,7 +45,8 @@ const TicketDetails = ({
       if (result?.data) {
         const snapData = result?.data;
         setIsPayment(true);
-        navigate({ to: `/payment?snapData=${snapData}` });
+        localStorage.setItem("timeLeft", "0");
+        navigate({ to: `/payment?snapToken=${snapToken}&amount=${amount}` });
       } else {
         toast.error("Failed to create payment token");
       }
@@ -60,15 +61,6 @@ const TicketDetails = ({
       return createBooking(data);
     },
     onSuccess: (response) => {
-      toast.success(`Seat ${seatNumber} Successfully booked.`, {
-        autoClose: 3000,
-      });
-      toast.success(
-        `Seat ${seatNumberReturn} Successfully booked for the return flight.`,
-        {
-          autoClose: 3000,
-        }
-      );
       if (response?.bookingId) {
         const bookingId = response.bookingId;
         localStorage.setItem("bookingId", bookingId);
@@ -164,11 +156,11 @@ const TicketDetails = ({
         throw new Error("Booking data not found. Please fill the form first.");
       }
 
-      localStorage.setItem("timeLeft", "0");
-      
       const updatedBookingDetail = dataBooking.bookingDetail.map((detail) => {
         const basePrice = detail.price;
-        const discountedPrice = basePrice - (basePrice * totalDiscount / 100);
+        const discountedPrice = Math.round(
+          basePrice - (basePrice * totalDiscount) / 100
+        );
 
         return {
           ...detail,
@@ -190,24 +182,35 @@ const TicketDetails = ({
     }
   };
 
-  const priceDeparture =
+  const priceDeparture = Math.round(
     (flight?.data?.price || 0) * adultInput +
-    (flight?.data?.price || 0) * childInput;
-  const priceReturn =
+      (flight?.data?.price || 0) * childInput
+  );
+
+  const priceReturn = Math.round(
     (returnFlight?.data?.price || 0) * adultInput +
-    (returnFlight?.data?.price || 0) * childInput;
+      (returnFlight?.data?.price || 0) * childInput
+  );
 
-  const taxDeparture = priceDeparture * 0.03;
-  const taxReturn = priceReturn * 0.03;
-  
-  const totalPriceDeparture = priceDeparture + taxDeparture;
-  const totalPriceReturn = priceReturn + taxReturn;
+  const discountDeparture = Math.round(priceDeparture * (totalDiscount / 100));
+  const discountReturn = Math.round(priceReturn * (totalDiscount / 100));
 
-  const discountDeparture = (priceDeparture) * (totalDiscount / 100);
-  const discountReturn = (priceReturn * totalDiscount) / 100; 
+  const priceAfterDiscountDeparture = priceDeparture - discountDeparture;
+  const priceAfterDiscountReturn = priceReturn - discountReturn;
 
-  const Total =
-    totalPriceDeparture + totalPriceReturn - discountDeparture - discountReturn;
+  const totalPriceWithoutTax =
+    priceAfterDiscountDeparture + (isRoundtrip ? priceAfterDiscountReturn : 0);
+  const tax = Math.round(totalPriceWithoutTax * 0.03);
+
+  const Total = totalPriceWithoutTax + tax;
+
+  const taxDeparture = Math.round(
+    (priceAfterDiscountDeparture / totalPriceWithoutTax) * tax
+  );
+  const taxReturn = tax - taxDeparture;
+
+  //const totalPriceDeparture = priceAfterDiscountDeparture + taxDeparture;
+  //const totalPriceReturn = isRoundtrip ? (priceAfterDiscountReturn + taxReturn) : 0;
 
   return (
     <>
@@ -535,7 +538,7 @@ const TicketDetails = ({
                     style={{
                       width: "24px",
                       height: "24px",
-                      marginRight: "8px", 
+                      marginRight: "8px",
                     }}
                   />
                   Discount

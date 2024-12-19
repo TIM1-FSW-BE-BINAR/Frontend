@@ -9,7 +9,7 @@ import PropTypes from "prop-types";
 
 const NavbarBooking = ({ isSaved, isPayment, isComplete }) => {
   const navigate = useNavigate();
-  const { user, token } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const [timeLeft, setTimeLeft] = useState(() => {
     const savedTime = localStorage.getItem("timeLeft");
     return savedTime ? parseInt(savedTime, 10) : 0;
@@ -115,7 +115,7 @@ useEffect(() => {
 
             <Row>
               <div>
-                {!user && !token ? (
+                {!user ? (
                   <>
                     <div id="black-overlay"></div>
                     <Row>
