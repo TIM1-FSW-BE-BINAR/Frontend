@@ -58,26 +58,42 @@ const Homepage = () => {
   const [checkedSwitch, setCheckedSwitch] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
 
-  const {
-    fromInput,
-    setFromInput,
-    toInput,
-    setToInput,
-    departureDate,
-    setDepartureDate,
-    returnDate,
-    setReturnDate,
-    adultInput,
-    setAdultInput,
-    childInput,
-    setChildInput,
-    babyInput,
-    setBabyInput,
-    totalPassengers,
-    setTotalPassengers,
-    classInput,
-    setClassInput,
-  } = useContext(HomepageContext);
+  const departureDateFormat = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0];
+  };
+
+  const [fromInput, setFromInput] = useState("Jakarta-CGK");
+  const [toInput, setToInput] = useState("Surabaya-SUB");
+  const [departureDate, setDepartureDate] = useState(
+    departureDateFormat(new Date().toISOString())
+  );
+  const [returnDate, setReturnDate] = useState("");
+  const [adultInput, setAdultInput] = useState(1);
+  const [childInput, setChildInput] = useState(1);
+  const [babyInput, setBabyInput] = useState(1);
+  const [totalPassengers, setTotalPassengers] = useState(3);
+  const [classInput, setClassInput] = useState("First Class");
+
+   const [today, setToday] = useState("");
+   useEffect(() => {
+     const now = new Date();
+     const utcDate = now.toISOString();
+     setToday(utcDate);
+   }, []);
+
+   useEffect(() => {
+     if(localStorage.getItem("lastFrom")){
+      setFromInput(localStorage.getItem("lastFrom"));
+      setToInput(localStorage.getItem("lastTo"));
+      setDepartureDate(localStorage.getItem("lastDeparture"));
+      setReturnDate(localStorage.getItem("lastReturn"));
+      setAdultInput(localStorage.getItem("lastAdult"));
+      setChildInput(localStorage.getItem("lastChild"));
+      setBabyInput(localStorage.getItem("lastBaby"));
+      setClassInput(localStorage.getItem("lastClass"));
+     }
+   }, []);
 
   // Pagination
   const [page, setPage] = useState(1);
@@ -147,13 +163,6 @@ const Homepage = () => {
 
   const navigate = useNavigate();
 
-  const [today, setToday] = useState("");
-  useEffect(() => {
-    const now = new Date();
-    const utcDate = now.toISOString();
-    setToday(utcDate);
-  }, []);
-
   const handleSearchPage = (e) => {
     e.preventDefault();
     if (
@@ -184,6 +193,14 @@ const Homepage = () => {
             babyInput,
             classInput,
           }).toString();
+          localStorage.setItem("lastFrom", fromInput);
+          localStorage.setItem("lastTo", toInput);
+          localStorage.setItem("lastDeparture", departureDate);
+          localStorage.setItem("lastReturn", checkedSwitch ? returnDate : "");
+          localStorage.setItem("lastAdult", adultInput);
+          localStorage.setItem("lastChild", childInput);
+          localStorage.setItem("lastBaby", babyInput);
+          localStorage.setItem("lastClass", classInput);
           navigate({
             to: `/search?${queryParams}`,
           });
@@ -257,10 +274,7 @@ const Homepage = () => {
     const year = date.getUTCFullYear();
     return `${day} ${month} ${year}`;
   };
-  const departureDateFormat = (dateString) => {
-    const date = new Date(dateString);
-    return date.toISOString().split("T")[0];
-  };
+  
   const classInputFormat = (flightClass) => {
     if (flightClass === "FIRST") {
       flightClass = "First Class";
