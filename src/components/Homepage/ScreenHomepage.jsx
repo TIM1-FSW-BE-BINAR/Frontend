@@ -184,7 +184,6 @@ const Homepage = () => {
             babyInput,
             classInput,
           }).toString();
-
           navigate({
             to: `/search?${queryParams}`,
           });

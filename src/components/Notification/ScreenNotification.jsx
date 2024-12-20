@@ -13,6 +13,7 @@ import { id } from "date-fns/locale";
 import { BeatLoader } from "react-spinners";
 import "./ScreenNotification.css";
 import ScreenNotificationLoading from "./Loading/ScreenNotificationLoading";
+import notFound from "../../assets/homepage/not-found.png";
 
 const ScreenNotification = () => {
   const { token } = useSelector((state) => state.auth);
@@ -84,7 +85,7 @@ const ScreenNotification = () => {
           {filteredNotifications?.length === 0 ? (
             <div className=" d-flex justify-content-center align-items-center mt-5 flex-column">
               <img
-                src="src/assets/homepage/not-found.png"
+                src={notFound}
                 alt="tidak-ditemukan"
                 style={{ width: "25rem" }}
                 className="img-search-not-found"
