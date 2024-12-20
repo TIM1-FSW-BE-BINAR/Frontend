@@ -232,7 +232,8 @@ const DetailHistory = ({ id, onBack }) => {
   }, [isSuccess, data, isError, error]);
 
   if (isLoading) return <DetailPesananLoading />;
-  if (isError) return <p>Error fetching details: {error.message}</p>;
+  if (isError || !booking)
+    return <p>Error fetching details: {error?.message || "Unknown error"}</p>;
 
   return (
     <>
