@@ -11,7 +11,6 @@ export const getIdPayment = async (id) => {
   );
 
   const result = await response.json();
-  console.log("payment id:", result);
 
   if (result?.data?.id) {
     result.data.paymentId = result.data.id;
@@ -31,10 +30,25 @@ export const cancelPayment = async (orderId, request) => {
         authorization: `Bearer ${token}`,
       },
       method: "POST",
-      body: formData,
     }
   );
 
   const result = await response.json();
   return result;
+};
+
+export const getAllPayment = async () => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/v1/payment`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+      method: "GET",
+    }
+  );
+
+  const result = await response.json();
+  return result?.data;
 };

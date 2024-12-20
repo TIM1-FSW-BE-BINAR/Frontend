@@ -1,26 +1,29 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { useSelector } from "react-redux";
 import toast, { Toaster } from "react-hot-toast";
 import { Container, Row, Col, Card, Spinner } from "react-bootstrap";
 import DetailPesanan from "./DetailPesanan";
-import { useMutation } from "@tanstack/react-query";
-import { createSnap } from "../../../service/payment/snap";
 
 const PaymentOptions = () => {
   const [snapLoaded, setSnapLoaded] = useState(false);
   const [snapToken, setSnapToken] = useState("");
+  const [bookingId, setBookingId] = useState("");
+  const [amount, setAmount] = useState("");
   const [paymentInitiated, setPaymentInitiated] = useState(false);
-  const searchParams = new URLSearchParams(location.search);
-  const bookingId = parseInt(searchParams.get("bookingId") || "0", 10);
-  // const bookingId = 56;
-  console.log("ini booking id", bookingId);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // if (!transaction_payment) {
-    //         navigate("/");
-    //        }
+    const queryParams = new URLSearchParams(location.search);
+    setSnapToken(queryParams.get("snapToken") || "");
+    setAmount(queryParams.get("amount") || "");
+
+    const storedBookingId = localStorage.getItem("bookingId");
+    if (storedBookingId) {
+      setBookingId(storedBookingId);
+    }
+  }, []);
+
+  useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
     script.setAttribute("data-client-key", "SB-Mid-client-sWHHfn6Rjgzxjvrc");
@@ -71,42 +74,6 @@ const PaymentOptions = () => {
     }
   }, [snapLoaded, snapToken, paymentInitiated]);
 
-  const { mutate: snapCreate } = useMutation({
-    mutationFn: (request) => {
-      return createSnap(request);
-    },
-    onSuccess: (result) => {
-      if (result?.data) {
-        const snaptoken = result?.data?.token;
-        setSnapToken(snaptoken);
-        console.log("P berhasil", snaptoken);
-      } else {
-        handleApiError(result.message);
-      }
-    },
-    onError: (err) => {
-      handleApiError(err.message);
-      toast.error(err?.message, {
-        style: {
-          padding: "16px",
-          background: "#FF0000",
-          color: "#FFFFFF",
-        },
-        iconTheme: {
-          primary: "#000",
-          secondary: "#fff",
-        },
-      });
-    },
-  });
-
-  useEffect(() => {
-    const request = {
-      bookingId,
-    };
-    snapCreate(request);
-  }, [snapCreate]);
-
   return (
     <Container className="py-4">
       <Row className="justify-content-center">
@@ -140,8 +107,8 @@ const PaymentOptions = () => {
               <Card.Title className="text-secondary text-center">
                 Ticket Details
               </Card.Title>
-              {/* Tambahkan detail tiket di sini */}
-              <DetailPesanan bookingId={bookingId} />
+              {/* detail tiket */}
+              <DetailPesanan bookingId={bookingId} amount={amount} />
             </Card.Body>
           </Card>
         </Col>

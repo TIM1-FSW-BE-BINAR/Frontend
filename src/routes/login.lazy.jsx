@@ -55,7 +55,7 @@ function Login() {
         });
       }
     },
-    config: { duration: 4000 },
+    config: { duration: 3500 },
     loop: true,
   });
 

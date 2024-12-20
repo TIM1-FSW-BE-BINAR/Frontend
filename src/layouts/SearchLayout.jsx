@@ -80,12 +80,12 @@ const SearchFlight = ({
 
   const [dateBtnActive, setDateBtnActive] = useState(null);
   const dateObj = new Date(date);
-  const [currentWeek, setCurrentWeek] = useState(dateObj); // Tanggal acuan untuk 1 minggu
-  const [weekDates, setWeekDates] = useState([]); // Menyimpan daftar tanggal dalam 1 minggu
-  const [dateActive, setDateActive] = useState(date); // handle search saat date active nya diganti
+  const [currentWeek, setCurrentWeek] = useState(dateObj);
+  const [weekDates, setWeekDates] = useState([]); 
+  const [dateActive, setDateActive] = useState(date); 
 
   const calculateWeekDates = (baseDate) => {
-    const startDate = startOfWeek(baseDate, { weekStartsOn: 1 }); // Mulai dari hari Senin
+    const startDate = startOfWeek(baseDate, { weekStartsOn: 1 });
     return Array.from({ length: 7 }, (_, i) => addDays(startDate, i));
   };
 

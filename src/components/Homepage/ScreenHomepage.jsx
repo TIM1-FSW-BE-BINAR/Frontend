@@ -58,7 +58,6 @@ const Homepage = () => {
   const [checkedSwitch, setCheckedSwitch] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
 
- 
   const {
     fromInput,
     setFromInput,
@@ -84,7 +83,7 @@ const Homepage = () => {
   const [page, setPage] = useState(1);
 
   const handleButtonCardClick = (index) => {
-    setActiveButton(index); 
+    setActiveButton(index);
   };
 
   const handleSelectClass = (className, elementId, label) => {
@@ -151,7 +150,7 @@ const Homepage = () => {
   const [today, setToday] = useState("");
   useEffect(() => {
     const now = new Date();
-    const utcDate = now.toISOString(); 
+    const utcDate = now.toISOString();
     setToday(utcDate);
   }, []);
 

@@ -62,6 +62,10 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
       toast.error("This seat is already taken!");
       return;
     }
+    if (seat.status === "UNAVAILABLE") {
+      toast.error("This seat is Unavailable!");
+      return;
+    }
 
     if (
       selectedSeats.length >= totalSeat &&
@@ -172,7 +176,7 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
                 <div
                   key={seatIndex}
                   className={`seat ${
-                    seat?.status === "LOCKED" ? "booked" : ""
+                    seat?.status === "LOCKED" || seat?.status === "UNAVAILABLE" ? "booked" : ""
                   } ${isSelected ? "selected" : ""}`}
                   onClick={() => seat && handleSeatClick(seat)}
                   style={{
