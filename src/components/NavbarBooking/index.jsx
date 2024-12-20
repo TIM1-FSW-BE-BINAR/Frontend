@@ -9,7 +9,7 @@ import PropTypes from "prop-types";
 
 const NavbarBooking = ({ isSaved, isPayment, isComplete }) => {
   const navigate = useNavigate();
-  const { user, token } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const [timeLeft, setTimeLeft] = useState(() => {
     const savedTime = localStorage.getItem("timeLeft");
     return savedTime ? parseInt(savedTime, 10) : 0;
@@ -25,7 +25,6 @@ useEffect(() => {
             const newTime = prev > 0 ? prev - 1 : 0;
             localStorage.getItem("timeLeft", newTime);
             localStorage.setItem("timeLeft", newTime); 
-            console.log("Updated timeLeft:", newTime);
             return newTime;
           });
         }, 1000);
@@ -116,7 +115,7 @@ useEffect(() => {
 
             <Row>
               <div>
-                {!user && !token ? (
+                {!user ? (
                   <>
                     <div id="black-overlay"></div>
                     <Row>

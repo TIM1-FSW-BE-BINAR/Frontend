@@ -5,7 +5,6 @@ body {
 .form-section {
   position: relative;
   padding: 20px;
-  /* margin-top: -50px; */
 }
 
 .form-container {
@@ -13,7 +12,6 @@ body {
   border-radius: 8px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   max-width: 1200px;
-  /* transform: translateY(-50%); */
   margin: 0 auto;
 }
 
@@ -126,31 +124,6 @@ body {
   transform: translateY(-5px);
 }
 
-/* Styling untuk Badge */
-.badge-container {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 2;
-}
-
-.badge {
-  display: inline-block;
-  padding: 5px 10px;
-  border-radius: 20px;
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: bold;
-}
-
-.badge-limited {
-  background-color: #aa6bff;
-}
-
-.badge-discount {
-  background-color: #ff69b4;
-}
-
 /* Styling Card Title */
 .card-title {
   font-size: 1.2rem;
@@ -175,8 +148,8 @@ body {
 .custom-card-body {
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Untuk membuat teks terpisah dengan jarak */
-  align-items: flex-start; /* Posisi sejajar di kiri */
+  justify-content: space-between;
+  align-items: flex-start;
   gap: 2px;
 }
 
@@ -196,29 +169,28 @@ body {
   flex-wrap: nowrap;
   text-align: center;
   cursor: pointer;
-  min-width: 120px; /* Pastikan tombol memiliki lebar minimum */
+  min-width: 120px;
   max-width: 180px;
-  transition: all 0.3s ease; /* Animasi transisi */
+  transition: all 0.3s ease;
   padding: 10px;
   border-radius: 8px;
 }
 
-/* Ukuran ikon yang konsisten */
 .responsive-button .icon {
-  font-size: 18px; /* Ukuran tetap */
+  font-size: 18px;
   margin-right: 6px;
-  width: 18px; /* Konsisten */
-  height: 18px; /* Konsisten */
-  flex-shrink: 0; /* Ikon tidak mengecil */
-  display: inline-block; /* Pastikan sebagai blok untuk mencegah distorsi */
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: inline-block;
 }
 
 /* Styling teks */
 .responsive-button .button-label {
   font-size: 0.9rem;
-  color: #000; /* Warna teks default */
-  white-space: nowrap; /* Hindari teks terpotong */
-  margin: 0; /* Hindari margin default */
+  color: #000;
+  white-space: nowrap;
+  margin: 0;
 }
 
 /* Hover efek */
@@ -231,7 +203,6 @@ body {
   color: #fff;
 }
 
-/* Warna tombol saat aktif (clicked) */
 .responsive-button.active {
   background: #7126b5 !important;
 }
@@ -245,7 +216,7 @@ body {
 @media (max-width: 576px) {
   .responsive-button {
     padding: 8px;
-    min-width: 100px; /* Lebar minimum lebih kecil untuk layar kecil */
+    min-width: 100px;
     max-width: 150px;
   }
 

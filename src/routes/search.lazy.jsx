@@ -1,7 +1,7 @@
-import * as React from "react";
 import { createLazyFileRoute, useLocation } from "@tanstack/react-router";
-import ScreenSearch from "../components/Search/SearchFlight";
+import SearchLayout from "../layouts/SearchLayout";
 import NavigationBar from "../components/Navbar";
+import Footer from "../components/Footer";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getAirports } from "../service/airport/airportService";
@@ -22,7 +22,8 @@ function Search() {
   const adultInput = searchParams.get("adultInput");
   const childInput = searchParams.get("childInput");
   const babyInput = searchParams.get("babyInput");
-  const classInput = searchParams.get("classInput");
+  let classInput = searchParams.get("classInput");
+  classInput = classInput?.replace(/\+/g, " ");
 
   const departureAirportCode = fromInput?.split("-")[1];
   const returnAirportCode = toInput?.split("-")[1];
@@ -31,16 +32,24 @@ function Search() {
   const [departureAirportId, setDepartureAirportId] = useState(null);
   const [returnAirportId, setReturnAirportId] = useState(null);
 
+  const [seatClassValue, setSeatClassValue] = useState(classInput);
+
+  useEffect(() => {
+    if (classInput === "Premium Economy") {
+      setSeatClassValue("PREMIUM_ECONOMY");
+    } else {
+      setSeatClassValue(classInput?.split(" ")[0]);
+    }
+  }, [classInput]);
+
   const { data, isSuccess, isError } = useQuery({
     queryKey: ["airports"],
     queryFn: () => getAirports(),
-    staleTime: 0, // Paksa fetch ulang setiap kali query dijalankan
   });
 
   useEffect(() => {
     if (isSuccess) {
       setAirports(data);
-      // Reset departure and return airport IDs
       setDepartureAirportId(null);
       setReturnAirportId(null);
     } else if (isError) {
@@ -66,22 +75,54 @@ function Search() {
     }
   }, [returnAirportCode, airports]);
 
+  const [flightSelect, setFlightSelect] = useState("");
+  const [returnScreen, setReturnScreen] = useState(false);
+
   return (
     <>
       <NavigationBar />
-      <ScreenSearch
-        fromInput={fromInput?.replace(/\+/g, " ")}
-        toInput={toInput?.replace(/\+/g, " ")}
-        departureDate={departureDate}
-        returnDate={returnDate}
-        passengers={totalPassengers}
-        adultInput={adultInput}
-        childInput={childInput}
-        babyInput={babyInput}
-        classInput={classInput?.replace(/\+/g, " ")}
-        departureAirportId={departureAirportId}
-        returnAirportId={returnAirportId}
-      />
+
+      {returnScreen ? (
+        <SearchLayout
+          key="return"
+          fromInput={toInput?.replace(/\+/g, " ")}
+          toInput={fromInput?.replace(/\+/g, " ")}
+          departureDate={departureDate}
+          returnDate={returnDate}
+          passengers={totalPassengers}
+          adultInput={adultInput}
+          childInput={childInput}
+          babyInput={babyInput}
+          classInput={seatClassValue}
+          departureAirportId={returnAirportId}
+          returnAirportId={departureAirportId}
+          date={returnDate}
+          setReturnScreen={setReturnScreen}
+          setFlightSelect={setFlightSelect}
+          flightSelect={flightSelect}
+        />
+      ) : (
+        <SearchLayout
+          key="departure"
+          fromInput={fromInput?.replace(/\+/g, " ")}
+          toInput={toInput?.replace(/\+/g, " ")}
+          departureDate={departureDate}
+          returnDate={returnDate}
+          passengers={totalPassengers}
+          adultInput={adultInput}
+          childInput={childInput}
+          babyInput={babyInput}
+          classInput={seatClassValue}
+          departureAirportId={departureAirportId}
+          returnAirportId={returnAirportId}
+          date={departureDate}
+          setReturnScreen={setReturnScreen}
+          setFlightSelect={setFlightSelect}
+          flightSelect={null}
+        />
+      )}
+
+      <Footer />
     </>
   );
 }
