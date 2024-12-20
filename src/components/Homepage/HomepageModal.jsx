@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Col, Container, Form, Modal, Row } from "react-bootstrap";
 import searchIcon from "../../assets/homepage/icon/search-icon.png";
 import { SlLocationPin } from "react-icons/sl";
@@ -18,9 +18,8 @@ const HomepageModal = (props) => {
 
   useEffect(() => {
     if (show) {
-      setInputValue(""); // Reset nilai input saat modal dibuka
+      setInputValue("");
 
-      // Remove duplicates when modal is opened
       const uniqueFlights = flights.reduce(
         (acc, flight) => {
           const key =
@@ -40,58 +39,56 @@ const HomepageModal = (props) => {
     }
   }, [show, flights, activeModal, setInputValue]);
 
- useEffect(() => {
-   if (inputValue.trim() === "") {
-     // Jika input kosong, tampilkan seluruh data unik
-     const uniqueFlights = flights.reduce(
-       (acc, flight) => {
-         const key =
-           activeModal === "from"
-             ? `${flight.departure.city}-${flight.departure.code}`
-             : `${flight.arrival.city}-${flight.arrival.code}`;
-         if (!acc.map.has(key)) {
-           acc.map.set(key, true);
-           acc.list.push(flight);
-         }
-         return acc;
-       },
-       { map: new Map(), list: [] }
-     ).list;
+  useEffect(() => {
+    if (inputValue.trim() === "") {
+      const uniqueFlights = flights.reduce(
+        (acc, flight) => {
+          const key =
+            activeModal === "from"
+              ? `${flight.departure.city}-${flight.departure.code}`
+              : `${flight.arrival.city}-${flight.arrival.code}`;
+          if (!acc.map.has(key)) {
+            acc.map.set(key, true);
+            acc.list.push(flight);
+          }
+          return acc;
+        },
+        { map: new Map(), list: [] }
+      ).list;
 
-     setFilteredFlights(uniqueFlights);
-   } else {
-     const lowerCaseInput = inputValue.toLowerCase();
-     const filtered = flights.filter((flight) => {
-       const targetFields =
-         activeModal === "from"
-           ? `${flight.departure.city} ${flight.departure.code}`
-           : `${flight.arrival.city} ${flight.arrival.code}`;
-       return targetFields.toLowerCase().includes(lowerCaseInput);
-     });
+      setFilteredFlights(uniqueFlights);
+    } else {
+      const lowerCaseInput = inputValue.toLowerCase();
+      const filtered = flights.filter((flight) => {
+        const targetFields =
+          activeModal === "from"
+            ? `${flight.departure.city} ${flight.departure.code}`
+            : `${flight.arrival.city} ${flight.arrival.code}`;
+        return targetFields.toLowerCase().includes(lowerCaseInput);
+      });
 
-     // Remove duplicates based on city and code for filtered results
-     const uniqueFiltered = filtered.reduce(
-       (acc, flight) => {
-         const key =
-           activeModal === "from"
-             ? `${flight.departure.city}-${flight.departure.code}`
-             : `${flight.arrival.city}-${flight.arrival.code}`;
-         if (!acc.map.has(key)) {
-           acc.map.set(key, true);
-           acc.list.push(flight);
-         }
-         return acc;
-       },
-       { map: new Map(), list: [] }
-     ).list;
+      const uniqueFiltered = filtered.reduce(
+        (acc, flight) => {
+          const key =
+            activeModal === "from"
+              ? `${flight.departure.city}-${flight.departure.code}`
+              : `${flight.arrival.city}-${flight.arrival.code}`;
+          if (!acc.map.has(key)) {
+            acc.map.set(key, true);
+            acc.list.push(flight);
+          }
+          return acc;
+        },
+        { map: new Map(), list: [] }
+      ).list;
 
-     setFilteredFlights(uniqueFiltered);
-   }
- }, [inputValue, flights, activeModal]);
+      setFilteredFlights(uniqueFiltered);
+    }
+  }, [inputValue, flights, activeModal]);
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-      e.preventDefault(); // Mencegah submit default
+      e.preventDefault();
     }
   };
 
@@ -165,7 +162,6 @@ const HomepageModal = (props) => {
             </Col>
           </Row>
 
-          {/* Scrollable List Section */}
           <div
             style={{
               maxHeight: "300px",
