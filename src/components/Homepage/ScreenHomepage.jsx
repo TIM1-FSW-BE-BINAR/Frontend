@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import {
   Button,
   Card,
@@ -20,13 +20,12 @@ import seatIcon from "../../assets/homepage/icon/seat-icon.png";
 import adultIcon from "../../assets/homepage/icon/adult-icon.png";
 import childIcon from "../../assets/homepage/icon/child-icon.png";
 import babyIcon from "../../assets/homepage/icon/baby-icon.png";
-import plusIcon from "../../assets/homepage/icon/plus-icon.png";
-import minusIcon from "../../assets/homepage/icon/minus-icon.png";
 import selectedIcon from "../../assets/homepage/icon/selected-icon.png";
 import notFoundImage from "../../assets/homepage/not-found.png";
 import CardHomepageLoading from "../Loading/cardHomepageLoading";
-import { FaSearch,FaArrowRight } from "react-icons/fa";
+import { FaSearch, FaArrowRight } from "react-icons/fa";
 import HomepageModal from "./HomepageModal";
+import PassengerRow from "./PasenggerRow";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 
@@ -40,8 +39,8 @@ import { useQuery } from "@tanstack/react-query";
 import { getFlights } from "../../service/flight/flightService";
 import { useNavigate } from "@tanstack/react-router";
 
-// Context 
-import {HomepageContext} from "../../context/HomepageContext";
+// Context
+import { HomepageContext } from "../../context/HomepageContext";
 
 const ScreenHomepage = () => {
   return <Homepage />;
@@ -59,8 +58,8 @@ const Homepage = () => {
   const [checkedSwitch, setCheckedSwitch] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
 
-  // State untuk form input ambil dari context
-  const { fromInput,
+  const {
+    fromInput,
     setFromInput,
     toInput,
     setToInput,
@@ -77,13 +76,14 @@ const Homepage = () => {
     totalPassengers,
     setTotalPassengers,
     classInput,
-    setClassInput,} = useContext(HomepageContext);
+    setClassInput,
+  } = useContext(HomepageContext);
 
   // Pagination
   const [page, setPage] = useState(1);
 
   const handleButtonCardClick = (index) => {
-    setActiveButton(index); // Set the active button index
+    setActiveButton(index);
   };
 
   const handleSelectClass = (className, elementId, label) => {
@@ -148,12 +148,11 @@ const Homepage = () => {
   const navigate = useNavigate();
 
   const [today, setToday] = useState("");
-    useEffect(() => {
-      // Mendapatkan tanggal hari ini dalam format UTC
-      const now = new Date();
-      const utcDate = now.toISOString(); // Format ISO 8601 dalam UTC
-      setToday(utcDate);
-    }, []);
+  useEffect(() => {
+    const now = new Date();
+    const utcDate = now.toISOString();
+    setToday(utcDate);
+  }, []);
 
   const handleSearchPage = (e) => {
     e.preventDefault();
@@ -166,24 +165,26 @@ const Homepage = () => {
     ) {
       toast.error("Please fill out all fields in the form!");
     } else {
-      if(departureDate < departureDateFormat(today)){
+      if (departureDate < departureDateFormat(today)) {
         toast.error("Cannot select date before today!");
-      }else{
-        if(adultInput == 0 && childInput == 0 && babyInput > 0){
-          toast.error("You cannot select a flight for infants without an accompanying adult.");
-        }else{
+      } else {
+        if (adultInput == 0 && childInput == 0 && babyInput > 0) {
+          toast.error(
+            "You cannot select a flight for infants without an accompanying adult."
+          );
+        } else {
           const queryParams = new URLSearchParams({
             fromInput,
             toInput,
             departureDate,
-            returnDate: checkedSwitch ? returnDate : "", // Kirim kosong jika null
+            returnDate: checkedSwitch ? returnDate : "",
             totalPassengers,
             adultInput,
             childInput,
             babyInput,
             classInput,
           }).toString();
-    
+
           navigate({
             to: `/search?${queryParams}`,
           });
@@ -192,13 +193,11 @@ const Homepage = () => {
     }
   };
 
-  const [flightsData, setFlightsData] = useState([]); // data hasil fetch per page
-
-  const [state, setState] = useState(""); // state pilihan dari user
+  const [flightsData, setFlightsData] = useState([]);
+  const [state, setState] = useState("");
   const [notFound, setNotFound] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Menggunakan react query untuk mengambil data per page
   const {
     data: flightData,
     isSuccess: isSuccessFlight,
@@ -232,7 +231,6 @@ const Homepage = () => {
     }
   }, [flightData, isSuccessFlight, isErrorFlight, isPendingFlight]);
 
-  // use query untuk mengambil seluruh data flight
   const [flightsDataAll, setFlightsDataALl] = useState([]);
   const { data: flightDataAll, isSuccess: isSuccessFlightDataAll } = useQuery({
     queryKey: ["all-flights", state],
@@ -250,16 +248,16 @@ const Homepage = () => {
     }
   }, [flightDataAll, isSuccessFlightDataAll]);
 
- const formatDate = (dateString) => {
-   const date = new Date(dateString);
-   const day = date.getUTCDate(); // Mendapatkan hari dalam UTC
-   const month = date.toLocaleString("en-US", {
-     month: "long",
-     timeZone: "UTC",
-   }); // Mendapatkan bulan dalam teks dalam UTC
-   const year = date.getUTCFullYear(); // Mendapatkan tahun dalam UTC
-   return `${day} ${month} ${year}`;
- };
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getUTCDate();
+    const month = date.toLocaleString("en-US", {
+      month: "long",
+      timeZone: "UTC",
+    });
+    const year = date.getUTCFullYear();
+    return `${day} ${month} ${year}`;
+  };
   const departureDateFormat = (dateString) => {
     const date = new Date(dateString);
     return date.toISOString().split("T")[0];
@@ -288,7 +286,7 @@ const Homepage = () => {
   };
 
   return (
-    <>
+    <div className="mb-5">
       <section id="hero">
         <Container fluid className="p-0 mt-4 ">
           <Row className="position-relative justify-content-between">
@@ -296,10 +294,7 @@ const Homepage = () => {
               <img className="w-100" src={kotak1} alt="" />
             </Col>
 
-            {/* Kolom tengah */}
-            <Col
-              className="w-full position-absolute top-0 start-50 translate-middle-x z-index-2 banner-img"
-            >
+            <Col className="w-full position-absolute top-0 start-50 translate-middle-x z-index-2 banner-img">
               <Container
                 fluid
                 className="p-0 rounded"
@@ -365,7 +360,9 @@ const Homepage = () => {
               <Col>
                 <h3>
                   Choose a Special Flight Schedule with{" "}
-                  <span className="text-primary">AirFly!</span>
+                  <span className="" style={{ color: "#7126b5" }}>
+                    AirFly!
+                  </span>
                 </h3>
               </Col>
             </Row>
@@ -571,7 +568,7 @@ const Homepage = () => {
                     </Form.Group>
                   </Col>
                 </Row>
-                {/* button */}
+
                 <Button
                   type="submit"
                   className="btn btn-block w-100 mt-2 mx-0 animated-button"
@@ -611,252 +608,30 @@ const Homepage = () => {
 
           <Modal.Body className="pt-2">
             <Container>
-              <Row className="d-flex justify-content-between align-items-center">
-                <Col xs={5} sm={6} className="d-flex">
-                  <img
-                    src={adultIcon}
-                    alt=""
-                    className="img-fluid mt-1"
-                    style={{
-                      maxWidth: "20px",
-                      maxHeight: "20px",
-                    }}
-                  />
-                  <div className="ms-2">
-                    <p className="fw-bold mb-0">Adult</p>
-                    <p>(12 Years and Above)</p>
-                  </div>
-                </Col>
-                {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
-                <Col className="p-0 d-flex justify-content-end align-items-center">
-                  {/* Tombol Minus */}
-                  <Button
-                    className="animated-button"
-                    style={{
-                      border: "none",
-                      backgroundColor: "transparent",
-                      padding: "0",
-                    }}
-                  >
-                    <img
-                      src={minusIcon}
-                      className="img-fluid"
-                      alt=""
-                      style={{
-                        maxWidth: "40px",
-                        maxHeight: "40px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => {
-                        decrementInputPassengers("adult");
-                      }}
-                    />
-                  </Button>
-
-                  {/* Input Field */}
-                  <input
-                    type="text"
-                    style={{
-                      width: "50px",
-                      fontSize: "16px",
-                      textAlign: "center",
-                      padding: "5px",
-                      marginLeft: "10px",
-                      marginRight: "10px",
-                    }}
-                    value={adultInput}
-                    readOnly
-                  />
-
-                  {/* Tombol Plus */}
-                  <Button
-                    className="animated-button"
-                    style={{
-                      border: "none",
-                      backgroundColor: "transparent",
-                      padding: "0",
-                    }}
-                  >
-                    <img
-                      src={plusIcon}
-                      className="img-fluid"
-                      alt=""
-                      style={{
-                        maxWidth: "40px",
-                        maxHeight: "40px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => {
-                        incrementInputPassengers("adult");
-                      }}
-                    />
-                  </Button>
-                </Col>
-              </Row>
-              <Row className="d-flex justify-content-between align-items-center">
-                <Col xs={5} sm={6} className="d-flex">
-                  <img
-                    src={childIcon}
-                    alt=""
-                    className="img-fluid mt-1"
-                    style={{
-                      maxWidth: "20px",
-                      maxHeight: "20px",
-                    }}
-                  />
-                  <div className="ms-2">
-                    <p className="fw-bold mb-0">Child</p>
-                    <p>(2 - 11 Years Old)</p>
-                  </div>
-                </Col>
-                {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
-                <Col className="p-0 d-flex justify-content-end align-items-center">
-                  {/* Tombol Minus */}
-                  <Button
-                    className="animated-button"
-                    style={{
-                      border: "none",
-                      backgroundColor: "transparent",
-                      padding: "0",
-                    }}
-                  >
-                    <img
-                      src={minusIcon}
-                      className="img-fluid"
-                      alt=""
-                      style={{
-                        maxWidth: "40px",
-                        maxHeight: "40px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => {
-                        decrementInputPassengers("child");
-                      }}
-                    />
-                  </Button>
-
-                  {/* Input Field */}
-                  <input
-                    type="text"
-                    style={{
-                      width: "50px",
-                      fontSize: "16px",
-                      textAlign: "center",
-                      padding: "5px",
-                      marginLeft: "10px",
-                      marginRight: "10px",
-                    }}
-                    value={childInput}
-                    readOnly
-                  />
-
-                  {/* Tombol Plus */}
-                  <Button
-                    className="animated-button"
-                    style={{
-                      border: "none",
-                      backgroundColor: "transparent",
-                      padding: "0",
-                    }}
-                  >
-                    <img
-                      src={plusIcon}
-                      className="img-fluid"
-                      alt=""
-                      style={{
-                        maxWidth: "40px",
-                        maxHeight: "40px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => {
-                        incrementInputPassengers("child");
-                      }}
-                    />
-                  </Button>
-                </Col>
-              </Row>
-              <Row className="d-flex justify-content-between align-items-center">
-                <Col xs={5} sm={6} className="d-flex">
-                  <img
-                    src={babyIcon}
-                    alt=""
-                    className="img-fluid mt-1"
-                    style={{
-                      maxWidth: "20px",
-                      maxHeight: "20px",
-                    }}
-                  />
-                  <div className="ms-2">
-                    <p className="fw-bold mb-0">Baby</p>
-                    <p>(Under 2 Years Old)</p>
-                  </div>
-                </Col>
-                {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
-                <Col className="p-0 d-flex justify-content-end align-items-center">
-                  {/* Tombol Minus */}
-                  <Button
-                    className="animated-button"
-                    style={{
-                      border: "none",
-                      backgroundColor: "transparent",
-                      padding: "0",
-                    }}
-                  >
-                    <img
-                      src={minusIcon}
-                      className="img-fluid"
-                      alt=""
-                      style={{
-                        maxWidth: "40px",
-                        maxHeight: "40px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => {
-                        decrementInputPassengers("baby");
-                      }}
-                    />
-                  </Button>
-
-                  {/* Input Field */}
-                  <input
-                    type="text"
-                    style={{
-                      width: "50px",
-                      fontSize: "16px",
-                      textAlign: "center",
-                      padding: "5px",
-                      marginLeft: "10px",
-                      marginRight: "10px",
-                    }}
-                    value={babyInput}
-                    readOnly
-                  />
-
-                  {/* Tombol Plus */}
-                  <Button
-                    className="animated-button"
-                    style={{
-                      border: "none",
-                      backgroundColor: "transparent",
-                      padding: "0",
-                    }}
-                  >
-                    <img
-                      src={plusIcon}
-                      className="img-fluid"
-                      alt=""
-                      style={{
-                        maxWidth: "40px",
-                        maxHeight: "40px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => {
-                        incrementInputPassengers("baby");
-                      }}
-                    />
-                  </Button>
-                </Col>
-              </Row>
+              <PassengerRow
+                icon={adultIcon}
+                label="Adult"
+                ageInfo="(12 Years and Above)"
+                inputValue={adultInput}
+                onIncrement={() => incrementInputPassengers("adult")}
+                onDecrement={() => decrementInputPassengers("adult")}
+              />
+              <PassengerRow
+                icon={childIcon}
+                label="Child"
+                ageInfo="(2 - 11 Years Old)"
+                inputValue={childInput}
+                onIncrement={() => incrementInputPassengers("child")}
+                onDecrement={() => decrementInputPassengers("child")}
+              />
+              <PassengerRow
+                icon={babyIcon}
+                label="Baby"
+                ageInfo="(Under 2 Years Old)"
+                inputValue={babyInput}
+                onIncrement={() => incrementInputPassengers("baby")}
+                onDecrement={() => decrementInputPassengers("baby")}
+              />
             </Container>
           </Modal.Body>
           <Modal.Footer>
@@ -1002,7 +777,6 @@ const Homepage = () => {
             <h2>Favorite Destinations</h2>
           </Row>
           <Row className="g-2 mb-2 flex-wrap">
-            {/* Tombol dengan responsivitas */}
             {["All", "Asia", "Amerika", "Australia", "Eropa", "Afrika"].map(
               (label, index) => (
                 <Col
@@ -1064,9 +838,10 @@ const Homepage = () => {
                         {flight?.arrival.city}
                       </Card.Title>
                       <p
-                        className="text-primary mb-1"
+                        className="mb-1"
                         style={{
                           fontSize: "14px",
+                          color: "#7126b5",
                         }}
                       >
                         {flight?.airline.name}
@@ -1128,7 +903,7 @@ const Homepage = () => {
           reverseOrder={false}
         />
       </div>
-    </>
+    </div>
   );
 };
 
