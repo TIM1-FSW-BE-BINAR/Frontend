@@ -1,6 +1,5 @@
-import * as React from "react";
 import { createLazyFileRoute, useLocation } from "@tanstack/react-router";
-import SearchLayout from "../layouts/searchLayout";
+import SearchLayout from "../layouts/SearchLayout";
 import NavigationBar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useState, useEffect } from "react";
