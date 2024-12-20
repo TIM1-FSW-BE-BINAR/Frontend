@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import "../components/Search/SearchFlight.css";
+import React, { useEffect, useState } from "react";
+import "./SearchFlight.css";
 import { Accordion, Button, Col, Container, Modal, Row } from "react-bootstrap";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaArrowRight } from "react-icons/fa";
@@ -7,12 +7,13 @@ import { FiBox } from "react-icons/fi";
 import { FiHeart } from "react-icons/fi";
 import { FiDollarSign } from "react-icons/fi";
 import { LuArrowUpDown } from "react-icons/lu";
-import selectedIcon from "../assets/homepage/icon/selected-icon.png";
-import longArrowRight from "../assets/homepage/icon/long-arrow-right-icon.png";
-import baggageDelay from "../assets/homepage/icon/baggage-delay-icon.png";
-import loadingImage from "../assets/homepage/loading.png";
-import notFoundImage from "../assets/homepage/not-found.png";
-import ticketSoldOutImage from "../assets/homepage/tickets-sold-out.png";
+import selectedIcon from "../../assets/homepage/icon/selected-icon.png";
+import airlineLogo from "../../assets/homepage/airline-logo.png";
+import longArrowRight from "../../assets/homepage/icon/long-arrow-right-icon.png";
+import baggageDelay from "../../assets/homepage/icon/baggage-delay-icon.png";
+import loadingImage from "../../assets/homepage/loading.png";
+import notFoundImage from "../../assets/homepage/not-found.png";
+import ticketSoldOutImage from "../../assets/homepage/tickets-sold-out.png";
 import {
   format,
   addWeeks,
@@ -21,14 +22,14 @@ import {
   addDays,
   isSameDay,
 } from "date-fns";
-import { enUS } from "date-fns/locale";
-import { useNavigate } from "@tanstack/react-router";
+import { id, enUS } from "date-fns/locale";
+import { Navigate, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { getFlights, getFlightId } from "../service/flight/flightService";
+import { getFlights, getFlightId } from "../../service/flight/flightService";
 import toast, { Toaster } from "react-hot-toast";
 import { useSelector } from "react-redux";
 
-const SearchFlight = ({
+const SearchFlightReturn = ({
   fromInput,
   toInput,
   departureDate,
@@ -40,120 +41,86 @@ const SearchFlight = ({
   classInput,
   departureAirportId,
   returnAirportId,
-  date,
-  setReturnScreen,
-  setFlightSelect,
-  flightSelect,
+  flightSelect
 }) => {
+
   const navigate = useNavigate();
 
-  const [returnPage, setReturnPage] = useState(false);
-
-  useEffect(() => {
-    if (flightSelect !== null) {
-      setReturnPage(true);
-    }
-  }, [flightSelect]);
-
-  const departureDateFormat = (dateString) => {
-    const date = new Date(dateString);
-    return date.toISOString().split("T")[0];
-  };
-
-  const [today, setToday] = useState("");
-  useEffect(() => {
-    const now = new Date();
-    const utcDate = now.toISOString();
-    setToday(utcDate);
-  }, []);
-
-  useEffect(() => {
-    if (today && departureDate < departureDateFormat(today)) {
-      toast.error("Cannot select date before today!");
-      navigate({ to: "/" });
-    }
-  }, [today, departureDate, navigate]);
-
+  // Tentang kondisi hasil search
   const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [ticketSoldOut, setTicketSoldOut] = useState(false);
 
-  const [dateBtnActive, setDateBtnActive] = useState(null);
-  const dateObj = new Date(date);
-  const [currentWeek, setCurrentWeek] = useState(dateObj);
-  const [weekDates, setWeekDates] = useState([]); 
-  const [dateActive, setDateActive] = useState(date); 
+  // Tentang week date departure
+  const [dateBtnActiveReturn, setDateBtnActiveReturn] = useState(null);
+  const returnDateObj = new Date(returnDate);
+  const [currentWeekReturn, setCurrentWeekReturn] = useState(returnDateObj); // Tanggal acuan untuk 1 minggu
+  const [weekDatesReturn, setWeekDatesReturn] = useState([]); // Menyimpan daftar tanggal dalam 1 minggu
+  const [returnDateActive, setreturnDateActive] = useState(returnDate); // handle search saat date active nya diganti
 
-  const calculateWeekDates = (baseDate) => {
-    const startDate = startOfWeek(baseDate, { weekStartsOn: 1 });
+  const calculateWeekDatesReturn = (baseDate) => {
+    const startDate = startOfWeek(baseDate, { weekStartsOn: 1 }); // Mulai dari hari Senin
     return Array.from({ length: 7 }, (_, i) => addDays(startDate, i));
   };
 
   // update tanggal saat minggu berubah
   useEffect(() => {
-    const week = calculateWeekDates(currentWeek);
+    const week = calculateWeekDatesReturn(currentWeekReturn);
 
-    setWeekDates((prevWeekDates) => {
-      if (JSON.stringify(prevWeekDates) !== JSON.stringify(week)) {
+    // Update hanya jika weekDatesReturn berubah
+    setWeekDatesReturn((prevWeekDatesReturn) => {
+      if (JSON.stringify(prevWeekDatesReturn) !== JSON.stringify(week)) {
         return week;
       }
-      return prevWeekDates;
+      return prevWeekDatesReturn;
     });
 
-    if (dateBtnActive === null) {
-      const activeIndex = week.findIndex((date) => isSameDay(date, dateObj));
-      setDateBtnActive(activeIndex);
+    if (dateBtnActiveReturn === null) {
+      const activeIndex = week.findIndex((date) =>
+        isSameDay(date, returnDateObj)
+      );
+      setDateBtnActiveReturn(activeIndex);
     }
-  }, [currentWeek, dateObj, dateBtnActive]);
+  }, [currentWeekReturn, returnDateObj, dateBtnActiveReturn]);
 
   const handleNextWeek = () => {
-    setCurrentWeek((prevDate) => addWeeks(prevDate, 1)); // Tambah 1 Minggu
+    setCurrentWeekReturn((prevDate) => addWeeks(prevDate, 1)); // Tambah 1 Minggu
   };
 
   const handlePreviousWeek = () => {
-    setCurrentWeek((prevDate) => subWeeks(prevDate, 1)); // Kurangi 1 Minggu
+    setCurrentWeekReturn((prevDate) => subWeeks(prevDate, 1)); // Kurangi 1 Minggu
   };
 
- 
-
-  const handleDateBtnActive = (index, date) => {
-    if (returnPage) {
-      if (date < departureDate) {
-        toast.error("Cannot select return date before departure date!");
-      } else {
-        setDateBtnActive(index);
-        setDateActive(date);
-        setTicketSoldOut(false);
-      }
-    } else {
-      if (date < departureDateFormat(today)) {
-        toast.error("Cannot select date before today!");
-      } else {
-        setDateBtnActive(index);
-        setDateActive(date);
-        setTicketSoldOut(false);
-      }
+  const handleDateBtnActiveReturn = (index, date) => {
+    if(date < departureDate){
+      toast.error("Cannot select return date before departure date!");
+    }else{
+      setDateBtnActiveReturn(index);
+      setreturnDateActive(date);
+      setTicketSoldOut(false);
     }
   };
 
   const formatTime = (dateString) => {
     const date = new Date(dateString);
-    const hours = String(date.getUTCHours()).padStart(2, "0");
-    const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+    const hours = String(date.getUTCHours()).padStart(2, "0"); // Menggunakan getUTCHours untuk waktu UTC
+    const minutes = String(date.getUTCMinutes()).padStart(2, "0"); // Menggunakan getUTCMinutes untuk waktu UTC
     return `${hours}:${minutes}`;
   };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const day = date.getUTCDate();
+    const day = date.getUTCDate(); // Menggunakan getUTCDate untuk tanggal UTC
     const month = date.toLocaleString("en-US", {
       month: "long",
       timeZone: "UTC",
-    });
-    const year = date.getUTCFullYear();
+    }); // Menggunakan timeZone: "UTC" untuk mendapatkan bulan dalam UTC
+    const year = date.getUTCFullYear(); // Menggunakan getUTCFullYear untuk tahun UTC
     return `${day} ${month} ${year}`;
   };
+  // Tentang week date departure selesai
 
+  // Tentang perfilteran dan fetch search
   const [filterShowModal, setFilterShowModal] = useState(false);
   const [filter, setFilter] = useState("Filter");
   const [tempFilter, setTempFilter] = useState("");
@@ -162,7 +129,17 @@ const SearchFlight = ({
 
   const [filterChange, setFilterChange] = useState({});
   const [filterTempChange, setFilterTempChange] = useState({});
+  const [saveFilter, setSaveFilter] = useState(true);
   const [flightsData, setFlightsData] = useState([]);
+  const [seatClassValue, setSeatClassValue] = useState(classInput);
+
+  useEffect(() => {
+    if (classInput === "Premium Economy") {
+      setSeatClassValue("PREMIUM_ECONOMY");
+    } else {
+      setSeatClassValue(classInput?.split(" ")[0]);
+    }
+  }, [classInput]);
 
   const handleFilterClose = () => {
     setFilterShowModal(false);
@@ -170,29 +147,30 @@ const SearchFlight = ({
 
   const handleSaveFilter = () => {
     setFilter(tempFilter);
-
+    setSaveFilter(true);
     setFilterShowModal(false);
     setFilterChange(filterTempChange);
   };
 
   const handleSelectFilter = (FilterName, elementId, label) => {
-    setSelectedFilter(FilterName);
-    setSelectedElement(elementId);
-    setTempFilter(label);
+    setSelectedFilter(FilterName); // Simpan nama Filter yang dipilih
+    setSelectedElement(elementId); // Simpan elemen yang dipilih
+    setTempFilter(label); // Simpan nilai sementara dari pilihan
   };
 
   const handleFilterTempChange = (newFilter) => {
-    setFilterTempChange(newFilter);
+    setFilterTempChange(newFilter); // Update filter tambahan
   };
 
+  // fetch data flight nya berdasarkan filter
   const { data, isSuccess, isError, isPending } = useQuery({
-    queryKey: ["search-flights", filterChange, dateActive],
+    queryKey: ["search-flights-return", filterChange, returnDateActive],
     queryFn: () =>
       getFlights({
-        departureAirport: departureAirportId,
-        arrivalAirport: returnAirportId,
-        seatClass: classInput,
-        departureTime: dateActive,
+        departureAirport: returnAirportId,
+        arrivalAirport: departureAirportId,
+        seatClass: seatClassValue,
+        departureTime: returnDateActive,
         ...filterChange,
       }),
     enabled: !!departureAirportId && !!returnAirportId,
@@ -202,7 +180,7 @@ const SearchFlight = ({
     if (isSuccess) {
       setFlightsData(data);
       setLoading(false);
-
+      setSaveFilter(false);
       if (data.length === 0) {
         setNotFound(true);
       } else {
@@ -221,16 +199,17 @@ const SearchFlight = ({
     returnAirportId,
     isPending,
   ]);
+  // Tentang perfilteran dan fetch search selesai
 
-  const { user, token } = useSelector((state) => state.auth);
-
+  // Menuju halaman bookingPage
+   const { user, token } = useSelector((state) => state.auth);
   const handleBookingPage = async (flight) => {
     const flightDataById = await getFlightId(flight?.id);
     if (flightDataById.error?.message) {
       // tiket nya habis
       setTicketSoldOut(true);
     } else {
-      if (returnPage) {
+        // tiket tersedia, kirim flight nya ke booking
         const queryParams = new URLSearchParams({
           flightId: flightSelect,
           returnFlightId: flight.id,
@@ -240,83 +219,28 @@ const SearchFlight = ({
           babyInput,
         }).toString();
 
-        if (user && token) {
+        // cek apakah user sudah login, jika belum tidak bisa ke halaman booking
+        if(user && token){
           navigate({
             to: `/booking?${queryParams}`,
           });
-        } else {
-          toast.error("You need to login first!");
+        }else{
+          toast.error("You need to login first!")
           setTimeout(() => {
             navigate({
               to: "/login",
             });
           }, 1000);
         }
-      } else {
-        if (returnDate !== "") {
-          setFlightSelect(flight.id);
-          setReturnScreen(true);
-        } else {
-          const queryParams = new URLSearchParams({
-            flightId: flight.id,
-            totalPassengers: passengers,
-            adultInput,
-            childInput,
-            babyInput,
-          }).toString();
-
-          if (user && token) {
-            navigate({
-              to: `/booking?${queryParams}`,
-            });
-          } else {
-            toast.error("You need to login first!");
-            setTimeout(() => {
-              navigate({
-                to: "/login",
-              });
-            }, 1000);
-          }
-        }
-      }
+      
     }
-  };
-
-  const initialTime = 15 * 60;
-  const [timeLeft, setTimeLeft] = useState(() => {
-    const savedTime = localStorage.getItem("timeLeft");
-    return savedTime ? parseInt(savedTime, 10) : initialTime;
-  });
-  const [isTimerActive, setIsTimerActive] = useState(true);
-
-  useEffect(() => {
-    let interval;
-    if (isTimerActive && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft((prev) => {
-          const newTime = prev > 0 ? prev - 1 : 0;
-          localStorage.setItem("timeLeft", newTime);
-          return newTime;
-        });
-      }, 1000);
-    } else if (timeLeft === 0) {
-      setIsTimerActive(false);
-    }
-
-    return () => clearInterval(interval);
-  }, [isTimerActive, timeLeft]);
-
-  const handleResetTimer = () => {
-    setTimeLeft(initialTime);
-    localStorage.setItem("timeLeft", initialTime);
-    setIsTimerActive(true);
   };
 
   return (
-    <div className="mb-5">
+    <>
       <Container className="">
         <Row className="mt-5 mb-2">
-          <h2>Select a Flight {returnPage ? "Return" : ""}</h2>
+          <h2>Select a Return Flight</h2>
         </Row>
         <Row>
           <Col xs={12} sm={8} md={8} className="mb-2 mb-sm-0">
@@ -326,7 +250,7 @@ const SearchFlight = ({
               onClick={() => navigate({ to: "/" })}
             >
               <FaArrowLeft className="me-2" />
-              {fromInput} {">"} {toInput} - {passengers} Passenger -{" "}
+              {toInput} {">"} {fromInput} - {passengers} Passenger -{" "}
               {classInput}
             </Button>
           </Col>
@@ -358,15 +282,15 @@ const SearchFlight = ({
             lg={10}
             className="d-flex flex-wrap justify-content-center gap-3 w-full"
           >
-            {weekDates.map((date, index) => (
+            {weekDatesReturn.map((date, index) => (
               <Button
                 key={index}
                 className={`${
-                  dateBtnActive === index ? "date-active" : ""
+                  dateBtnActiveReturn === index ? "date-active" : ""
                 } d-flex flex-column justify-content-center align-items-center w-full px-3 py-1 date-btn`}
                 onClick={() => {
                   const dateSelect = format(date, "yyyy-MM-dd");
-                  handleDateBtnActive(index, dateSelect);
+                  handleDateBtnActiveReturn(index, dateSelect);
                 }}
               >
                 <h6>{format(date, "EEEE", { locale: enUS })}</h6>
@@ -394,6 +318,7 @@ const SearchFlight = ({
               className="d-flex align-items-center bg-white rounded-pill px-3 filter-btn"
               onClick={() => {
                 setFilterShowModal(true);
+                setSaveFilter(false);
               }}
             >
               <LuArrowUpDown className="up-down-icon" />
@@ -593,6 +518,7 @@ const SearchFlight = ({
                             lg={9}
                             className="d-flex align-items-center mb-3 mb-sm-0"
                           >
+                            {/* Flight Details */}
                             <Container
                               fluid
                               className="d-flex justify-content-center align-items-center"
@@ -705,7 +631,6 @@ const SearchFlight = ({
                               onClick={(event) => {
                                 event.stopPropagation(); // Prevent Accordion from toggling
                                 handleBookingPage(flight);
-                                handleResetTimer();
                               }}
                             >
                               Select
@@ -1050,8 +975,8 @@ const SearchFlight = ({
         }}
         reverseOrder={false}
       />
-    </div>
+    </>
   );
 };
 
-export default SearchFlight;
+export default SearchFlightReturn;
