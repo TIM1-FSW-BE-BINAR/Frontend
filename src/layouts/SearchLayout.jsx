@@ -1049,7 +1049,11 @@ const SearchFlight = ({
             <Button variant="secondary" onClick={handleFilterClose}>
               Close
             </Button>
-            <Button variant="primary" onClick={handleSaveFilter}>
+            <Button
+              variant="primary"
+              onClick={handleSaveFilter}
+              style={{ backgroundColor: "#7126b5" }}
+            >
               Save
             </Button>
           </Modal.Footer>

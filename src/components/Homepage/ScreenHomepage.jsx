@@ -70,10 +70,10 @@ const Homepage = () => {
   );
   const [returnDate, setReturnDate] = useState("");
   const [adultInput, setAdultInput] = useState(1);
-  const [childInput, setChildInput] = useState(1);
-  const [babyInput, setBabyInput] = useState(1);
-  const [totalPassengers, setTotalPassengers] = useState(3);
-  const [classInput, setClassInput] = useState("First Class");
+  const [childInput, setChildInput] = useState(0);
+  const [babyInput, setBabyInput] = useState(0);
+  const [totalPassengers, setTotalPassengers] = useState(1);
+  const [classInput, setClassInput] = useState("Economy");
 
    const [today, setToday] = useState("");
    useEffect(() => {
@@ -88,9 +88,9 @@ const Homepage = () => {
       setToInput(localStorage.getItem("lastTo"));
       setDepartureDate(localStorage.getItem("lastDeparture"));
       setReturnDate(localStorage.getItem("lastReturn"));
-      setAdultInput(localStorage.getItem("lastAdult"));
-      setChildInput(localStorage.getItem("lastChild"));
-      setBabyInput(localStorage.getItem("lastBaby"));
+      setAdultInput(parseInt(localStorage.getItem("lastAdult")));
+      setChildInput(parseInt(localStorage.getItem("lastChild")));
+      setBabyInput(parseInt(localStorage.getItem("lastBaby")));
       setClassInput(localStorage.getItem("lastClass"));
      }
    }, []);
@@ -292,6 +292,7 @@ const Homepage = () => {
     setFromInput(fromInputSelect);
     setToInput(toInputSelect);
     setDepartureDate(departureDateSelect);
+    setReturnDate("");
     setClassInput(classInputSelect);
     toast("Form updated!", {
       icon: "✈️",
@@ -901,6 +902,9 @@ const Homepage = () => {
                 setPage(page);
               }}
               ellipsis={1}
+              style={{ 
+                color: "#7126b5"
+               }}
             />
           </Row>
         </Container>
