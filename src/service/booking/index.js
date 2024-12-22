@@ -11,7 +11,6 @@ export const getAllBookings = async () => {
   );
 
   const result = await response.json();
-  console.log("booking:", result);
   return result?.data;
 };
 
