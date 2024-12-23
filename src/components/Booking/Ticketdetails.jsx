@@ -646,8 +646,8 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
 
         <Button
           variant="danger"
-          id="box-timer"
-          style={{ zIndex: "1", marginTop: "1rem" }}
+          className="btn btn-block px-4 py-2 w-100 animated-button"
+          style={{ zIndex: "1", marginTop: "1rem", backgroundColor: "#ff0000" }}
           onClick={handlePayment}
         >
           Payment
