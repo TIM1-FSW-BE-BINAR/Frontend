@@ -586,7 +586,7 @@ const Homepage = () => {
                 <Button
                   type="submit"
                   className="btn btn-block w-100 mt-2 mx-0 animated-button"
-                  style={{ backgroundColor: "#7126b5" }}
+                  style={{ backgroundColor: "#7126b5", border: "none" }}
                 >
                   Search for Flights
                 </Button>
