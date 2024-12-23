@@ -1,9 +1,9 @@
 import * as React from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import NotifikasiLayout from "../layouts/Notifikasi/NotifikasiLayout";
-import ScreenNotifikasi from "../components/Notifikasi/ScreenNotifikasi";
-import NotFoundNotifikasi from "../components/Notifikasi/NotFound/NotFoundNotifikasi";
-import { NotificationProvider } from "../components/Notifikasi/NotificationContext";
+import NotificationLayout from "../layouts/Notification/NotificationLayout";
+import ScreenNotification from "../components/Notification/ScreenNotification";
+import NotFoundNotification from "../components/Notification/NotFound/NotFoundNotification";
+import { NotificationProvider } from "../components/Notification/NotificationContext";
 import { useState } from "react";
 import { getUserNotifications } from "../service/notification";
 import Protected from "../components/Auth/Protected";
@@ -21,8 +21,9 @@ export const Route = createLazyFileRoute("/notification")({
 
 function Notification() {
   const { token } = useSelector((state) => state.auth);
-  const [openNotifikasi, setOpenNotifikasi] = useState(true);
-  const [openNotFoundNotifikasi, setOpenNotFoundNotifikasi] = useState(false);
+  const [openNotification, setOpenNotification] = useState(true);
+  const [openNotFoundNotification, setOpenNotFoundNotification] =
+    useState(false);
 
   const { data, isSuccess } = useQuery({
     queryKey: ["getUserNotification"],
@@ -32,23 +33,22 @@ function Notification() {
 
   useEffect(() => {
     if (isSuccess && (!data || data.length === 0)) {
-      // Jika query sukses tetapi data kosong
-      setOpenNotFoundNotifikasi(true);
-      setOpenNotifikasi(false);
+      setOpenNotFoundNotification(true);
+      setOpenNotification(false);
     }
   }, [isSuccess, data]);
   return (
     <>
       <NotificationProvider>
-        <NotifikasiLayout
-          openNotifikasi={openNotifikasi}
-          setOpenNotifikasi={setOpenNotifikasi}
-          openNotFoundNotifikasi={openNotFoundNotifikasi}
-          setOpenNotFoundNotifikasi={setOpenNotFoundNotifikasi}
+        <NotificationLayout
+          openNotification={openNotification}
+          setOpenNotification={setOpenNotification}
+          openNotFoundNotification={openNotFoundNotification}
+          setOpenNotFoundNotification={setOpenNotFoundNotification}
         >
-          {openNotifikasi && <ScreenNotifikasi />}
-          {openNotFoundNotifikasi && <NotFoundNotifikasi />}
-        </NotifikasiLayout>
+          {openNotification && <ScreenNotification />}
+          {openNotFoundNotification && <NotFoundNotification />}
+        </NotificationLayout>
       </NotificationProvider>
     </>
   );

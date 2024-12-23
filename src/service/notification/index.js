@@ -10,9 +10,7 @@ export const getAllNotifications = async () => {
     }
   );
 
-  // get data
   const result = await response.json();
-  console.log(result);
   return result?.data;
 };
 
@@ -28,9 +26,7 @@ export const getUserNotifications = async () => {
     }
   );
 
-  // get data
   const result = await response.json();
-  console.log(result);
   return result?.data;
 };
 
@@ -46,9 +42,7 @@ export const getIdNotification = async (id) => {
     }
   );
 
-  // get data
   const result = await response.json();
-  console.log(result);
   return result?.data;
 };
 
@@ -91,8 +85,6 @@ export const getShowNotifications = async () => {
     }
   );
 
-  // get data
   const result = await response.json();
-  console.log(result);
   return result?.data;
 };

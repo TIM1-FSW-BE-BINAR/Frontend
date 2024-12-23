@@ -1,21 +1,26 @@
-import React, { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
-// Membuat context
 export const HomepageContext = createContext();
 
-// Membuat provider untuk context
 export function HomepageProvider({ children }) {
-  const [fromInput, setFromInput] = useState("");
-  const [toInput, setToInput] = useState("");
-  const [departureDate, setDepartureDate] = useState(""); // Untuk Departure
-  const [returnDate, setReturnDate] = useState("");
-  const [adultInput, setAdultInput] = useState(0);
-  const [childInput, setChildInput] = useState(0);
-  const [babyInput, setBabyInput] = useState(0);
-  const [totalPassengers, setTotalPassengers] = useState("");
-  const [classInput, setClassInput] = useState("");
+  const departureDateFormat = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0];
+  };
 
-  // Membuat value yang akan diakses oleh komponen lain
+
+  const [fromInput, setFromInput] = useState("Jakarta-CGK");
+  const [toInput, setToInput] = useState("Surabaya-SUB");
+  const [departureDate, setDepartureDate] = useState(
+    departureDateFormat(new Date().toISOString())
+  );
+  const [returnDate, setReturnDate] = useState("");
+  const [adultInput, setAdultInput] = useState(1);
+  const [childInput, setChildInput] = useState(1);
+  const [babyInput, setBabyInput] = useState(1);
+  const [totalPassengers, setTotalPassengers] = useState(3);
+  const [classInput, setClassInput] = useState("First Class");
+
   const value = {
     fromInput,
     setFromInput,
@@ -37,5 +42,9 @@ export function HomepageProvider({ children }) {
     setClassInput,
   };
 
-  return <HomepageContext.Provider value={value}>{children}</HomepageContext.Provider>;
+  return (
+    <HomepageContext.Provider value={value}>
+      {children}
+    </HomepageContext.Provider>
+  );
 }

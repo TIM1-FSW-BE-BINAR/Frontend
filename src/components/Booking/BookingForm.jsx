@@ -17,7 +17,15 @@ import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { Container, Card, Button, Col, Form, Row, Accordion } from "react-bootstrap";
+import {
+  Container,
+  Card,
+  Button,
+  Col,
+  Form,
+  Row,
+  Accordion,
+} from "react-bootstrap";
 import "font-awesome/css/font-awesome.min.css";
 import PropTypes from "prop-types";
 
@@ -178,12 +186,12 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
       const passengerRequiredFields = requiredFields
         .map((field) => (passengerData[`${field}_${index}`] ? null : field))
         .filter(Boolean);
-      
+
       const identityNumber = passengerData[`identityNumber_${index}`];
       let identityValidation = !/^\d{16}$/.test(identityNumber);
-      
+
       if (passagerId === "Paspor") {
-        identityValidation = !/^\d{8}$/.test(identityNumber); 
+        identityValidation = !/^\d{8}$/.test(identityNumber);
       }
 
       if (identityValidation) {
@@ -196,7 +204,6 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
         );
         return false;
       }
-
 
       if (passengerRequiredFields.length > 0) {
         passengerRequiredFields.forEach((field) => {
@@ -487,7 +494,7 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
                         <Card style={{ border: "none" }}>
                           <Card.Header
                             className="text-white"
-                            style={{ background: "#3C3C3C"}}
+                            style={{ background: "#3C3C3C" }}
                           >
                             Passenger Information {index + 1} - {type}
                             {isSaved && (

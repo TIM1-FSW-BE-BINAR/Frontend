@@ -56,15 +56,18 @@ useEffect(() => {
 
   const getDeadline = () => {
     const now = new Date();
-    now.setHours(now.getMinutes() + 15);
-    const options = {
+    now.setMinutes(now.getMinutes() + 15);
+  
+    const formatter = new Intl.DateTimeFormat("id-ID", {
       year: "numeric",
       month: "long",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-    };
-    return now.toLocaleDateString("id-ID", options);
+      timeZone: "Asia/Jakarta", 
+    });
+  
+    return formatter.format(now);
   };
 
   return (
