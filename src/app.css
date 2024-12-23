@@ -62,3 +62,32 @@ body {
   box-shadow: 0 0 0px 3px rgba(111, 66, 193, 0.5);
   outline: none;
 }
+
+.custom-accordion-header {
+  background-color: #3C3C3C !important;
+  color: #ffffff !important;
+  border-radius: 4px;
+}
+.custom-accordion-header .accordion-button {
+  background-color: #3C3C3C !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important; 
+  outline: none !important; 
+}
+.custom-accordion-header .accordion-button:not(.collapsed) {
+  background-color: #3C3C3C !important;
+  color: #ffffff !important;
+  box-shadow: none !important; 
+}
+.custom-accordion-header .accordion-button:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+.custom-accordion-header .accordion-button::after {
+  filter: brightness(0) invert(1); 
+}
+.custom-accordion-header .accordion-button:not(.collapsed)::after {
+  filter: brightness(0) invert(1); 
+}
+

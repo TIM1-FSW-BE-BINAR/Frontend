@@ -115,7 +115,10 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
                 return <div key={seatIndex} style={{ width: "35px" }}></div>;
               }
 
-              const seat = seats.find((seat) => seat.seatNumber === seatNumber);
+              const seat = seats.find((seat) => seat.seatNumber === seatNumber) || {
+                  seatNumber,
+                  status: "UNAVAILABLE",
+                };
               const isSelected = selectedSeats.some(
                 (selectedSeat) => selectedSeat.id === seat?.id
               );
