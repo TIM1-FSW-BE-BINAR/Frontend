@@ -58,26 +58,42 @@ const Homepage = () => {
   const [checkedSwitch, setCheckedSwitch] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
 
-  const {
-    fromInput,
-    setFromInput,
-    toInput,
-    setToInput,
-    departureDate,
-    setDepartureDate,
-    returnDate,
-    setReturnDate,
-    adultInput,
-    setAdultInput,
-    childInput,
-    setChildInput,
-    babyInput,
-    setBabyInput,
-    totalPassengers,
-    setTotalPassengers,
-    classInput,
-    setClassInput,
-  } = useContext(HomepageContext);
+  const departureDateFormat = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0];
+  };
+
+  const [fromInput, setFromInput] = useState("Jakarta-CGK");
+  const [toInput, setToInput] = useState("Surabaya-SUB");
+  const [departureDate, setDepartureDate] = useState(
+    departureDateFormat(new Date().toISOString())
+  );
+  const [returnDate, setReturnDate] = useState("");
+  const [adultInput, setAdultInput] = useState(1);
+  const [childInput, setChildInput] = useState(0);
+  const [babyInput, setBabyInput] = useState(0);
+  const [totalPassengers, setTotalPassengers] = useState(1);
+  const [classInput, setClassInput] = useState("Economy");
+
+   const [today, setToday] = useState("");
+   useEffect(() => {
+     const now = new Date();
+     const utcDate = now.toISOString();
+     setToday(utcDate);
+   }, []);
+
+   useEffect(() => {
+     if(localStorage.getItem("lastFrom")){
+      setFromInput(localStorage.getItem("lastFrom"));
+      setToInput(localStorage.getItem("lastTo"));
+      setDepartureDate(localStorage.getItem("lastDeparture"));
+      setReturnDate(localStorage.getItem("lastReturn"));
+      setAdultInput(parseInt(localStorage.getItem("lastAdult")));
+      setChildInput(parseInt(localStorage.getItem("lastChild")));
+      setBabyInput(parseInt(localStorage.getItem("lastBaby")));
+      setClassInput(localStorage.getItem("lastClass"));
+     }
+   }, []);
 
   // Pagination
   const [page, setPage] = useState(1);
@@ -147,13 +163,6 @@ const Homepage = () => {
 
   const navigate = useNavigate();
 
-  const [today, setToday] = useState("");
-  useEffect(() => {
-    const now = new Date();
-    const utcDate = now.toISOString();
-    setToday(utcDate);
-  }, []);
-
   const handleSearchPage = (e) => {
     e.preventDefault();
     if (
@@ -184,6 +193,14 @@ const Homepage = () => {
             babyInput,
             classInput,
           }).toString();
+          localStorage.setItem("lastFrom", fromInput);
+          localStorage.setItem("lastTo", toInput);
+          localStorage.setItem("lastDeparture", departureDate);
+          localStorage.setItem("lastReturn", checkedSwitch ? returnDate : "");
+          localStorage.setItem("lastAdult", adultInput);
+          localStorage.setItem("lastChild", childInput);
+          localStorage.setItem("lastBaby", babyInput);
+          localStorage.setItem("lastClass", classInput);
           navigate({
             to: `/search?${queryParams}`,
           });
@@ -257,10 +274,7 @@ const Homepage = () => {
     const year = date.getUTCFullYear();
     return `${day} ${month} ${year}`;
   };
-  const departureDateFormat = (dateString) => {
-    const date = new Date(dateString);
-    return date.toISOString().split("T")[0];
-  };
+  
   const classInputFormat = (flightClass) => {
     if (flightClass === "FIRST") {
       flightClass = "First Class";
@@ -278,6 +292,7 @@ const Homepage = () => {
     setFromInput(fromInputSelect);
     setToInput(toInputSelect);
     setDepartureDate(departureDateSelect);
+    setReturnDate("");
     setClassInput(classInputSelect);
     toast("Form updated!", {
       icon: "✈️",
@@ -285,7 +300,7 @@ const Homepage = () => {
   };
 
   return (
-    <div className="mb-5">
+    <>
       <section id="hero">
         <Container fluid className="p-0 mt-4 ">
           <Row className="position-relative justify-content-between">
@@ -571,7 +586,7 @@ const Homepage = () => {
                 <Button
                   type="submit"
                   className="btn btn-block w-100 mt-2 mx-0 animated-button"
-                  style={{ backgroundColor: "#7126b5" }}
+                  style={{ backgroundColor: "#7126b5", border: "none" }}
                 >
                   Search for Flights
                 </Button>
@@ -887,6 +902,9 @@ const Homepage = () => {
                 setPage(page);
               }}
               ellipsis={1}
+              style={{ 
+                color: "#7126b5"
+               }}
             />
           </Row>
         </Container>
@@ -902,7 +920,7 @@ const Homepage = () => {
           reverseOrder={false}
         />
       </div>
-    </div>
+    </>
   );
 };
 

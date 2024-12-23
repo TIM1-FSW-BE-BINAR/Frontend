@@ -90,7 +90,7 @@ const NavigationBar = () => {
                         }}
                       >
                         <LuLogIn style={{ marginRight: "10px" }} />
-                        Masuk
+                        Login
                       </Nav.Link>
                     </>
                   )}

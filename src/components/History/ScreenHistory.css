@@ -47,6 +47,15 @@
   .search-not-found {
     left: 0 !important;
   }
+
+  .button-compt {
+    margin-left: unset !important;
+  }
+
+  .button-filter {
+    width: 10rem;
+    font-size: 10px;
+  }
 }
 
 @media (min-width: 427px) and (max-width: 768px) {
@@ -100,6 +109,10 @@
   .search-not-found {
     left: 10rem !important;
   }
+
+  .button-compt {
+    margin-left: 3rem !important;
+  }
 }
 
 @media (min-width: 1024px) and (max-width: 1439px) {
@@ -116,5 +129,9 @@
 
   .search-not-found {
     left: 12rem !important;
+  }
+
+  .button-compt {
+    margin-left: 4rem !important;
   }
 }

@@ -20,6 +20,7 @@ import {
   startOfWeek,
   addDays,
   isSameDay,
+  endOfWeek,
 } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { useNavigate } from "@tanstack/react-router";
@@ -106,15 +107,27 @@ const SearchFlight = ({
     }
   }, [currentWeek, dateObj, dateBtnActive]);
 
-  const handleNextWeek = () => {
-    setCurrentWeek((prevDate) => addWeeks(prevDate, 1)); // Tambah 1 Minggu
-  };
+ const handleNextWeek = () => {
+   const maxDate = addWeeks(new Date(dateActive), 1);
+   const lastDayOfCurrentWeek = endOfWeek(currentWeek, { weekStartsOn: 1 });
 
-  const handlePreviousWeek = () => {
-    setCurrentWeek((prevDate) => subWeeks(prevDate, 1)); // Kurangi 1 Minggu
-  };
+   if (lastDayOfCurrentWeek < maxDate) {
+     setCurrentWeek((prevDate) => addWeeks(prevDate, 1));
+   } else {
+     toast.error("Cannot go further than one week ahead!");
+   }
+ };
 
- 
+ const handlePreviousWeek = () => {
+   const minDate = subWeeks(new Date(dateActive), 1);
+   const firstDayOfCurrentWeek = startOfWeek(currentWeek, { weekStartsOn: 1 });
+
+   if (firstDayOfCurrentWeek > minDate) {
+     setCurrentWeek((prevDate) => subWeeks(prevDate, 1));
+   } else {
+     toast.error("Cannot go further than one week back!");
+   }
+ };
 
   const handleDateBtnActive = (index, date) => {
     if (returnPage) {
@@ -313,7 +326,7 @@ const SearchFlight = ({
   };
 
   return (
-    <div className="mb-5">
+    <>
       <Container className="">
         <Row className="mt-5 mb-2">
           <h2>Select a Flight {returnPage ? "Return" : ""}</h2>
@@ -1036,7 +1049,11 @@ const SearchFlight = ({
             <Button variant="secondary" onClick={handleFilterClose}>
               Close
             </Button>
-            <Button variant="primary" onClick={handleSaveFilter}>
+            <Button
+              variant="primary"
+              onClick={handleSaveFilter}
+              style={{ backgroundColor: "#7126b5" }}
+            >
               Save
             </Button>
           </Modal.Footer>
@@ -1050,7 +1067,7 @@ const SearchFlight = ({
         }}
         reverseOrder={false}
       />
-    </div>
+    </>
   );
 };
 
