@@ -75,7 +75,6 @@ const PaymentOptions = () => {
     if (snapLoaded && !paymentInitiated && snapToken) {
       handlePay();
       setPaymentInitiated(true);
-      console.log("ini di if");
     }
   }, [snapLoaded, snapToken, paymentInitiated]);
 
