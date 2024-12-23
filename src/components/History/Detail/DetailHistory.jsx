@@ -46,7 +46,7 @@ const DetailHistory = ({ id, onBack }) => {
       if (result?.data?.[0]?.qrCodeImage) {
         setQrCodeImage(result.qrCodeImage);
         toast.success(
-          "Ticket printed successfully! Please wait a second to refresh",
+          "Ticket printed successfully! Please wait a second for auto refresh",
           {
             style: {
               padding: "16px",
@@ -62,7 +62,7 @@ const DetailHistory = ({ id, onBack }) => {
 
         setTimeout(() => {
           window.location.reload();
-        }, 1000);
+        }, 1500);
       } else {
         toast.error("Flight ticket data not found or payment not yet paid", {
           style: {
@@ -106,21 +106,24 @@ const DetailHistory = ({ id, onBack }) => {
   const cancelMutation = useMutation({
     mutationFn: (orderId) => cancelPayment(orderId),
     onSuccess: () => {
-      toast.success("Payment canceled successfully!", {
-        style: {
-          padding: "16px",
-          background: "#73CA5C",
-          color: "#FFFFFF",
-        },
-        iconTheme: {
-          primary: "#FFFFFF",
-          secondary: "#73CA5C",
-        },
-      });
+      toast.success(
+        "Payment canceled successfully! Please wait a second for auto refresh",
+        {
+          style: {
+            padding: "16px",
+            background: "#73CA5C",
+            color: "#FFFFFF",
+          },
+          iconTheme: {
+            primary: "#FFFFFF",
+            secondary: "#73CA5C",
+          },
+        }
+      );
 
       setTimeout(() => {
         window.location.reload();
-      }, 1000);
+      }, 1500);
     },
     onError: (err) => {
       toast.error("Failed to cancel payment. Please try again.", {
