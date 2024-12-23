@@ -300,7 +300,7 @@ const Homepage = () => {
   };
 
   return (
-    <div className="mb-5">
+    <>
       <section id="hero">
         <Container fluid className="p-0 mt-4 ">
           <Row className="position-relative justify-content-between">
@@ -920,7 +920,7 @@ const Homepage = () => {
           reverseOrder={false}
         />
       </div>
-    </div>
+    </>
   );
 };
 

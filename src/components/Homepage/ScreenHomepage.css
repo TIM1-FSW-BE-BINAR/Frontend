@@ -394,4 +394,5 @@ body {
 
 .pagination {
   --bs-pagination-active-bg: #7126b5 !important;
+  --bs-link-color: #7126b5 !important;
 }
