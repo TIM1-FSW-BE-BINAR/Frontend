@@ -323,8 +323,6 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
       bookingDetail,
     };
 
-    console.log("Request in JSON format:", JSON.stringify(request, null, 2));
-
     setDataBooking(request);
     toast.success("Data successfully saved.", {
       autoClose: 3000,
