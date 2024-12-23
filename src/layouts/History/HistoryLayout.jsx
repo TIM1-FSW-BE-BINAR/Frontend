@@ -28,6 +28,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { TextField, Button as MUIButton } from "@mui/material";
 import "./HistoryLayout.css";
 import { useHistoryContext } from "../../components/History/HistoryContext";
+import Footer from "../../components/Footer";
 
 function PageHeader() {
   const [showFilterDate, setShowFilterDate] = useState(false);
@@ -241,6 +242,7 @@ export default function HistoryLayout({ children }) {
         <PageHeader />
         {children}
       </Container>
+      <Footer />
     </>
   );
 }

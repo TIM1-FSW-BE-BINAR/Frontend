@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, Button, Row, Col, Image, Accordion } from "react-bootstrap";
 import { getIdBooking } from "../../../service/booking";
@@ -27,6 +27,9 @@ const DetailHistory = ({ id, onBack }) => {
   const [qrCodeImage, setQrCodeImage] = useState(null);
   const [matchedPayment, setMatchedPayment] = useState(null);
   const [activeKey, setActiveKey] = useState(null);
+  const [isOverlayVisible, setOverlayVisible] = useState(false);
+  const cardBodyRef = useRef(null);
+  const [scrollPosition, setScrollPosition] = useState(0);
 
   const { data, isLoading, isSuccess, isError, error } = useQuery({
     queryKey: ["getIdBooking", id],
@@ -190,10 +193,48 @@ const DetailHistory = ({ id, onBack }) => {
 
   const handleCancelPayment = () => {
     if (matchedPayment?.orderId) {
-      cancelMutation.mutate(matchedPayment?.orderId);
+      setOverlayVisible(true);
+
+      toast(
+        (t) => (
+          <div className="text-center cancel-toast">
+            <p>Are you sure you want to cancel the payment?</p>
+            <div>
+              <button
+                onClick={() => {
+                  toast.dismiss(t.id);
+                  setOverlayVisible(false);
+                  cancelMutation.mutate(matchedPayment?.orderId);
+                }}
+                className="btn btn-danger me-2"
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => {
+                  toast.dismiss(t.id);
+                  setOverlayVisible(false);
+                }}
+                className="btn btn-secondary"
+              >
+                No
+              </button>
+            </div>
+          </div>
+        ),
+        {
+          duration: Infinity,
+          position: "top-center",
+        }
+      );
     } else {
       toast.error("Payment ID is missing. Cannot cancel payment.");
     }
+  };
+
+  const handleOverlayClick = () => {
+    setOverlayVisible(false);
+    toast.dismiss();
   };
 
   const handlePrintTicket = () => {
@@ -336,6 +377,14 @@ const DetailHistory = ({ id, onBack }) => {
     });
   };
 
+  const handleScroll = (event) => {
+    if (cardBodyRef.current) {
+      const newPosition = scrollPosition + event.deltaY;
+      cardBodyRef.current.scrollTop = newPosition;
+      setScrollPosition(newPosition);
+    }
+  };
+
   if (isLoading) return <DetailPesananLoading />;
   if (isError || !booking)
     return <p>Error fetching details: {error?.message || "Unknown error"}</p>;
@@ -347,9 +396,13 @@ const DetailHistory = ({ id, onBack }) => {
         style={{
           width: "25rem",
           height: "65rem",
-          left: "0",
+          position: "sticky",
+          top: "20px", // Distance from the top of the viewport
           background: "#FFFFFF",
+          overflowY: "auto", // Enables vertical scroll
+          scrollbarWidth: "thin", // Optional: reduce scrollbar size
         }}
+        onWheel={handleScroll}
       >
         <Button
           variant="none"
@@ -359,7 +412,13 @@ const DetailHistory = ({ id, onBack }) => {
         >
           <VscChromeClose size={25} style={{ color: "black" }} />
         </Button>
-        <Card.Body>
+        <Card.Body
+          ref={cardBodyRef}
+          style={{
+            maxHeight: "calc(100% - 60px)",
+            overflow: "hidden", // Menghilangkan scroll otomatis
+          }}
+        >
           {/* Status Pesanan */}
           <div className="d-flex justify-content-between align-items-center mb-3 custom-status">
             <h6 className="fw-bold custom-h6">Booking Detail</h6>
@@ -368,13 +427,13 @@ const DetailHistory = ({ id, onBack }) => {
               style={{
                 backgroundColor:
                   matchedPayment?.status === "pending"
-                    ? "#FF0000"
+                    ? "#8A8A8A"
                     : matchedPayment?.status === "settlement"
                       ? "#73CA5C"
                       : matchedPayment?.status === "expire"
                         ? "#8A8A8A"
                         : matchedPayment?.status === "cancel"
-                          ? "#dbd807"
+                          ? "#FF0000"
                           : "#FF0000",
                 borderRadius: "10px",
                 fontSize: "12px",
@@ -591,6 +650,10 @@ const DetailHistory = ({ id, onBack }) => {
                   : ""}
             </Button>
           </div>
+
+          {isOverlayVisible && (
+            <div className="overlay" onClick={handleOverlayClick}></div>
+          )}
 
           {/* Tombol Cancel Payment */}
           {matchedPayment?.status === "pending" && (
