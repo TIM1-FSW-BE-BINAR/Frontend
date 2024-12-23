@@ -1,17 +1,25 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 export const HomepageContext = createContext();
 
 export function HomepageProvider({ children }) {
-  const [fromInput, setFromInput] = useState("");
-  const [toInput, setToInput] = useState("");
-  const [departureDate, setDepartureDate] = useState("");
+  const departureDateFormat = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0];
+  };
+
+
+  const [fromInput, setFromInput] = useState("Jakarta-CGK");
+  const [toInput, setToInput] = useState("Surabaya-SUB");
+  const [departureDate, setDepartureDate] = useState(
+    departureDateFormat(new Date().toISOString())
+  );
   const [returnDate, setReturnDate] = useState("");
-  const [adultInput, setAdultInput] = useState(0);
-  const [childInput, setChildInput] = useState(0);
-  const [babyInput, setBabyInput] = useState(0);
-  const [totalPassengers, setTotalPassengers] = useState("");
-  const [classInput, setClassInput] = useState("");
+  const [adultInput, setAdultInput] = useState(1);
+  const [childInput, setChildInput] = useState(1);
+  const [babyInput, setBabyInput] = useState(1);
+  const [totalPassengers, setTotalPassengers] = useState(3);
+  const [classInput, setClassInput] = useState("First Class");
 
   const value = {
     fromInput,
