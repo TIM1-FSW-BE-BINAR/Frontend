@@ -828,7 +828,7 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
                   <Button
                     type="submit"
                     variant="purple"
-                    className=" px-4 py-2 w-100"
+                    className="btn btn-block px-4 py-2 w-100 animated-button"
                     style={{
                       backgroundColor: isSaved ? "#D0D0D0" : "#6a1b9a",
                       borderColor: isSaved ? "#D0D0D0" : "#6a1b9a",
