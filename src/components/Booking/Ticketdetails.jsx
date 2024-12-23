@@ -205,7 +205,7 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
     (priceAfterDiscountDeparture / totalPriceWithoutTax) * tax
   );
   const taxReturn = tax - taxDeparture;
-  
+
   return (
     <>
       <Toaster position="top-right" />
