@@ -83,15 +83,11 @@ export const createBooking = async (request) => {
  }
 
  if (result.meta?.statusCode === 201) {
-
    const bookingId = result.data?.bookingId; 
-
    if (bookingId) {
      localStorage.setItem("bookingId", bookingId);
    }
-
    return result.data;
  }
-
   return result?.data;
 };

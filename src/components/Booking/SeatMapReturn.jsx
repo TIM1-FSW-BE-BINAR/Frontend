@@ -133,7 +133,10 @@ const SeatMapReturn = ({
 
               const seat = returnSeats.find(
                 (seat) => seat.seatNumber === seatNumber
-              );
+              ) || {
+                  seatNumber,
+                  status: "UNAVAILABLE",
+                };
               const isSelected = selectedSeatsReturn.some(
                 (selectedSeat) => selectedSeat.id === seat?.id
               );
@@ -142,9 +145,15 @@ const SeatMapReturn = ({
                 default: { backgroundColor: "#4A90E2" },
                 selected: { backgroundColor: "#7126B5" },
                 booked: { backgroundColor: "#D0D0D0", cursor: "not-allowed" },
+                unavailable: {
+                  backgroundColor: "#D0D0D0",
+                  cursor: "not-allowed",
+                },
               };
               const getSeatStyle = (seat, isSelected) => {
                 if (seat?.status === "LOCKED") return seatStyle.booked;
+                if (seat?.status === "UNAVAILABLE")
+                  return seatStyle.unavailable;
                 if (isSelected) return seatStyle.selected;
                 return seatStyle.default;
               };

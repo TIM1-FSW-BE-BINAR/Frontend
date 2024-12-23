@@ -8,15 +8,16 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import toast, { Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
-import SeatMapReturn from "../SeatMapReturn";
-import TicketDetails from "../TicketDetails";
-import SeatMap from "../SeatMap";
+import SeatMap from "./SeatMap";
+import SeatMapReturn from "./SeatMapReturn";
+import TicketDetails from "./Ticketdetails";
+import SelectCountry from "./SelectCountry";
 import { getFlightId } from "../../service/flight/flightService";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { Container, Card, Button, Col, Form, Row } from "react-bootstrap";
+import { Container, Card, Button, Col, Form, Row, Accordion } from "react-bootstrap";
 import "font-awesome/css/font-awesome.min.css";
 import PropTypes from "prop-types";
 
@@ -28,6 +29,8 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const [dataBooking, setDataBooking] = useState(null);
+  const [activeKey, setActiveKey] = useState("0");
+  const [activeKeyReturn, setActiveKeyReturn] = useState("0");
 
   const flightId = parseInt(searchParams.get("flightId") || "0", 10);
   const returnFlightId = parseInt(
@@ -175,6 +178,25 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
       const passengerRequiredFields = requiredFields
         .map((field) => (passengerData[`${field}_${index}`] ? null : field))
         .filter(Boolean);
+      
+      const identityNumber = passengerData[`identityNumber_${index}`];
+      let identityValidation = !/^\d{16}$/.test(identityNumber);
+      
+      if (passagerId === "Paspor") {
+        identityValidation = !/^\d{8}$/.test(identityNumber); 
+      }
+
+      if (identityValidation) {
+        toast.error(
+          `Identity Number for Passenger ${index + 1} must be ${
+            passagerId === "Paspor"
+              ? "at least 8 digits!"
+              : "exactly 16 digits number!"
+          }`
+        );
+        return false;
+      }
+
 
       if (passengerRequiredFields.length > 0) {
         passengerRequiredFields.forEach((field) => {
@@ -381,7 +403,7 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
             <form onSubmit={onSubmit}>
               {/* Card Pemesan */}
               <div className="mb-3 shadow-sm">
-                <Card style={{ width: "" }}>
+                <Card>
                   <Card.Body>
                     <Card.Title>
                       <b>Enter User Information</b>
@@ -455,7 +477,7 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
 
               {/* Card penumpang */}
               <div className="mb-3 shadow-sm">
-                <Card style={{ width: "" }}>
+                <Card>
                   <Card.Body>
                     <Card.Title>
                       <b>Enter Passenger Information</b>
@@ -465,7 +487,7 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
                         <Card style={{ border: "none" }}>
                           <Card.Header
                             className="text-white"
-                            style={{ background: "#3C3C3C" }}
+                            style={{ background: "#3C3C3C"}}
                           >
                             Passenger Information {index + 1} - {type}
                             {isSaved && (
@@ -600,15 +622,12 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
                                 controlId="validationCustom01"
                               >
                                 <Form.Label>Citizenship</Form.Label>
-                                <Form.Control
-                                  required
-                                  type="text"
+                                <SelectCountry
                                   name={`citizenship_${index}`}
                                   value={
                                     passengerData[`citizenship_${index}`] || ""
                                   }
                                   onChange={handlePassengerChange}
-                                  className="custom-input"
                                   disabled={isSaved}
                                 />
                               </Form.Group>
@@ -643,11 +662,21 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
                             </Row>
                             <Row className="mb-3">
                               <Form.Group>
-                                <Form.Label>ID Number</Form.Label>
+                                <Form.Label>
+                                  {passengerData[`passagerId_${index}`] ===
+                                  "Paspor"
+                                    ? "Passport Number"
+                                    : "ID Number"}
+                                </Form.Label>
                                 <Form.Control
                                   required
                                   type="text"
-                                  placeholder="ID Number"
+                                  placeholder={
+                                    passengerData[`passagerId_${index}`] ===
+                                    "Paspor"
+                                      ? "Passport Number"
+                                      : "ID Number"
+                                  }
                                   name={`identityNumber_${index}`}
                                   value={
                                     passengerData[`identityNumber_${index}`] ||
@@ -666,7 +695,7 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
                                   <Form.Group>
                                     <Form.Label>Issuing Country</Form.Label>
                                     <Col>
-                                      <Select
+                                      <SelectCountry
                                         name={`countryOfIssue_${index}`}
                                         value={
                                           passengerData[
@@ -680,161 +709,8 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
                                               event.target.value,
                                           }))
                                         }
-                                        fullWidth
-                                        sx={{
-                                          width: "100%",
-                                          height: "40px",
-                                          border: "none",
-                                          borderRadius: "7px",
-                                        }}
                                         disabled={isSaved}
-                                      >
-                                        <MenuItem value="Afghanistan">
-                                          Afghanistan
-                                        </MenuItem>
-                                        <MenuItem value="Argentina">
-                                          Argentina
-                                        </MenuItem>
-                                        <MenuItem value="Australia">
-                                          Australia
-                                        </MenuItem>
-                                        <MenuItem value="Austria">
-                                          Austria
-                                        </MenuItem>
-                                        <MenuItem value="Bahrain">
-                                          Bahrain
-                                        </MenuItem>
-                                        <MenuItem value="Bangladesh">
-                                          Bangladesh
-                                        </MenuItem>
-                                        <MenuItem value="Bhutan">
-                                          Bhutan
-                                        </MenuItem>
-                                        <MenuItem value="Bolivia">
-                                          Bolivia
-                                        </MenuItem>
-                                        <MenuItem value="Brazil">
-                                          Brazil
-                                        </MenuItem>
-                                        <MenuItem value="Brunei">
-                                          Brunei
-                                        </MenuItem>
-                                        <MenuItem value="Bulgaria">
-                                          Bulgaria
-                                        </MenuItem>
-                                        <MenuItem value="Cambodia">
-                                          Cambodia
-                                        </MenuItem>
-                                        <MenuItem value="Canada">
-                                          Canada
-                                        </MenuItem>
-                                        <MenuItem value="China">China</MenuItem>
-                                        <MenuItem value="Colombia">
-                                          Colombia
-                                        </MenuItem>
-                                        <MenuItem value="Denmark">
-                                          Denmark
-                                        </MenuItem>
-                                        <MenuItem value="Egypt">Egypt</MenuItem>
-                                        <MenuItem value="Finland">
-                                          Finland
-                                        </MenuItem>
-                                        <MenuItem value="France">
-                                          France
-                                        </MenuItem>
-                                        <MenuItem value="Germany">
-                                          Germany
-                                        </MenuItem>
-                                        <MenuItem value="India">India</MenuItem>
-                                        <MenuItem value="Indonesia">
-                                          Indonesia
-                                        </MenuItem>
-                                        <MenuItem value="Iran">Iran</MenuItem>
-                                        <MenuItem value="Iraq">Iraq</MenuItem>
-                                        <MenuItem value="Italy">Italy</MenuItem>
-                                        <MenuItem value="Japan">Japan</MenuItem>
-                                        <MenuItem value="Jordan">
-                                          Jordan
-                                        </MenuItem>
-                                        <MenuItem value="Kazakhstan">
-                                          Kazakhstan
-                                        </MenuItem>
-                                        <MenuItem value="Korea (North)">
-                                          Korea (North)
-                                        </MenuItem>
-                                        <MenuItem value="Korea (South)">
-                                          Korea (South)
-                                        </MenuItem>
-                                        <MenuItem value="Kuwait">
-                                          Kuwait
-                                        </MenuItem>
-                                        <MenuItem value="Laos">Laos</MenuItem>
-                                        <MenuItem value="Malaysia">
-                                          Malaysia
-                                        </MenuItem>
-                                        <MenuItem value="Maldives">
-                                          Maldives
-                                        </MenuItem>
-                                        <MenuItem value="Mexico">
-                                          Mexico
-                                        </MenuItem>
-                                        <MenuItem value="Monaco">
-                                          Monaco
-                                        </MenuItem>
-                                        <MenuItem value="Myanmar (Burma)">
-                                          Myanmar (Burma)
-                                        </MenuItem>
-                                        <MenuItem value="Nepal">Nepal</MenuItem>
-                                        <MenuItem value="Oman">Oman</MenuItem>
-                                        <MenuItem value="Pakistan">
-                                          Pakistan
-                                        </MenuItem>
-                                        <MenuItem value="Philippines">
-                                          Philippines
-                                        </MenuItem>
-                                        <MenuItem value="Qatar">Qatar</MenuItem>
-                                        <MenuItem value="Russia">
-                                          Russia
-                                        </MenuItem>
-                                        <MenuItem value="Saudi Arabia">
-                                          Saudi Arabia
-                                        </MenuItem>
-                                        <MenuItem value="Singapore">
-                                          Singapore
-                                        </MenuItem>
-                                        <MenuItem value="Spain">Spain</MenuItem>
-                                        <MenuItem value="Sri Lanka">
-                                          Sri Lanka
-                                        </MenuItem>
-                                        <MenuItem value="Thailand">
-                                          Thailand
-                                        </MenuItem>
-                                        <MenuItem value="Turkey">
-                                          Turkey
-                                        </MenuItem>
-                                        <MenuItem value="United Arab Emirates">
-                                          United Arab Emirates
-                                        </MenuItem>
-                                        <MenuItem value="United Kingdom">
-                                          United Kingdom
-                                        </MenuItem>
-                                        <MenuItem value="United States">
-                                          United States
-                                        </MenuItem>
-                                        <MenuItem value="Uzbekistan">
-                                          Uzbekistan
-                                        </MenuItem>
-                                        <MenuItem value="Vietnam">
-                                          Vietnam
-                                        </MenuItem>
-                                        <MenuItem value="Yemen">Yemen</MenuItem>
-                                        <MenuItem value="Zambia">
-                                          Zambia
-                                        </MenuItem>
-                                        <MenuItem value="Zimbabwe">
-                                          Zimbabwe
-                                        </MenuItem>
-                                      </Select>
+                                      />
                                     </Col>
                                   </Form.Group>
                                 </Row>
@@ -877,33 +753,62 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
               </div>
 
               {/* Card Seat */}
-              <div className="mb-3 shadow-sm">
-                <Card style={{ width: "" }}>
-                  <Card.Body>
-                    <Card.Title>
-                      <b>
-                        {isRoundtrip ? "Choose Departure Seat" : "Choose Seat"}
-                      </b>
-                    </Card.Title>
-                    <SeatMap
-                      selectedSeats={selectedSeats}
-                      setSelectedSeats={setSelectedSeats}
-                      totalSeat={totalSeat}
-                      isSaved={isSaved}
-                    />
-                  </Card.Body>
-                </Card>
-              </div>
-              {isRoundtrip && (
+              {isRoundtrip ? (
+                <>
+                  <Accordion
+                    activeKey={activeKey}
+                    onSelect={(key) =>
+                      setActiveKey(key === activeKey ? null : key)
+                    }
+                    className="mb-3 shadow-sm"
+                  >
+                    <Accordion.Item eventKey="0">
+                      <Accordion.Header>
+                        <b>Choose Departure Seat</b>
+                      </Accordion.Header>
+                      <Accordion.Body>
+                        <SeatMap
+                          selectedSeats={selectedSeats}
+                          setSelectedSeats={setSelectedSeats}
+                          totalSeat={totalSeat}
+                          isSaved={isSaved}
+                        />
+                      </Accordion.Body>
+                    </Accordion.Item>
+                  </Accordion>
+
+                  <Accordion
+                    activeKey={activeKeyReturn}
+                    onSelect={(key) =>
+                      setActiveKeyReturn(key === activeKeyReturn ? null : key)
+                    }
+                    className="mb-3 shadow-sm"
+                  >
+                    <Accordion.Item eventKey="0">
+                      <Accordion.Header>
+                        <b>Choose Return Seat</b>
+                      </Accordion.Header>
+                      <Accordion.Body>
+                        <SeatMapReturn
+                          selectedSeatsReturn={selectedSeatsReturn}
+                          setSelectedSeatsReturn={setSelectedSeatsReturn}
+                          totalSeat={totalSeat}
+                          isSaved={isSaved}
+                        />
+                      </Accordion.Body>
+                    </Accordion.Item>
+                  </Accordion>
+                </>
+              ) : (
                 <div className="mb-3 shadow-sm">
-                  <Card style={{ width: "" }}>
+                  <Card>
                     <Card.Body>
                       <Card.Title>
-                        <b>Choose Return Seat</b>
+                        <b>Choose Seat</b>
                       </Card.Title>
-                      <SeatMapReturn
-                        selectedSeatsReturn={selectedSeatsReturn}
-                        setSelectedSeatsReturn={setSelectedSeatsReturn}
+                      <SeatMap
+                        selectedSeats={selectedSeats}
+                        setSelectedSeats={setSelectedSeats}
                         totalSeat={totalSeat}
                         isSaved={isSaved}
                       />
