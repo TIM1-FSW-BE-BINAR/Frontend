@@ -16,6 +16,8 @@ const HomepageModal = (props) => {
 
   const [filteredFlights, setFilteredFlights] = useState([]);
 
+  console.log(flights);
+
   useEffect(() => {
     if (show) {
       setInputValue("");

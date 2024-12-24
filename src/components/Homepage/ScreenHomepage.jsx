@@ -247,7 +247,6 @@ const Homepage = () => {
       const pageItems = flightData.meta.pagination.pageItems;
       const totalData = parseInt(totalPage, 10) * parseInt(pageItems, 10);
 
-      // Set flightsDataAll jika belum pernah di-set atau jika state berubah
       if (flightsDataAllRef.current === null || stateChanged()) {
         flightsDataAllRef.current = totalData;
         setFlightsDataAll(totalData);
