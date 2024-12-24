@@ -42,7 +42,7 @@ const ScreenHistory = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [activeFilter, setActiveFilter] = useState(() => {
     const savedFilter = localStorage.getItem("activeFilter");
-    return savedFilter ? savedFilter : "all"; // Default ke "all" jika tidak ada di localStorage
+    return savedFilter ? savedFilter : "all";
   });
 
   const [isMobile, setIsMobile] = useState(
@@ -59,7 +59,6 @@ const ScreenHistory = () => {
   }, []);
 
   useEffect(() => {
-    // Save state to localStorage
     localStorage.setItem("selectedId", selectedId);
     localStorage.setItem("isDetailVisible", isDetailVisible);
     localStorage.setItem("activeFilter", activeFilter);
@@ -343,8 +342,8 @@ const ScreenHistory = () => {
                         width: "40rem",
                         left: "6rem",
                         border: isSelected
-                          ? "2px solid #A06ECE" // Apply the desired border color when selected
-                          : "1px solid #ddd", // Default border color
+                          ? "2px solid #A06ECE"
+                          : "1px solid #ddd",
                         outline: isSelected ? "3px solid #A06ECE" : "none",
                       }}
                     >

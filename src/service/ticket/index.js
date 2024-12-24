@@ -16,7 +16,6 @@ export const tickets = async (id, request) => {
     }
   );
 
-  // get the data if fetching succeed!
   const result = await response.json();
   return result;
 };
