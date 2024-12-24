@@ -13,7 +13,6 @@ export const createSnap = async (request) => {
   );
 
   const result = await response.json();
-  console.log("createsnap", result);
   return result;
 };
 

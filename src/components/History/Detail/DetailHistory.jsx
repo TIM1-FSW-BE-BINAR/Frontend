@@ -492,8 +492,14 @@ const DetailHistory = ({ id, onBack }) => {
               {/* Logo Maskapai */}
               <img
                 className="me-4"
-                src="img/airlane_logo1.svg"
-                alt="Airlane Logo"
+                src={
+                  booking?.flight?.airline?.imageUrl ||
+                  "imageUrl Airline not available"
+                }
+                alt={
+                  booking?.flight?.airline?.imageId ||
+                  "imageId Airline not available"
+                }
                 style={{ width: "40px", height: "40px" }}
               />
 

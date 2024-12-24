@@ -54,7 +54,7 @@ const PaymentOptions = () => {
             toast.success("Payment Success!");
             const timer = setTimeout(() => {
               navigate({ to: "/complete" });
-            }, 4000);
+            }, 2000);
             return () => clearTimeout(timer);
           },
           onPending: function () {
