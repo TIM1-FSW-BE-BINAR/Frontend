@@ -1,4 +1,4 @@
-//import * as React from "react";
+import React from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import HistoryLayout from "../layouts/History/HistoryLayout";
 import ScreenHistory from "../components/History/ScreenHistory";

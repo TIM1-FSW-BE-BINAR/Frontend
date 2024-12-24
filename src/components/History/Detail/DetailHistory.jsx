@@ -414,8 +414,8 @@ const DetailHistory = ({ id, onBack }) => {
         </Button>
         <Card.Body
           style={{
-            maxHeight: "100%", // Pastikan elemen anak tidak melampaui tinggi Card
-            overflowY: "auto", // Terapkan overflow ke kontainer Body jika diperlukan
+            maxHeight: "100%",
+            overflowY: "auto",
           }}
         >
           <div style={{ height: "80rem" }}>

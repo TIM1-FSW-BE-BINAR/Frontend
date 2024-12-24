@@ -1,6 +1,6 @@
 .card-detail-history {
-  max-height: 65rem; /* Pastikan ada batas */
-  overflow-y: auto; /* Tambahkan properti scroll */
+  max-height: 65rem;
+  overflow-y: auto;
 }
 
 .overlay {
@@ -15,16 +15,16 @@
 }
 
 .customized-style::-webkit-scrollbar {
-  width: 8px; /* Lebar scrollbar */
+  width: 8px;
 }
 
 .customized-style::-webkit-scrollbar-thumb {
-  background-color: #ccc; /* Warna thumb scrollbar */
-  border-radius: 10px; /* Membulatkan thumb */
+  background-color: #ccc;
+  border-radius: 10px;
 }
 
 .customized-style::-webkit-scrollbar-track {
-  background: #f5f5f5; /* Warna track */
+  background: #f5f5f5;
 }
 
 .cancel-toast {
