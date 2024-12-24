@@ -28,8 +28,6 @@ const DetailHistory = ({ id, onBack }) => {
   const [matchedPayment, setMatchedPayment] = useState(null);
   const [activeKey, setActiveKey] = useState(null);
   const [isOverlayVisible, setOverlayVisible] = useState(false);
-  const cardBodyRef = useRef(null);
-  const [scrollPosition, setScrollPosition] = useState(0);
 
   const { data, isLoading, isSuccess, isError, error } = useQuery({
     queryKey: ["getIdBooking", id],
@@ -255,6 +253,10 @@ const DetailHistory = ({ id, onBack }) => {
     }
 
     try {
+      cardElement.scrollTop = 0;
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       const buttons = document.querySelectorAll(".custom-btn2, .custom-btn3");
       buttons.forEach((button) => (button.style.display = "none"));
 
@@ -278,7 +280,15 @@ const DetailHistory = ({ id, onBack }) => {
       let positionY = (pageHeight - imgHeight) / 2;
 
       if (imgHeight <= pageHeight) {
-        pdf.addImage(imgData, "PNG", positionX, positionY, imgWidth, imgHeight);
+        pdf.addImage(
+          imgData,
+          "PNG",
+
+          positionX,
+          positionY,
+          imgWidth,
+          imgHeight
+        );
       } else {
         let remainingHeight = canvas.height;
         let pageOffset = 0;
@@ -377,14 +387,6 @@ const DetailHistory = ({ id, onBack }) => {
     });
   };
 
-  const handleScroll = (event) => {
-    if (cardBodyRef.current) {
-      const newPosition = scrollPosition + event.deltaY;
-      cardBodyRef.current.scrollTop = newPosition;
-      setScrollPosition(newPosition);
-    }
-  };
-
   if (isLoading) return <DetailPesananLoading />;
   if (isError || !booking)
     return <p>Error fetching details: {error?.message || "Unknown error"}</p>;
@@ -394,15 +396,13 @@ const DetailHistory = ({ id, onBack }) => {
       <Card
         className="shadow-sm rounded border-1 mt-5 card-detail-history customized-style"
         style={{
-          width: "25rem",
+          width: "27rem",
           height: "65rem",
           position: "sticky",
-          top: "20px", // Distance from the top of the viewport
+          top: "20px",
           background: "#FFFFFF",
-          overflowY: "auto", // Enables vertical scroll
-          scrollbarWidth: "thin", // Optional: reduce scrollbar size
+          overflowY: "auto",
         }}
-        onWheel={handleScroll}
       >
         <Button
           variant="none"
@@ -413,305 +413,297 @@ const DetailHistory = ({ id, onBack }) => {
           <VscChromeClose size={25} style={{ color: "black" }} />
         </Button>
         <Card.Body
-          ref={cardBodyRef}
           style={{
-            maxHeight: "calc(100% - 60px)",
-            overflow: "hidden", // Menghilangkan scroll otomatis
+            maxHeight: "100%", // Pastikan elemen anak tidak melampaui tinggi Card
+            overflowY: "auto", // Terapkan overflow ke kontainer Body jika diperlukan
           }}
         >
-          {/* Status Pesanan */}
-          <div className="d-flex justify-content-between align-items-center mb-3 custom-status">
-            <h6 className="fw-bold custom-h6">Booking Detail</h6>
-            <span
-              className="px-3 py-1 text-white"
-              style={{
-                backgroundColor:
-                  matchedPayment?.status === "pending"
-                    ? "#8A8A8A"
-                    : matchedPayment?.status === "settlement"
-                      ? "#73CA5C"
-                      : matchedPayment?.status === "expire"
-                        ? "#8A8A8A"
-                        : matchedPayment?.status === "cancel"
-                          ? "#FF0000"
-                          : "#FF0000",
-                borderRadius: "10px",
-                fontSize: "12px",
-              }}
-            >
-              {matchedPayment?.status === "pending"
-                ? "UNPAID"
-                : matchedPayment?.status === "settlement"
-                  ? "PAID"
-                  : matchedPayment?.status === "expire"
-                    ? "EXPIRED"
-                    : matchedPayment?.status === "cancel"
-                      ? "CANCELED"
-                      : "UNPAID"}
-            </span>
-          </div>
-
-          {/* Booking Code */}
-          <div className="d-flex align-items-center mb-3">
-            <span className="fw-bold me-2">Booking Code:</span>
-            <span style={{ color: "#7126B5", fontWeight: "bold" }}>
-              {booking?.code || "N/A"}
-            </span>
-          </div>
-
-          {/* Keberangkatan */}
-          <div className="mb-3 d-flex align-items-start justify-content-between">
-            <div>
-              <p className="m-0 fw-bold">
-                {booking?.flight?.departureTime
-                  ? format(new Date(booking.flight.departureTime), "HH:mm", {
-                      locale: enUS,
-                    })
-                  : "N/A"}
-              </p>
-              <p className="m-0">
-                {booking?.flight?.departureTime
-                  ? format(
-                      new Date(booking.flight.departureTime),
-                      "dd MMMM yyyy",
-                      {
-                        locale: enUS,
-                      }
-                    )
-                  : "N/A"}
-              </p>
-              <p className="m-0">
-                {booking?.flight?.departure?.name || "Departure Airport N/A"}
-              </p>
+          <div style={{ height: "80rem" }}>
+            {" "}
+            {/* Status Pesanan */}
+            <div className="d-flex justify-content-between align-items-center mb-3 custom-status">
+              <h6 className="fw-bold custom-h6">Booking Detail</h6>
+              <span
+                className="px-3 py-1 text-white"
+                style={{
+                  backgroundColor:
+                    matchedPayment?.status === "pending"
+                      ? "#8A8A8A"
+                      : matchedPayment?.status === "settlement"
+                        ? "#73CA5C"
+                        : matchedPayment?.status === "expire"
+                          ? "#8A8A8A"
+                          : matchedPayment?.status === "cancel"
+                            ? "#FF0000"
+                            : "#FF0000",
+                  borderRadius: "10px",
+                  fontSize: "12px",
+                }}
+              >
+                {matchedPayment?.status === "pending"
+                  ? "UNPAID"
+                  : matchedPayment?.status === "settlement"
+                    ? "PAID"
+                    : matchedPayment?.status === "expire"
+                      ? "EXPIRED"
+                      : matchedPayment?.status === "cancel"
+                        ? "CANCELED"
+                        : "UNPAID"}
+              </span>
             </div>
-            <span className="fw-bold" style={{ color: "#A06ECE" }}>
-              Departure
-            </span>
-          </div>
-          <hr />
-
-          <div className="mb-3 d-flex align-items-center">
-            {/* Logo Maskapai */}
-            <img
-              className="me-4"
-              src="img/airlane_logo1.svg"
-              alt="Airlane Logo"
-              style={{ width: "40px", height: "40px" }}
-            />
-
-            <div>
-              {/* Detail Maskapai */}
-              <h6 className="fw-bolder m-0 custom-flight">
-                {booking?.flight?.airline?.name || "Airline not available"} -{" "}
-                {booking.flight?.class
-                  ? booking.flight.class.replace(/_/g, " ")
-                  : "Class not available"}
-              </h6>
-              <p className="m-0 fw-bold">
-                {booking?.flight?.flightNumber || "Flight Number N/A"}
-              </p>
-              {/* Informasi Penumpang */}
-              <div className="mt-4">
-                <h6 className="fw-bolder mb-0 custom-flight-info">
-                  Information:
-                </h6>
-                {booking?.bookingDetail?.map((detail, index) => (
-                  <div key={detail.id}>
-                    <p
-                      className="m-0"
-                      style={{ color: "#4B1979", fontWeight: "500" }}
-                    >
-                      {`Penumpang ${index + 1}: ${detail.passenger?.name} ${detail.passenger?.familyName} `}
-                    </p>
-                    <p className="m-0">{`ID: ${detail.passenger?.identityNumber || "N/A"}`}</p>
-                  </div>
-                ))}
+            {/* Booking Code */}
+            <div className="d-flex align-items-center mb-3">
+              <span className="fw-bold me-2">Booking Code:</span>
+              <span style={{ color: "#7126B5", fontWeight: "bold" }}>
+                {booking?.code || "N/A"}
+              </span>
+            </div>
+            {/* Keberangkatan */}
+            <div className="mb-3 d-flex align-items-start justify-content-between">
+              <div>
+                <p className="m-0 fw-bold">
+                  {booking?.flight?.departureTime
+                    ? format(new Date(booking.flight.departureTime), "HH:mm", {
+                        locale: enUS,
+                      })
+                    : "N/A"}
+                </p>
+                <p className="m-0">
+                  {booking?.flight?.departureTime
+                    ? format(
+                        new Date(booking.flight.departureTime),
+                        "dd MMMM yyyy",
+                        {
+                          locale: enUS,
+                        }
+                      )
+                    : "N/A"}
+                </p>
+                <p className="m-0">
+                  {booking?.flight?.departure?.name || "Departure Airport N/A"}
+                </p>
               </div>
-            </div>
-          </div>
-          <hr />
-
-          {/* Kedatangan */}
-          <div className="mb-3 d-flex align-items-start justify-content-between">
-            <div>
-              <p className="m-0 fw-bold">
-                {booking?.flight?.arrivalTime
-                  ? format(new Date(booking.flight.arrivalTime), "HH:mm", {
-                      locale: enUS,
-                    })
-                  : "N/A"}
-              </p>
-              <p className="m-0">
-                {booking?.flight?.arrivalTime
-                  ? format(
-                      new Date(booking.flight.arrivalTime),
-                      "dd MMMM yyyy",
-                      {
-                        locale: enUS,
-                      }
-                    )
-                  : "N/A"}
-              </p>
-              <p className="m-0">
-                {booking?.flight?.arrival?.name || "Arrival Airport N/A"}
-              </p>
-            </div>
-
-            <span className="fw-bold" style={{ color: "#A06ECE" }}>
-              Arrival
-            </span>
-          </div>
-          <hr />
-
-          {/* Rincian Harga */}
-          <div className="mb-3">
-            <h6 className="fw-bold custom-payment">Payment Detail:</h6>
-            <div>
-              {groupedPassengers &&
-                Object.entries(groupedPassengers).map(([type, data]) => (
-                  <Row key={type}>
-                    <Col xs={8}>
-                      <p className="m-0">{`${data.count} ${type}`}</p>
-                    </Col>
-                    <Col xs={4} className="text-end">
-                      <p className="m-0">{`IDR ${data.totalPrice.toLocaleString("id-ID")}`}</p>
-                    </Col>
-                    <Col xs={8}>
-                      <p className="m-0">Tax</p>
-                    </Col>
-                    <Col xs={4} className="text-end">
-                      <p className="m-0">
-                        {`IDR ${(booking?.totalPrice + booking?.totalPrice * 0.03 - booking?.totalPrice).toLocaleString("id-ID")}`}
-                      </p>
-                    </Col>
-                  </Row>
-                ))}
+              <span className="fw-bold" style={{ color: "#A06ECE" }}>
+                Departure
+              </span>
             </div>
             <hr />
-            <div className="d-flex justify-content-between fw-bold">
-              <p>Total</p>
-              <p>
-                {matchedPayment?.amount
-                  ? `IDR ${matchedPayment.amount.toLocaleString("id-ID")}`
-                  : "Price not available"}
-              </p>
+            <div className="mb-3 d-flex align-items-center">
+              {/* Logo Maskapai */}
+              <img
+                className="me-4"
+                src="img/airlane_logo1.svg"
+                alt="Airlane Logo"
+                style={{ width: "40px", height: "40px" }}
+              />
+
+              <div>
+                {/* Detail Maskapai */}
+                <h6 className="fw-bolder m-0 custom-flight">
+                  {booking?.flight?.airline?.name || "Airline not available"} -{" "}
+                  {booking.flight?.class
+                    ? booking.flight.class.replace(/_/g, " ")
+                    : "Class not available"}
+                </h6>
+                <p className="m-0 fw-bold">
+                  {booking?.flight?.flightNumber || "Flight Number N/A"}
+                </p>
+                {/* Informasi Penumpang */}
+                <div className="mt-4">
+                  <h6 className="fw-bolder mb-0 custom-flight-info">
+                    Information:
+                  </h6>
+                  {booking?.bookingDetail?.map((detail, index) => (
+                    <div key={detail.id}>
+                      <p
+                        className="m-0"
+                        style={{ color: "#4B1979", fontWeight: "500" }}
+                      >
+                        {`Penumpang ${index + 1}: ${detail.passenger?.name} ${detail.passenger?.familyName} `}
+                      </p>
+                      <p className="m-0">{`ID: ${detail.passenger?.identityNumber || "N/A"}`}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
+            <hr />
+            {/* Kedatangan */}
+            <div className="mb-3 d-flex align-items-start justify-content-between">
+              <div>
+                <p className="m-0 fw-bold">
+                  {booking?.flight?.arrivalTime
+                    ? format(new Date(booking.flight.arrivalTime), "HH:mm", {
+                        locale: enUS,
+                      })
+                    : "N/A"}
+                </p>
+                <p className="m-0">
+                  {booking?.flight?.arrivalTime
+                    ? format(
+                        new Date(booking.flight.arrivalTime),
+                        "dd MMMM yyyy",
+                        {
+                          locale: enUS,
+                        }
+                      )
+                    : "N/A"}
+                </p>
+                <p className="m-0">
+                  {booking?.flight?.arrival?.name || "Arrival Airport N/A"}
+                </p>
+              </div>
 
-          {/* Tombol Lanjut Bayar atau Print Ticket */}
-
-          <div className="mt-3 d-flex justify-content-center align-items-center flex-column">
-            <Button
-              variant="none"
-              className="mt-2 text-white rounded-pill custom-btn1"
-              style={{
-                width: "15rem",
-                height: "3rem",
-                backgroundColor:
-                  matchedPayment?.status === "cancel" ||
-                  matchedPayment?.status === "expire" ||
-                  booking?.bookingDetail[0]?.qrCodeImage
-                    ? "transparent"
-                    : matchedPayment?.status === "pending" || !matchedPayment
-                      ? "#73CA5C"
-                      : "#4B1979",
-
-                display:
-                  matchedPayment?.status === "cancel" ||
-                  matchedPayment?.status === "expire" ||
-                  booking?.bookingDetail[0]?.qrCodeImage
-                    ? "none"
-                    : "block",
-              }}
-              onClick={() => {
-                if (matchedPayment?.status === "pending" || !matchedPayment) {
-                  handlePaymentNavigation();
-                } else if (
-                  matchedPayment?.status !== "cancel" &&
-                  matchedPayment?.status !== "expire" &&
-                  !booking?.bookingDetail[0]?.qrCodeImage
-                ) {
-                  handlePrintTicket();
-                }
-              }}
-              disabled={
-                matchedPayment?.status === "cancel" ||
-                matchedPayment?.status === "expire" ||
-                booking?.bookingDetail[0]?.qrCodeImage ||
-                mutation?.isLoading
-              }
-            >
-              {matchedPayment?.status === "pending" || !matchedPayment
-                ? "Continue Payment"
-                : !booking?.bookingDetail[0]?.qrCodeImage
-                  ? mutation.isLoading
-                    ? "Printing..."
-                    : "Print Ticket"
-                  : ""}
-            </Button>
-          </div>
-
-          {isOverlayVisible && (
-            <div className="overlay" onClick={handleOverlayClick}></div>
-          )}
-
-          {/* Tombol Cancel Payment */}
-          {matchedPayment?.status === "pending" && (
-            <div className="mt-2 text-center">
+              <span className="fw-bold" style={{ color: "#A06ECE" }}>
+                Arrival
+              </span>
+            </div>
+            <hr />
+            {/* Rincian Harga */}
+            <div className="mb-3">
+              <h6 className="fw-bold custom-payment">Payment Detail:</h6>
+              <div>
+                {groupedPassengers &&
+                  Object.entries(groupedPassengers).map(([type, data]) => (
+                    <Row key={type}>
+                      <Col xs={8}>
+                        <p className="m-0">{`${data.count} ${type}`}</p>
+                      </Col>
+                      <Col xs={4} className="text-end">
+                        <p className="m-0">{`IDR ${data.totalPrice.toLocaleString("id-ID")}`}</p>
+                      </Col>
+                      <Col xs={8}>
+                        <p className="m-0">Tax</p>
+                      </Col>
+                      <Col xs={4} className="text-end">
+                        <p className="m-0">
+                          {`IDR ${(booking?.totalPrice + booking?.totalPrice * 0.03 - booking?.totalPrice).toLocaleString("id-ID")}`}
+                        </p>
+                      </Col>
+                    </Row>
+                  ))}
+              </div>
+              <hr />
+              <div className="d-flex justify-content-between fw-bold">
+                <p>Total</p>
+                <p>
+                  {matchedPayment?.amount
+                    ? `IDR ${matchedPayment.amount.toLocaleString("id-ID")}`
+                    : "Price not available"}
+                </p>
+              </div>
+            </div>
+            {/* Tombol Lanjut Bayar atau Print Ticket */}
+            <div className="mt-3 d-flex justify-content-center align-items-center flex-column">
               <Button
                 variant="none"
-                className="mb-3 text-white rounded-pill custom-btn2"
+                className="mt-2 text-white rounded-pill custom-btn1"
                 style={{
                   width: "15rem",
                   height: "3rem",
-                  backgroundColor: "#FF0000",
+                  backgroundColor:
+                    matchedPayment?.status === "cancel" ||
+                    matchedPayment?.status === "expire" ||
+                    booking?.bookingDetail[0]?.qrCodeImage
+                      ? "transparent"
+                      : matchedPayment?.status === "pending" || !matchedPayment
+                        ? "#73CA5C"
+                        : "#4B1979",
+
+                  display:
+                    matchedPayment?.status === "cancel" ||
+                    matchedPayment?.status === "expire" ||
+                    booking?.bookingDetail[0]?.qrCodeImage
+                      ? "none"
+                      : "block",
                 }}
-                onClick={handleCancelPayment}
+                onClick={() => {
+                  if (matchedPayment?.status === "pending" || !matchedPayment) {
+                    handlePaymentNavigation();
+                  } else if (
+                    matchedPayment?.status !== "cancel" &&
+                    matchedPayment?.status !== "expire" &&
+                    !booking?.bookingDetail[0]?.qrCodeImage
+                  ) {
+                    handlePrintTicket();
+                  }
+                }}
+                disabled={
+                  matchedPayment?.status === "cancel" ||
+                  matchedPayment?.status === "expire" ||
+                  booking?.bookingDetail[0]?.qrCodeImage ||
+                  mutation?.isLoading
+                }
               >
-                Cancel Payment
+                {matchedPayment?.status === "pending" || !matchedPayment
+                  ? "Continue Payment"
+                  : !booking?.bookingDetail[0]?.qrCodeImage
+                    ? mutation.isLoading
+                      ? "Printing..."
+                      : "Print Ticket"
+                    : ""}
               </Button>
             </div>
-          )}
+            {isOverlayVisible && (
+              <div className="overlay" onClick={handleOverlayClick}></div>
+            )}
+            {/* Tombol Cancel Payment */}
+            {matchedPayment?.status === "pending" && (
+              <div className="mt-2 text-center">
+                <Button
+                  variant="none"
+                  className="mb-3 text-white rounded-pill custom-btn2"
+                  style={{
+                    width: "15rem",
+                    height: "3rem",
+                    backgroundColor: "#FF0000",
+                  }}
+                  onClick={handleCancelPayment}
+                >
+                  Cancel Payment
+                </Button>
+              </div>
+            )}
+            {/* tombol download */}
+            {booking?.bookingDetail[0]?.qrCodeImage && (
+              <div className="mt-3 text-center">
+                <Button
+                  variant="none"
+                  className="mb-3 me-2 rounded-pill custom-btn2"
+                  style={{
+                    backgroundColor: "#FFFFFF",
+                    color: "#4B1979",
+                    borderColor: "#4B1979",
+                    height: "3rem",
+                    width: "10rem",
+                  }}
+                  onClick={handleDownloadQRCode}
+                >
+                  Download QR
+                </Button>
+                <Button
+                  variant="none"
+                  className="mb-3 text-white rounded-pill custom-btn3"
+                  style={{
+                    backgroundColor: "#4B1979",
+                    height: "3rem",
+                    width: "10rem",
+                  }}
+                  onClick={handleDownloadTicket}
+                >
+                  Print Ticket
+                </Button>
 
-          {/* tombol download */}
-          {booking?.bookingDetail[0]?.qrCodeImage && (
-            <div className="mt-3 text-center">
-              <Button
-                variant="none"
-                className="mb-3 me-2 rounded-pill custom-btn2"
-                style={{
-                  backgroundColor: "#FFFFFF",
-                  color: "#4B1979",
-                  borderColor: "#4B1979",
-                  height: "3rem",
-                  width: "10rem",
-                }}
-                onClick={handleDownloadQRCode}
-              >
-                Download QR
-              </Button>
-              <Button
-                variant="none"
-                className="mb-3 text-white rounded-pill custom-btn3"
-                style={{
-                  backgroundColor: "#4B1979",
-                  height: "3rem",
-                  width: "10rem",
-                }}
-                onClick={handleDownloadTicket}
-              >
-                Print Ticket
-              </Button>
-
-              <h6 className="custom-h6-qr">Scan QR Ticket:</h6>
-              <Image
-                src={booking?.bookingDetail[0]?.qrCodeImage}
-                alt="QR Code"
-                className="img-fluid qr-ticket"
-                style={{ maxWidth: "200px" }}
-              />
-            </div>
-          )}
+                <h6 className="custom-h6-qr">Scan QR Ticket:</h6>
+                <Image
+                  src={booking?.bookingDetail[0]?.qrCodeImage}
+                  alt="QR Code"
+                  className="img-fluid qr-ticket"
+                  style={{ maxWidth: "200px" }}
+                />
+              </div>
+            )}
+          </div>
         </Card.Body>
       </Card>
       <Toaster position="top-right" reverseOrder={false} />

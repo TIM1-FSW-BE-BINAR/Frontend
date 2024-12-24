@@ -1,3 +1,8 @@
+.card-detail-history {
+  max-height: 65rem; /* Pastikan ada batas */
+  overflow-y: auto; /* Tambahkan properti scroll */
+}
+
 .overlay {
   position: fixed;
   top: 0;
