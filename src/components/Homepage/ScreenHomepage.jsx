@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useRef } from "react";
 import {
   Button,
   Card,
@@ -212,7 +212,16 @@ const Homepage = () => {
   const [notFound, setNotFound] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [flightsDataAll, setFlightsDataALl] = useState([]);
+  const [flightsDataAll, setFlightsDataAll] = useState([]);
+  const flightsDataAllRef = useRef(null); // Menyimpan nilai fetch pertama
+
+  // Fungsi untuk memeriksa apakah state berubah
+  const stateChanged = () => {
+    return (
+      flightsDataAllRef.current !== null &&
+      flightsDataAllRef.current.state !== state
+    );
+  };
 
   const {
     data: flightData,
@@ -237,7 +246,12 @@ const Homepage = () => {
       const totalPage = flightData.meta.pagination.totalPage;
       const pageItems = flightData.meta.pagination.pageItems;
       const totalData = parseInt(totalPage, 10) * parseInt(pageItems, 10);
-      setFlightsDataALl(totalData);
+
+      if (flightsDataAllRef.current === null || stateChanged()) {
+        flightsDataAllRef.current = totalData;
+        setFlightsDataAll(totalData);
+      }
+
       setLoading(false);
       if (flightData.data.length == 0) {
         setNotFound(true);
@@ -249,23 +263,13 @@ const Homepage = () => {
     } else if (isPendingFlight) {
       setLoading(true);
     }
-  }, [flightData, isSuccessFlight, isErrorFlight, isPendingFlight]);
-
-  // const { data: flightDataAll, isSuccess: isSuccessFlightDataAll } = useQuery({
-  //   queryKey: ["all-flights", state],
-  //   queryFn: () =>
-  //     getFlights({
-  //       ...(state !== "All" && { state: state }),
-  //       startDeparture: today,
-  //     }),
-  //   enabled: !!today,
-  // });
-
-  // useEffect(() => {
-  //   if (isSuccessFlightDataAll) {
-  //     setFlightsDataALl(flightDataAll);
-  //   }
-  // }, [flightDataAll, isSuccessFlightDataAll]);
+  }, [
+    flightData,
+    isSuccessFlight,
+    isErrorFlight,
+    isPendingFlight,
+    stateChanged,
+  ]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -302,7 +306,6 @@ const Homepage = () => {
     });
   };
 
-  // fetch airport
   const [airportsAll, setAirportsAll] = useState("");
   const {
     data: airportsData,
@@ -320,6 +323,15 @@ const Homepage = () => {
       console.log("Airports error occurred.");
     }
   }, [airportsData, isErrorAirports, isSuccessAirports]);
+
+  function formatToIDR(price) {
+    return price
+      .toLocaleString("id-ID", {
+        style: "currency",
+        currency: "IDR",
+      })
+      .replace(",00", "");
+  }
 
   return (
     <>
@@ -677,7 +689,7 @@ const Homepage = () => {
               variant="primary"
               onClick={handleSavePassengers}
               className="animated-button"
-              style={{ backgroundColor: "#7126b5" }}
+              style={{ backgroundColor: "#7126b5", border: "none" }}
             >
               Save
             </Button>
@@ -801,7 +813,7 @@ const Homepage = () => {
               variant="primary"
               onClick={handleSaveClass}
               className="animated-button"
-              style={{ backgroundColor: "#7126b5" }}
+              style={{ backgroundColor: "#7126b5", border: "none" }}
             >
               Save
             </Button>
@@ -815,7 +827,7 @@ const Homepage = () => {
             <h2>Favorite Destinations</h2>
           </Row>
           <Row className="g-2 mb-2 flex-wrap">
-            {["All", "Asia", "Amerika", "Australia", "Eropa", "Afrika"].map(
+            {["All", "Asia", "America", "Australia", "Europe", "Africa"].map(
               (label, index) => (
                 <Col
                   key={index}
@@ -906,7 +918,7 @@ const Homepage = () => {
                               fontSize: "16px",
                             }}
                           >
-                            IDR {flight?.price}
+                            {formatToIDR(flight?.price)}
                           </span>
                         </p>
                       </Card.Text>
