@@ -325,6 +325,13 @@ const SearchFlight = ({
     setIsTimerActive(true);
   };
 
+   function formatToIDR(price) {
+     return price.toLocaleString("id-ID", {
+       style: "currency",
+       currency: "IDR",
+     });
+   }
+
   return (
     <>
       <Container className="">
@@ -709,7 +716,7 @@ const SearchFlight = ({
                                 fontSize: "18px",
                               }}
                             >
-                              IDR {flight?.price}
+                              {formatToIDR(flight?.price)}
                             </h5>
                             <Button
                               className="btn btn-block w-full"
@@ -718,7 +725,7 @@ const SearchFlight = ({
                                 border: "none",
                               }}
                               onClick={(event) => {
-                                event.stopPropagation(); // Prevent Accordion from toggling
+                                event.stopPropagation();
                                 handleBookingPage(flight);
                                 handleResetTimer();
                               }}

@@ -302,7 +302,6 @@ const Homepage = () => {
     });
   };
 
-  // fetch airport
   const [airportsAll, setAirportsAll] = useState("");
   const {
     data: airportsData,
@@ -320,6 +319,13 @@ const Homepage = () => {
       console.log("Airports error occurred.");
     }
   }, [airportsData, isErrorAirports, isSuccessAirports]);
+
+  function formatToIDR(price) {
+    return price.toLocaleString("id-ID", {
+      style: "currency",
+      currency: "IDR",
+    });
+  }
 
   return (
     <>
@@ -906,7 +912,7 @@ const Homepage = () => {
                               fontSize: "16px",
                             }}
                           >
-                            IDR {flight?.price}
+                            {formatToIDR(flight?.price)}
                           </span>
                         </p>
                       </Card.Text>
