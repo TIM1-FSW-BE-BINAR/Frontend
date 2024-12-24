@@ -5,6 +5,31 @@
   text-overflow: ellipsis;
 }
 
+.custom-dropdown .dropdown-toggle {
+  background-color: #7126b5;
+  color: #ffffff;
+  border: 1px solid #ccc;
+}
+
+.custom-dropdown .dropdown-toggle:hover {
+  background-color: #7126b5;
+  color: #ffffff;
+}
+
+.custom-dropdown .dropdown-item {
+  background-color: #ffffff;
+  color: #000;
+}
+
+.custom-dropdown .dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.custom-dropdown .dropdown-item.active-item {
+  background-color: #7126b5 !important;
+  color: #ffffff !important;
+}
+
 @media (max-width: 426px) {
   .notif-type {
     font-size: 11px !important;

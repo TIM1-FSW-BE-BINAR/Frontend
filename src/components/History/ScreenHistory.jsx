@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  ButtonGroup,
+} from "react-bootstrap";
 import { IoLocationSharp } from "react-icons/io5";
 import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
@@ -9,7 +16,7 @@ import isSameDay from "date-fns/isSameDay";
 import { isWithinInterval, parseISO } from "date-fns";
 import { useHistoryContext } from "./HistoryContext";
 import DetailPesanan from "./Detail/DetailHistory";
-import { getAllPayment } from "../../service/payment";
+import { getAllPaymentPagination } from "../../service/payment";
 import "./ScreenHistory.css";
 import arrowRight from "../../assets/arrow-right.png";
 import notFound from "../../assets/homepage/not-found.png";
@@ -19,11 +26,24 @@ import ScreenRiwayatLoading from "./Loading/ScreenHistoryLoading";
 const ScreenHistory = () => {
   const { token } = useSelector((state) => state.auth);
   const { filterDate, searchQuery } = useHistoryContext();
-  const [groupedBookings, setGroupedBookings] = useState([]);
+  const [groupedBookings, setGroupedBookings] = useState(() => {
+    const savedData = localStorage.getItem("groupedBookings");
+    return savedData ? JSON.parse(savedData) : [];
+  });
   const [durations, setDurations] = useState({});
-  const [selectedId, setSelectedId] = useState(null);
-  const [isDetailVisible, setIsDetailVisible] = useState(false);
+  const [selectedId, setSelectedId] = useState(
+    localStorage.getItem("selectedId") || null
+  );
+  const [isDetailVisible, setIsDetailVisible] = useState(
+    localStorage.getItem("isDetailVisible") === "true"
+  );
   const [showDetailPrompt, setShowDetailPrompt] = useState(true);
+  const [matchedPayments, setMatchedPayments] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [activeFilter, setActiveFilter] = useState(() => {
+    const savedFilter = localStorage.getItem("activeFilter");
+    return savedFilter ? savedFilter : "all";
+  });
 
   const [isMobile, setIsMobile] = useState(
     window.matchMedia("(max-width: 450px)").matches
@@ -38,6 +58,13 @@ const ScreenHistory = () => {
     return () => mediaQuery.removeEventListener("change", handleResize);
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem("selectedId", selectedId);
+    localStorage.setItem("isDetailVisible", isDetailVisible);
+    localStorage.setItem("activeFilter", activeFilter);
+    localStorage.setItem("groupedBookings", JSON.stringify(groupedBookings));
+  }, [selectedId, isDetailVisible, activeFilter, groupedBookings]);
+
   const { data, isSuccess, isLoading } = useQuery({
     queryKey: ["getAllbookings"],
     queryFn: getAllBookings,
@@ -46,13 +73,15 @@ const ScreenHistory = () => {
 
   const { data: paymentData } = useQuery({
     queryKey: ["payment"],
-    queryFn: getAllPayment,
+    queryFn: getAllPaymentPagination,
     enabled: !!token,
   });
 
   useEffect(() => {
-    if (data && data.length > 0) {
+    if (data && Array.isArray(data) && data.length > 0) {
       let filteredData = data;
+
+      filteredData = filteredData.filter((booking) => booking.payment);
 
       if (filterDate && filterDate[0] && filterDate[1]) {
         filteredData = filteredData.filter((booking) => {
@@ -80,6 +109,22 @@ const ScreenHistory = () => {
           );
         });
       }
+
+      if (activeFilter && activeFilter !== "all") {
+        filteredData = filteredData.filter((booking) => {
+          switch (activeFilter) {
+            case "active":
+              return booking.status === "ACTIVE";
+            case "cancel":
+              return booking.status === "CANCELED";
+            case "expire":
+              return booking.status === "EXPIRED";
+            default:
+              return true;
+          }
+        });
+      }
+
       const sortedData = filteredData.sort(
         (a, b) => new Date(b.bookingDate) - new Date(a.bookingDate)
       );
@@ -99,9 +144,10 @@ const ScreenHistory = () => {
       setGroupedBookings(Object.entries(grouped));
       setShowDetailPrompt(false);
     } else {
+      setGroupedBookings([]);
       setShowDetailPrompt(false);
     }
-  }, [data, filterDate, searchQuery]);
+  }, [data, filterDate, searchQuery, activeFilter]);
 
   useEffect(() => {
     if (data) {
@@ -128,40 +174,45 @@ const ScreenHistory = () => {
   }, [data]);
 
   useEffect(() => {
-    if (isSuccess && paymentData?.payments && data) {
-      let matchedPayment = null;
+    if (data && paymentData) {
+      for (let i = 0; i < data.length; i++) {
+        const booking = data[i];
 
-      for (let booking of data) {
-        matchedPayment = paymentData.payments.find(
-          (payment) => payment.bookingId === booking.id
-        );
+        for (let j = 0; j < paymentData.length; j++) {
+          const payment = paymentData[j];
 
-        if (matchedPayment) {
-          // Logika status dan bgColor dari matchedPayment.status
-          let bgColor = "#73CA5C";
-          let status = "ACTIVE";
+          if (booking.id === payment.bookingId) {
+            let bgColor = "#73CA5C";
+            let status = "ACTIVE";
 
-          if (matchedPayment.status === "cancel") {
-            bgColor = "#FF0000";
-            status = "CANCELED";
-          } else if (matchedPayment.status === "expire") {
-            bgColor = "#8A8A8A";
-            status = "EXPIRED";
-          } else if (
-            matchedPayment.status === "pending" ||
-            matchedPayment.status === "settlement" ||
-            !["cancel", "expire"].includes(matchedPayment.status)
-          ) {
-            bgColor = "#73CA5C";
-            status = "ACTIVE";
+            if (payment.status === "cancel") {
+              bgColor = "#FF0000";
+              status = "CANCELED";
+            } else if (payment.status === "expire") {
+              bgColor = "#8A8A8A";
+              status = "EXPIRED";
+            } else if (
+              payment.status === "pending" ||
+              payment.status === "settlement" ||
+              !["cancel", "expire"].includes(payment.status)
+            ) {
+              bgColor = "#73CA5C";
+              status = "ACTIVE";
+            }
+
+            booking.status = status;
+            booking.bgColor = bgColor;
+
+            matchedPayments.push({ booking, payment });
+
+            break;
           }
-
-          booking.status = status;
-          booking.bgColor = bgColor;
         }
       }
+
+      setMatchedPayments(matchedPayments);
     }
-  }, [isSuccess, paymentData, data, isLoading]);
+  }, [data, paymentData]);
 
   const handleCardClickMobile = (id) => {
     setSelectedId(id);
@@ -188,8 +239,66 @@ const ScreenHistory = () => {
     }
   };
 
+  const handleFilterClick = (filter) => {
+    setActiveFilter(filter);
+    localStorage.setItem("activeFilter", filter);
+  };
+
   return (
     <Container fluid className="py-3 " style={{ background: "#FFFFFF" }}>
+      <div
+        className="d-flex justify-content-start mt-4 mb-1 button-compt"
+        style={{ marginLeft: "6rem" }}
+      >
+        <Button
+          className="button-filter"
+          style={{
+            backgroundColor: activeFilter === "all" ? "#7126B5" : "transparent",
+            color: activeFilter === "all" ? "white" : "#7126B5",
+            borderColor: "#7126B5",
+          }}
+          onClick={() => handleFilterClick("all")}
+        >
+          All
+        </Button>
+        <Button
+          style={{
+            backgroundColor:
+              activeFilter === "active" ? "#7126B5" : "transparent",
+            color: activeFilter === "active" ? "white" : "#7126B5",
+            borderColor: "#7126B5",
+          }}
+          className="ms-1 button-filter"
+          onClick={() => handleFilterClick("active")}
+        >
+          Active
+        </Button>
+        <Button
+          style={{
+            backgroundColor:
+              activeFilter === "cancel" ? "#7126B5" : "transparent",
+            color: activeFilter === "cancel" ? "white" : "#7126B5",
+            borderColor: "#7126B5",
+          }}
+          className="ms-1 button-filter"
+          onClick={() => handleFilterClick("cancel")}
+        >
+          Canceled
+        </Button>
+        <Button
+          style={{
+            backgroundColor:
+              activeFilter === "expire" ? "#7126B5" : "transparent",
+            color: activeFilter === "expire" ? "white" : "#7126B5",
+            borderColor: "#7126B5",
+          }}
+          className="ms-1 button-filter"
+          onClick={() => handleFilterClick("expire")}
+        >
+          Expired
+        </Button>
+      </div>
+
       <div
         className={`d-flex ${isMobile ? "flex-column" : "flex-row"}`}
         style={{ gap: "1rem" }}
@@ -203,7 +312,9 @@ const ScreenHistory = () => {
         >
           {isLoading ? (
             <ScreenRiwayatLoading />
-          ) : isSuccess && groupedBookings.length > 0 ? (
+          ) : isSuccess &&
+            Array.isArray(groupedBookings) &&
+            groupedBookings.length > 0 ? (
             groupedBookings.map(([monthYear, bookings]) => (
               <div key={monthYear}>
                 <h5
@@ -231,8 +342,9 @@ const ScreenHistory = () => {
                         width: "40rem",
                         left: "6rem",
                         border: isSelected
-                          ? "2px solid aqua"
+                          ? "2px solid #A06ECE"
                           : "1px solid #ddd",
+                        outline: isSelected ? "3px solid #A06ECE" : "none",
                       }}
                     >
                       <Card.Body>
@@ -330,8 +442,8 @@ const ScreenHistory = () => {
                             className="fs-5 fw-bolder ms-4 align-self-center custom-price"
                             style={{ color: "#4B1979" }}
                           >
-                            {booking?.totalPrice
-                              ? `IDR ${booking.totalPrice.toLocaleString("id-ID")}`
+                            {booking?.payment?.amount
+                              ? `IDR ${booking?.payment?.amount.toLocaleString("id-ID")}`
                               : "Price not available"}
                           </span>
                         </div>

@@ -326,7 +326,7 @@ const SearchFlight = ({
   };
 
   return (
-    <div className="mb-5">
+    <>
       <Container className="">
         <Row className="mt-5 mb-2">
           <h2>Select a Flight {returnPage ? "Return" : ""}</h2>
@@ -1067,7 +1067,7 @@ const SearchFlight = ({
         }}
         reverseOrder={false}
       />
-    </div>
+    </>
   );
 };
 

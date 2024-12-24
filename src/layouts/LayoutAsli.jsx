@@ -1,6 +1,7 @@
 import React from "react";
 import NavigationBar from "../components/Navbar";
 import NavbarBooking from "../components/NavbarBooking";
+import Footer from "../components/Footer/index";
 import PropTypes from "prop-types";
 
 export default function LayoutAsli({
@@ -9,7 +10,7 @@ export default function LayoutAsli({
   isSaved = false,
   isPayment = false,
   isComplete = false,
-  children
+  children,
 }) {
   return (
     <>
@@ -20,6 +21,7 @@ export default function LayoutAsli({
         isComplete={openSuccess}
       />
       {children}
+      <Footer />
     </>
   );
 }

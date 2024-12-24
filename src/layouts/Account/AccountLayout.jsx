@@ -5,6 +5,7 @@ import { VscArrowLeft } from "react-icons/vsc";
 import { Container, Row, Col, Button, ListGroup } from "react-bootstrap";
 import { Link } from "@tanstack/react-router";
 import "./AccountLayout.css";
+import Footer from "../../components/Footer";
 
 function PageHeader() {
   return (
@@ -72,6 +73,7 @@ export default function AccountLayout({
           </Col>
         </Row>
       </Container>
+      <Footer />
     </>
   );
 }

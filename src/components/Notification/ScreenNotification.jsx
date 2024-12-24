@@ -1,5 +1,12 @@
-import React from "react";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  DropdownButton,
+  Dropdown,
+} from "react-bootstrap";
 import { IoNotificationsCircle, IoEllipse } from "react-icons/io5";
 import {
   readNotification,
@@ -19,12 +26,19 @@ const ScreenNotification = () => {
   const { token } = useSelector((state) => state.auth);
   const queryClient = useQueryClient();
   const { filterDate, searchQuery } = useNotificationContext();
+  const [sortOrder, setSortOrder] = useState(() => {
+    return localStorage.getItem("sortOrder") || "desc";
+  });
 
   const { data, isLoading } = useQuery({
     queryKey: ["getUserNotification"],
     queryFn: getUserNotifications,
     enabled: !!token,
   });
+
+  useEffect(() => {
+    localStorage.setItem("sortOrder", sortOrder);
+  }, [sortOrder]);
 
   const formatDateTime = (dateString) => {
     const options = {
@@ -50,6 +64,14 @@ const ScreenNotification = () => {
     return true;
   });
 
+  const sortedNotifications = filteredNotifications?.sort((a, b) => {
+    if (sortOrder === "asc") {
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    } else {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    }
+  });
+
   const mutation = useMutation({
     mutationFn: readNotification,
     onSuccess: (updatedNotification, { notificationID }) => {
@@ -71,7 +93,6 @@ const ScreenNotification = () => {
     }
 
     if (!isRead) {
-      console.log("Marking notification as read...");
       mutation.mutate({ notificationID });
     }
   };
@@ -80,6 +101,32 @@ const ScreenNotification = () => {
 
   return (
     <Container fluid className=" py-3" style={{ background: "#FFFFFF" }}>
+      <Row className="align-items-center mb-3">
+        <Col
+          md={8}
+          className="offset-md-2 d-flex justify-content-end align-items-center"
+        >
+          <DropdownButton
+            id="dropdown-sort-order"
+            title={`Sort by: ${sortOrder === "desc" ? "Newest" : "Oldest"}`}
+            onSelect={(eventKey) => setSortOrder(eventKey)}
+            className="custom-dropdown"
+          >
+            <Dropdown.Item
+              eventKey="asc"
+              className={sortOrder === "asc" ? "active-item" : ""}
+            >
+              Oldest
+            </Dropdown.Item>
+            <Dropdown.Item
+              eventKey="desc"
+              className={sortOrder === "desc" ? "active-item" : ""}
+            >
+              Newest
+            </Dropdown.Item>
+          </DropdownButton>
+        </Col>
+      </Row>
       <Row className="align-items-center">
         <Col md={8} className="offset-md-2">
           {filteredNotifications?.length === 0 ? (

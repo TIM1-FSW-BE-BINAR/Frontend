@@ -38,9 +38,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import { getFlights } from "../../service/flight/flightService";
 import { useNavigate } from "@tanstack/react-router";
-
-// Context
-import { HomepageContext } from "../../context/HomepageContext";
+import { getAirports } from "../../service/airport/airportService";
 
 const ScreenHomepage = () => {
   return <Homepage />;
@@ -75,15 +73,15 @@ const Homepage = () => {
   const [totalPassengers, setTotalPassengers] = useState(1);
   const [classInput, setClassInput] = useState("Economy");
 
-   const [today, setToday] = useState("");
-   useEffect(() => {
-     const now = new Date();
-     const utcDate = now.toISOString();
-     setToday(utcDate);
-   }, []);
+  const [today, setToday] = useState("");
+  useEffect(() => {
+    const now = new Date();
+    const utcDate = now.toISOString();
+    setToday(utcDate);
+  }, []);
 
-   useEffect(() => {
-     if(localStorage.getItem("lastFrom")){
+  useEffect(() => {
+    if (localStorage.getItem("lastFrom")) {
       setFromInput(localStorage.getItem("lastFrom"));
       setToInput(localStorage.getItem("lastTo"));
       setDepartureDate(localStorage.getItem("lastDeparture"));
@@ -92,8 +90,8 @@ const Homepage = () => {
       setChildInput(parseInt(localStorage.getItem("lastChild")));
       setBabyInput(parseInt(localStorage.getItem("lastBaby")));
       setClassInput(localStorage.getItem("lastClass"));
-     }
-   }, []);
+    }
+  }, []);
 
   // Pagination
   const [page, setPage] = useState(1);
@@ -214,6 +212,8 @@ const Homepage = () => {
   const [notFound, setNotFound] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const [flightsDataAll, setFlightsDataALl] = useState([]);
+
   const {
     data: flightData,
     isSuccess: isSuccessFlight,
@@ -233,9 +233,13 @@ const Homepage = () => {
 
   useEffect(() => {
     if (isSuccessFlight) {
-      setFlightsData(flightData);
+      setFlightsData(flightData.data);
+      const totalPage = flightData.meta.pagination.totalPage;
+      const pageItems = flightData.meta.pagination.pageItems;
+      const totalData = parseInt(totalPage, 10) * parseInt(pageItems, 10);
+      setFlightsDataALl(totalData);
       setLoading(false);
-      if (flightData.length == 0) {
+      if (flightData.data.length == 0) {
         setNotFound(true);
       } else {
         setNotFound(false);
@@ -247,22 +251,21 @@ const Homepage = () => {
     }
   }, [flightData, isSuccessFlight, isErrorFlight, isPendingFlight]);
 
-  const [flightsDataAll, setFlightsDataALl] = useState([]);
-  const { data: flightDataAll, isSuccess: isSuccessFlightDataAll } = useQuery({
-    queryKey: ["all-flights", state],
-    queryFn: () =>
-      getFlights({
-        ...(state !== "All" && { state: state }),
-        startDeparture: today,
-      }),
-    enabled: !!today,
-  });
+  // const { data: flightDataAll, isSuccess: isSuccessFlightDataAll } = useQuery({
+  //   queryKey: ["all-flights", state],
+  //   queryFn: () =>
+  //     getFlights({
+  //       ...(state !== "All" && { state: state }),
+  //       startDeparture: today,
+  //     }),
+  //   enabled: !!today,
+  // });
 
-  useEffect(() => {
-    if (isSuccessFlightDataAll) {
-      setFlightsDataALl(flightDataAll);
-    }
-  }, [flightDataAll, isSuccessFlightDataAll]);
+  // useEffect(() => {
+  //   if (isSuccessFlightDataAll) {
+  //     setFlightsDataALl(flightDataAll);
+  //   }
+  // }, [flightDataAll, isSuccessFlightDataAll]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -274,7 +277,7 @@ const Homepage = () => {
     const year = date.getUTCFullYear();
     return `${day} ${month} ${year}`;
   };
-  
+
   const classInputFormat = (flightClass) => {
     if (flightClass === "FIRST") {
       flightClass = "First Class";
@@ -299,8 +302,27 @@ const Homepage = () => {
     });
   };
 
+  // fetch airport
+  const [airportsAll, setAirportsAll] = useState("");
+  const {
+    data: airportsData,
+    isSuccess: isSuccessAirports,
+    isError: isErrorAirports,
+  } = useQuery({
+    queryKey: ["airports"],
+    queryFn: () => getAirports(),
+  });
+
+  useEffect(() => {
+    if (isSuccessAirports) {
+      setAirportsAll(airportsData);
+    } else if (isErrorAirports) {
+      console.log("Airports error occurred.");
+    }
+  }, [airportsData, isErrorAirports, isSuccessAirports]);
+
   return (
-    <div className="mb-5">
+    <>
       <section id="hero">
         <Container fluid className="p-0 mt-4 ">
           <Row className="position-relative justify-content-between">
@@ -596,15 +618,17 @@ const Homepage = () => {
         </Container>
 
         {/* Memanggil from to modal */}
-        <HomepageModal
-          show={modalShow}
-          activeModal={activeModal}
-          flights={flightsDataAll}
-          onHide={() => setModalShow(false)}
-          inputValue={modalInputValue}
-          setInputValue={setModalInputValue}
-          onSubmit={handleModalSubmit}
-        />
+        {isSuccessAirports && airportsAll && (
+          <HomepageModal
+            show={modalShow}
+            activeModal={activeModal}
+            flights={airportsAll}
+            onHide={() => setModalShow(false)}
+            inputValue={modalInputValue}
+            setInputValue={setModalInputValue}
+            onSubmit={handleModalSubmit}
+          />
+        )}
 
         {/* Passengers Modal */}
         <Modal
@@ -896,15 +920,15 @@ const Homepage = () => {
             <PaginationControl
               page={page}
               between={4}
-              total={flightsDataAll.length}
+              total={flightsDataAll}
               limit={10}
               changePage={(page) => {
                 setPage(page);
               }}
               ellipsis={1}
-              style={{ 
-                color: "#7126b5"
-               }}
+              style={{
+                color: "#7126b5",
+              }}
             />
           </Row>
         </Container>
@@ -920,7 +944,7 @@ const Homepage = () => {
           reverseOrder={false}
         />
       </div>
-    </div>
+    </>
   );
 };
 

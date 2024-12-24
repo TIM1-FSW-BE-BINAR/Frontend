@@ -14,8 +14,7 @@ export const getAllSeats = async (params = {}) => {
   );
 
   if (!response.ok) {
-    console.error("API Error:", response.status, response.statusText);
-    throw new Error(`errorrrrr boss: ${response.statusText}`);
+    throw new Error(`API Error: ${response.statusText}`);
   }
 
   const result = await response.json();

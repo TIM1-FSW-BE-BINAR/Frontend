@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, Link } from "@tanstack/react-router";
 import toast, { Toaster } from "react-hot-toast";
-import { Container, Row, Col, Card, Spinner } from "react-bootstrap";
+import { Container, Row, Col, Card, Spinner, Button } from "react-bootstrap";
 import DetailPesanan from "./DetailPesanan";
 
 const PaymentOptions = () => {
@@ -52,6 +52,10 @@ const PaymentOptions = () => {
           embedId: "snap-container",
           onSuccess: function () {
             toast.success("Payment Success!");
+            const timer = setTimeout(() => {
+              navigate({ to: "/complete" });
+            }, 4000);
+            return () => clearTimeout(timer);
           },
           onPending: function () {
             toast("Waiting for your payment", { icon: "⏳" });
@@ -100,6 +104,17 @@ const PaymentOptions = () => {
               </div>
             </Card.Body>
           </Card>
+          <Button
+            type="submit"
+            className="btn btn-block w-100 mt-2 mx-0 animated-button"
+            style={{ backgroundColor: "#7126b5", border: "none" }}
+            as="a"
+            href="https://simulator.sandbox.midtrans.com/v2/qris/index"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Midtrans Sandbox Simulator
+          </Button>
         </Col>
         <Col lg={5}>
           <Card className="shadow-sm ">
