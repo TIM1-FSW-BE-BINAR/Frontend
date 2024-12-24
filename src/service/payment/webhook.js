@@ -12,6 +12,5 @@ export const webhook = async () => {
   );
 
   const result = await response.json();
-  console.log("webhook", result);
   return result;
 };
