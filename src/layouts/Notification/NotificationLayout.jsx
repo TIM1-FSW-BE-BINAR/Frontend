@@ -24,6 +24,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
 import "./NotificationLayout.css";
 import { useNotificationContext } from "../../components/Notification/NotificationContext";
+import Footer from "../../components/Footer";
 
 function PageHeader() {
   const [showFilterDate, setShowFilterDate] = useState(false);
@@ -250,6 +251,7 @@ export default function NotificationLayout({ children }) {
         <PageHeader />
         {children}
       </Container>
+      <Footer />
     </>
   );
 }
