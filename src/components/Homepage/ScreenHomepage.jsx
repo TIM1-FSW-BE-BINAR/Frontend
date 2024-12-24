@@ -677,7 +677,7 @@ const Homepage = () => {
               variant="primary"
               onClick={handleSavePassengers}
               className="animated-button"
-              style={{ backgroundColor: "#7126b5" }}
+              style={{ backgroundColor: "#7126b5", border: "none" }}
             >
               Save
             </Button>
@@ -801,7 +801,7 @@ const Homepage = () => {
               variant="primary"
               onClick={handleSaveClass}
               className="animated-button"
-              style={{ backgroundColor: "#7126b5" }}
+              style={{ backgroundColor: "#7126b5", border: "none" }}
             >
               Save
             </Button>
