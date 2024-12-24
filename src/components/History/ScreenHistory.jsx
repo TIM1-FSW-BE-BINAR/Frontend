@@ -26,14 +26,24 @@ import ScreenRiwayatLoading from "./Loading/ScreenHistoryLoading";
 const ScreenHistory = () => {
   const { token } = useSelector((state) => state.auth);
   const { filterDate, searchQuery } = useHistoryContext();
-  const [groupedBookings, setGroupedBookings] = useState([]);
+  const [groupedBookings, setGroupedBookings] = useState(() => {
+    const savedData = localStorage.getItem("groupedBookings");
+    return savedData ? JSON.parse(savedData) : [];
+  });
   const [durations, setDurations] = useState({});
-  const [selectedId, setSelectedId] = useState(null);
-  const [isDetailVisible, setIsDetailVisible] = useState(false);
+  const [selectedId, setSelectedId] = useState(
+    localStorage.getItem("selectedId") || null
+  );
+  const [isDetailVisible, setIsDetailVisible] = useState(
+    localStorage.getItem("isDetailVisible") === "true"
+  );
   const [showDetailPrompt, setShowDetailPrompt] = useState(true);
   const [matchedPayments, setMatchedPayments] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-  const [activeFilter, setActiveFilter] = useState("all");
+  const [activeFilter, setActiveFilter] = useState(() => {
+    const savedFilter = localStorage.getItem("activeFilter");
+    return savedFilter ? savedFilter : "all"; // Default ke "all" jika tidak ada di localStorage
+  });
 
   const [isMobile, setIsMobile] = useState(
     window.matchMedia("(max-width: 450px)").matches
@@ -48,6 +58,14 @@ const ScreenHistory = () => {
     return () => mediaQuery.removeEventListener("change", handleResize);
   }, []);
 
+  useEffect(() => {
+    // Save state to localStorage
+    localStorage.setItem("selectedId", selectedId);
+    localStorage.setItem("isDetailVisible", isDetailVisible);
+    localStorage.setItem("activeFilter", activeFilter);
+    localStorage.setItem("groupedBookings", JSON.stringify(groupedBookings));
+  }, [selectedId, isDetailVisible, activeFilter, groupedBookings]);
+
   const { data, isSuccess, isLoading } = useQuery({
     queryKey: ["getAllbookings"],
     queryFn: getAllBookings,
@@ -61,10 +79,9 @@ const ScreenHistory = () => {
   });
 
   useEffect(() => {
-    if (data && data.length > 0) {
+    if (data && Array.isArray(data) && data.length > 0) {
       let filteredData = data;
 
-      // Filter data agar hanya booking dengan payment yang ada
       filteredData = filteredData.filter((booking) => booking.payment);
 
       if (filterDate && filterDate[0] && filterDate[1]) {
@@ -94,16 +111,18 @@ const ScreenHistory = () => {
         });
       }
 
-      if (activeFilter !== "all") {
+      if (activeFilter && activeFilter !== "all") {
         filteredData = filteredData.filter((booking) => {
-          if (activeFilter === "active") {
-            return booking.status === "ACTIVE";
-          } else if (activeFilter === "cancel") {
-            return booking.status === "CANCELED";
-          } else if (activeFilter === "expire") {
-            return booking.status === "EXPIRED";
+          switch (activeFilter) {
+            case "active":
+              return booking.status === "ACTIVE";
+            case "cancel":
+              return booking.status === "CANCELED";
+            case "expire":
+              return booking.status === "EXPIRED";
+            default:
+              return true;
           }
-          return true;
         });
       }
 
@@ -126,6 +145,7 @@ const ScreenHistory = () => {
       setGroupedBookings(Object.entries(grouped));
       setShowDetailPrompt(false);
     } else {
+      setGroupedBookings([]);
       setShowDetailPrompt(false);
     }
   }, [data, filterDate, searchQuery, activeFilter]);
@@ -222,6 +242,7 @@ const ScreenHistory = () => {
 
   const handleFilterClick = (filter) => {
     setActiveFilter(filter);
+    localStorage.setItem("activeFilter", filter);
   };
 
   return (
@@ -292,7 +313,9 @@ const ScreenHistory = () => {
         >
           {isLoading ? (
             <ScreenRiwayatLoading />
-          ) : isSuccess && groupedBookings.length > 0 ? (
+          ) : isSuccess &&
+            Array.isArray(groupedBookings) &&
+            groupedBookings.length > 0 ? (
             groupedBookings.map(([monthYear, bookings]) => (
               <div key={monthYear}>
                 <h5
@@ -320,8 +343,9 @@ const ScreenHistory = () => {
                         width: "40rem",
                         left: "6rem",
                         border: isSelected
-                          ? "2px solid aqua"
-                          : "1px solid #ddd",
+                          ? "2px solid #A06ECE" // Apply the desired border color when selected
+                          : "1px solid #ddd", // Default border color
+                        outline: isSelected ? "3px solid #A06ECE" : "none",
                       }}
                     >
                       <Card.Body>

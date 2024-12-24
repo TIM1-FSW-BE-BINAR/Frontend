@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Row,
@@ -26,13 +26,19 @@ const ScreenNotification = () => {
   const { token } = useSelector((state) => state.auth);
   const queryClient = useQueryClient();
   const { filterDate, searchQuery } = useNotificationContext();
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrder, setSortOrder] = useState(() => {
+    return localStorage.getItem("sortOrder") || "desc";
+  });
 
   const { data, isLoading } = useQuery({
     queryKey: ["getUserNotification"],
     queryFn: getUserNotifications,
     enabled: !!token,
   });
+
+  useEffect(() => {
+    localStorage.setItem("sortOrder", sortOrder);
+  }, [sortOrder]);
 
   const formatDateTime = (dateString) => {
     const options = {
@@ -102,7 +108,7 @@ const ScreenNotification = () => {
         >
           <DropdownButton
             id="dropdown-sort-order"
-            title={`Sort by: ${sortOrder === "asc" ? "Oldest" : "Newest"}`}
+            title={`Sort by: ${sortOrder === "desc" ? "Newest" : "Oldest"}`}
             onSelect={(eventKey) => setSortOrder(eventKey)}
             className="custom-dropdown"
           >
