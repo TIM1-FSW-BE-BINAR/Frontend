@@ -39,7 +39,6 @@ const DetailPesanan = ({ bookingId, amount }) => {
 
   const renderFlightCard = (flight, details, title) => {
     if (!flight) {
-      console.log("flight gaada boss");
       return null;
     }
     return (

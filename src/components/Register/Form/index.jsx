@@ -85,7 +85,6 @@ const RegisterForm = () => {
 
   const handleApiError = (errorMessage) => {
     const message = errorMessage?.toLowerCase() || "";
-    console.log(message);
 
     setErrors({ email: "", password: "" });
     if (message.includes("email")) {
