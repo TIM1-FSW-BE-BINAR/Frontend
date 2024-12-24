@@ -325,12 +325,14 @@ const SearchFlight = ({
     setIsTimerActive(true);
   };
 
-   function formatToIDR(price) {
-     return price.toLocaleString("id-ID", {
-       style: "currency",
-       currency: "IDR",
-     });
-   }
+  function formatToIDR(price) {
+    return price
+      .toLocaleString("id-ID", {
+        style: "currency",
+        currency: "IDR",
+      })
+      .replace(",00", "");
+  }
 
   return (
     <>
