@@ -56,7 +56,7 @@ const PaymentOptions = () => {
             });
             const timer = setTimeout(() => {
               navigate({ to: "/complete" });
-            }, 4000);
+            }, 3000);
             return () => clearTimeout(timer);
           },
           onPending: function () {
