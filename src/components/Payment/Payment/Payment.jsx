@@ -51,10 +51,12 @@ const PaymentOptions = () => {
         window.snap.embed(snapToken, {
           embedId: "snap-container",
           onSuccess: function () {
-            toast.success("Payment Success!");
+            toast.success("Payment Success!", {
+              duration: 4000,
+            });
             const timer = setTimeout(() => {
               navigate({ to: "/complete" });
-            }, 4000);
+            }, 3000);
             return () => clearTimeout(timer);
           },
           onPending: function () {

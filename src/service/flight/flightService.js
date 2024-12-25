@@ -18,7 +18,7 @@ export const getFlights = async (filters = {}) => {
   if (!result) {
     throw new Error(result?.error?.message);
   }
-  return result?.data;
+  return result;
 };
 
 export const getFlightId = async (id) => {
@@ -32,4 +32,3 @@ export const getFlightId = async (id) => {
   const result = await response.json();
   return result;
 };
-

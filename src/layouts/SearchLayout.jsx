@@ -213,10 +213,10 @@ const SearchFlight = ({
 
   useEffect(() => {
     if (isSuccess) {
-      setFlightsData(data);
+      setFlightsData(data.data);
       setLoading(false);
 
-      if (data.length === 0) {
+      if (data.data.length === 0) {
         setNotFound(true);
       } else {
         setNotFound(false);
@@ -325,6 +325,15 @@ const SearchFlight = ({
     setIsTimerActive(true);
   };
 
+  function formatToIDR(price) {
+    return price
+      .toLocaleString("id-ID", {
+        style: "currency",
+        currency: "IDR",
+      })
+      .replace(",00", "");
+  }
+
   return (
     <>
       <Container className="">
@@ -335,7 +344,7 @@ const SearchFlight = ({
           <Col xs={12} sm={8} md={8} className="mb-2 mb-sm-0">
             <Button
               className="p-3 w-100 text-start back-btn"
-              style={{ background: "#A06ECE" }}
+              style={{ background: "#A06ECE", border: "none" }}
               onClick={() => navigate({ to: "/" })}
             >
               <FaArrowLeft className="me-2" />
@@ -348,6 +357,7 @@ const SearchFlight = ({
               className="p-3 w-100 ubah-btn animated-button"
               style={{
                 background: "#73CA5C",
+                border: "none",
               }}
               onClick={() => navigate({ to: "/" })}
             >
@@ -360,7 +370,7 @@ const SearchFlight = ({
             <Button
               onClick={handlePreviousWeek}
               className="animated-button"
-              style={{ backgroundColor: "#7126b5" }}
+              style={{ backgroundColor: "#7126b5", border: "none" }}
             >
               <FaArrowLeft />
             </Button>
@@ -391,7 +401,7 @@ const SearchFlight = ({
             <Button
               onClick={handleNextWeek}
               className="animated-button"
-              style={{ backgroundColor: "#7126b5" }}
+              style={{ backgroundColor: "#7126b5", border: "none" }}
             >
               <FaArrowRight />
             </Button>
@@ -708,15 +718,16 @@ const SearchFlight = ({
                                 fontSize: "18px",
                               }}
                             >
-                              IDR {flight?.price}
+                              {formatToIDR(flight?.price)}
                             </h5>
                             <Button
                               className="btn btn-block w-full"
                               style={{
                                 backgroundColor: "#7126B5",
+                                border: "none",
                               }}
                               onClick={(event) => {
-                                event.stopPropagation(); // Prevent Accordion from toggling
+                                event.stopPropagation();
                                 handleBookingPage(flight);
                                 handleResetTimer();
                               }}
@@ -1052,7 +1063,7 @@ const SearchFlight = ({
             <Button
               variant="primary"
               onClick={handleSaveFilter}
-              style={{ backgroundColor: "#7126b5" }}
+              style={{ backgroundColor: "#7126b5", border: "none" }}
             >
               Save
             </Button>

@@ -1,5 +1,4 @@
 export const tickets = async (id, request) => {
-  console.log("ticket post", request);
   const token = localStorage.getItem("token");
 
   const formData = new FormData();
