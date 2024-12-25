@@ -19,29 +19,31 @@ export const login = async (request) => {
     }
     return result;
   } catch (error) {
-    console.error("Error fetching data:", error);
     throw error;
   }
 };
 
 export const googleLogin = async (accessToken) => {
-  const response = await fetch(
-    `${import.meta.env.VITE_API_URL}/auth/google/login`,
-    {
-      body: JSON.stringify({ access_token: accessToken }),
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/v1/auth/login-google`,
+      {
+        body: JSON.stringify({ access_token: accessToken }),
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const result = await response.json();
+    if (!result?.meta) {
+      throw new Error(result?.error?.message);
     }
-  );
-
-  const result = await response.json();
-  if (!result?.success) {
-    throw new Error(result?.message);
+    return result;
+  } catch (error) {
+    throw error;
   }
-
-  return result?.data;
 };
 
 export const register = async (request) => {
@@ -69,7 +71,6 @@ export const register = async (request) => {
     }
     return result;
   } catch (error) {
-    console.error("Error fetching data:", error);
     throw error;
   }
 };
@@ -93,7 +94,6 @@ export const verifyEmail = async (request) => {
     const result = await response.json();
     return result;
   } catch (error) {
-    console.error("Error fetching data:", error.message);
     throw error;
   }
 };
@@ -117,7 +117,6 @@ export const resendOtp = async (request) => {
     const result = await response.json();
     return result;
   } catch (error) {
-    console.error("Error fetching data:", error.message);
     throw error;
   }
 };
@@ -141,7 +140,6 @@ export const resetPassword = async (request) => {
     const result = await response.json();
     return result;
   } catch (error) {
-    console.error("Error fetching data:", error.message);
     throw error;
   }
 };
@@ -159,7 +157,6 @@ export const profile = async () => {
   );
 
   const result = await response.json();
-  console.log(result);
   return result?.data;
 };
 
@@ -176,12 +173,10 @@ export const profileMe = async () => {
   );
 
   const result = await response.json();
-  console.log(result);
   return result?.data;
 };
 
 export const sendEmail = async (request) => {
-  console.log(request);
   try {
     const response = await fetch(
       `${import.meta.env.VITE_API_URL}/api/v1/auth/reset-otp`,
@@ -193,18 +188,9 @@ export const sendEmail = async (request) => {
         },
       }
     );
-
-    // if (!response.ok) {
-    //   const errorBody = await response.text();
-    //   throw new Error(
-    //     `HTTP error! status: ${response.status}, message: ${errorBody}`
-    //   );
-    // }
-
     const result = await response.json();
     return result;
   } catch (error) {
-    console.error("Error fetching data:", error);
     throw error;
   }
 };

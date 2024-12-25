@@ -1,29 +1,42 @@
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Nav } from "react-bootstrap";
+import { Link } from "@tanstack/react-router";
 
 const Footer = () => {
   return (
     <>
-      <footer>
+      <footer
+        style={{
+          marginTop: "auto",
+          backgroundColor: "#f8f9fa",
+          padding: "1rem",
+          position: "relative",
+          top: "50vh",
+        }}
+      >
         <Container className="py-1">
           <Row className="d-flex flex-column flex-lg-row">
             <Col>
-              <p>Jalan Suroyo No. 161 Mayangan Kota Probolonggo 672000</p>
-              <p>binarEticket@gmail.com</p>
-              <p>081-233-334-808</p>
+              <p>Suroyo Street No. 161, Mayangan, Probolinggo City, 672000</p>
+              <p>custommersupport@airfly-ticket.com</p>
+              <p>+62 81-233-334-808</p>
             </Col>
             <Col className="fw-medium">
-              <a className="nav-link active" href="#our-service">
-                Our Service
-              </a>
-              <a className="nav-link text-black" href="#why-us">
-                Why Us
-              </a>
-              <a className="nav-link text-black" href="#testimonial">
-                Testimonial
-              </a>
-              <a className="nav-link text-black" href="#faq">
-                FAQ
-              </a>
+              <Nav.Link className="nav-link active" as={Link} to="/">
+                Homepage
+              </Nav.Link>
+              <Nav.Link className="nav-link active" as={Link} to="/history">
+                History
+              </Nav.Link>
+              <Nav.Link
+                className="nav-link text-black"
+                as={Link}
+                to="/notification"
+              >
+                Notification
+              </Nav.Link>
+              <Nav.Link className="nav-link text-black" as={Link} to="/account">
+                Account Settings
+              </Nav.Link>
             </Col>
             <Col>
               <div className="row">
@@ -32,7 +45,7 @@ const Footer = () => {
               <div className="row">
                 <ul className="d-flex gap-2">
                   <li className="list-group">
-                    <a href="">
+                    <a href="https://github.com/TIM1-FSW-BE-BINAR">
                       <svg
                         width="32"
                         height="32"
@@ -82,7 +95,7 @@ const Footer = () => {
                     </a>
                   </li>
                   <li className="list-group">
-                    <a href="">
+                    <a href="https://github.com/TIM1-FSW-BE-BINAR">
                       <svg
                         width="32"
                         height="32"
@@ -101,7 +114,7 @@ const Footer = () => {
                     </a>
                   </li>
                   <li className="list-group">
-                    <a href="">
+                    <a href="https://github.com/TIM1-FSW-BE-BINAR">
                       <svg
                         width="32"
                         height="32"
@@ -126,7 +139,7 @@ const Footer = () => {
                     </a>
                   </li>
                   <li className="list-group">
-                    <a href="">
+                    <a href="https://github.com/TIM1-FSW-BE-BINAR">
                       <svg
                         width="32"
                         height="32"
@@ -156,9 +169,16 @@ const Footer = () => {
                   style={{
                     height: "36px",
                     width: "100px",
-                    backgroundColor: "#7126B5",
                   }}
-                ></div>
+                  className="justify-content-center align-items-center d-flex"
+                >
+                  <img
+                    src="/img/logo black.png"
+                    width="82"
+                    height="26"
+                    alt="Airfly logo"
+                  />
+                </div>
               </div>
             </Col>
           </Row>

@@ -1,4 +1,4 @@
-import React from "react";
+import { useRef } from "react";
 import {
   Button,
   Card,
@@ -20,25 +20,25 @@ import seatIcon from "../../assets/homepage/icon/seat-icon.png";
 import adultIcon from "../../assets/homepage/icon/adult-icon.png";
 import childIcon from "../../assets/homepage/icon/child-icon.png";
 import babyIcon from "../../assets/homepage/icon/baby-icon.png";
-import plusIcon from "../../assets/homepage/icon/plus-icon.png";
-import minusIcon from "../../assets/homepage/icon/minus-icon.png";
 import selectedIcon from "../../assets/homepage/icon/selected-icon.png";
-import cardImg from "../../assets/homepage/card-img.png";
-import { FaSearch } from "react-icons/fa";
+import notFoundImage from "../../assets/homepage/not-found.png";
+import CardHomepageLoading from "../Loading/cardHomepageLoading";
+import { FaSearch, FaArrowRight } from "react-icons/fa";
 import HomepageModal from "./HomepageModal";
+import PassengerRow from "./PasenggerRow";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 
 import { LocalizationProvider } from "@mui/x-date-pickers-pro/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
+import { PaginationControl } from "react-bootstrap-pagination-control";
 import toast, { Toaster } from "react-hot-toast";
 
 import { useQuery } from "@tanstack/react-query";
 import { getFlights } from "../../service/flight/flightService";
-import { getAirlines } from "../../service/airline/airlineService";
-import { getAirports } from "../../service/airport/airportService";
 import { useNavigate } from "@tanstack/react-router";
+import { getAirports } from "../../service/airport/airportService";
 
 const ScreenHomepage = () => {
   return <Homepage />;
@@ -46,35 +46,58 @@ const ScreenHomepage = () => {
 
 const Homepage = () => {
   const [modalShow, setModalShow] = useState(false);
-  const [fromInput, setFromInput] = useState("");
-  const [toInput, setToInput] = useState("");
-  const [departureDate, setDepartureDate] = useState(""); // Untuk Departure
-  const [returnDate, setReturnDate] = useState("");
   const [activeModal, setActiveModal] = useState("");
   const [modalInputValue, setModalInputValue] = useState("");
   const [PassengerModalShow, setPassengerModalShow] = useState(false);
   const [classModalShow, setClassModalShow] = useState(false);
-  const [adultInput, setAdultInput] = useState(0);
-  const [childInput, setChildInput] = useState(0);
-  const [babyInput, setBabyInput] = useState(0);
-  const [totalPassengers, setTotalPassengers] = useState("");
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedElement, setSelectedElement] = useState(null);
   const [tempClassInput, setTempClassInput] = useState("");
-  const [classInput, setClassInput] = useState("");
   const [checkedSwitch, setCheckedSwitch] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
 
+  const departureDateFormat = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0];
+  };
+
+  const [fromInput, setFromInput] = useState("Jakarta-CGK");
+  const [toInput, setToInput] = useState("Surabaya-SUB");
+  const [departureDate, setDepartureDate] = useState(
+    departureDateFormat(new Date().toISOString())
+  );
+  const [returnDate, setReturnDate] = useState("");
+  const [adultInput, setAdultInput] = useState(1);
+  const [childInput, setChildInput] = useState(0);
+  const [babyInput, setBabyInput] = useState(0);
+  const [totalPassengers, setTotalPassengers] = useState(1);
+  const [classInput, setClassInput] = useState("Economy");
+
+  const [today, setToday] = useState("");
   useEffect(() => {
-    setDepartureDate("");
-  }, [checkedSwitch]);
+    const now = new Date();
+    const utcDate = now.toISOString();
+    setToday(utcDate);
+  }, []);
 
   useEffect(() => {
-    setDepartureDate("");
-  }, [checkedSwitch]);
+    if (localStorage.getItem("lastFrom")) {
+      setFromInput(localStorage.getItem("lastFrom"));
+      setToInput(localStorage.getItem("lastTo"));
+      setDepartureDate(localStorage.getItem("lastDeparture"));
+      setReturnDate(localStorage.getItem("lastReturn"));
+      setAdultInput(parseInt(localStorage.getItem("lastAdult")));
+      setChildInput(parseInt(localStorage.getItem("lastChild")));
+      setBabyInput(parseInt(localStorage.getItem("lastBaby")));
+      setClassInput(localStorage.getItem("lastClass"));
+    }
+  }, []);
+
+  // Pagination
+  const [page, setPage] = useState(1);
 
   const handleButtonCardClick = (index) => {
-    setActiveButton(index); // Set the active button index
+    setActiveButton(index);
   };
 
   const handleSelectClass = (className, elementId, label) => {
@@ -149,85 +172,166 @@ const Homepage = () => {
     ) {
       toast.error("Please fill out all fields in the form!");
     } else {
-      const queryParams = new URLSearchParams({
-        fromInput,
-        toInput,
-        departureDate,
-        returnDate: returnDate || "", // Kirim kosong jika null
-        totalPassengers,
-        classInput,
-      }).toString();
-
-      navigate({
-        to: `/search?${queryParams}`,
-      });
+      if (departureDate < departureDateFormat(today)) {
+        toast.error("Cannot select date before today!");
+      } else {
+        if (adultInput == 0 && childInput == 0 && babyInput > 0) {
+          toast.error(
+            "You cannot select a flight for infants without an accompanying adult."
+          );
+        } else {
+          const queryParams = new URLSearchParams({
+            fromInput,
+            toInput,
+            departureDate,
+            returnDate: checkedSwitch ? returnDate : "",
+            totalPassengers,
+            adultInput,
+            childInput,
+            babyInput,
+            classInput,
+          }).toString();
+          localStorage.setItem("lastFrom", fromInput);
+          localStorage.setItem("lastTo", toInput);
+          localStorage.setItem("lastDeparture", departureDate);
+          localStorage.setItem("lastReturn", checkedSwitch ? returnDate : "");
+          localStorage.setItem("lastAdult", adultInput);
+          localStorage.setItem("lastChild", childInput);
+          localStorage.setItem("lastBaby", babyInput);
+          localStorage.setItem("lastClass", classInput);
+          navigate({
+            to: `/search?${queryParams}`,
+          });
+        }
+      }
     }
   };
 
-  const [flights, setFlights] = useState([]);
   const [flightsData, setFlightsData] = useState([]);
-
   const [state, setState] = useState("");
+  const [notFound, setNotFound] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (state === "Asia") {
-      const flightsDataFilter = flights.filter(
-        (flight) => flight.arrival.state === state
-      );
-      setFlightsData(flightsDataFilter);
-    } else if (state === "Amerika") {
-      const flightsDataFilter = flights.filter(
-        (flight) => flight.arrival.state === state
-      );
-      setFlightsData(flightsDataFilter);
-    } else if (state === "Australia") {
-      const flightsDataFilter = flights.filter(
-        (flight) => flight.arrival.state === state
-      );
-      setFlightsData(flightsDataFilter);
-    } else if (state === "Eropa") {
-      const flightsDataFilter = flights.filter(
-        (flight) => flight.arrival.state === state
-      );
-      setFlightsData(flightsDataFilter);
-    } else if (state === "Afrika") {
-      const flightsDataFilter = flights.filter(
-        (flight) => flight.arrival.state === state
-      );
-      setFlightsData(flightsDataFilter);
-    } else {
-      setFlightsData(flights);
-    }
-  }, [state, flights]);
+  const [flightsDataAll, setFlightsDataAll] = useState([]);
+  const flightsDataAllRef = useRef(null);
+  const pageItems = 10;
 
-  // Menggunakan react query
+  // Fungsi untuk memeriksa apakah state berubah
+  const stateChanged = () => {
+    return (
+      flightsDataAllRef.current !== null &&
+      flightsDataAllRef.current.state !== state
+    );
+  };
+
   const {
     data: flightData,
     isSuccess: isSuccessFlight,
     isPending: isPendingFlight,
     isError: isErrorFlight,
   } = useQuery({
-    queryKey: ["flights"],
-    queryFn: () => getFlights(),
-    enabled: true,
+    queryKey: ["flights", page, state],
+    queryFn: () =>
+      getFlights({
+        ...(state !== "All" && { state: state }),
+        startDeparture: today,
+        page,
+        limit: 10,
+      }),
+    enabled: !!page && !!today,
   });
 
-  if (isErrorFlight) {
-    console.log("flight error");
-  }
   useEffect(() => {
     if (isSuccessFlight) {
-      setFlights(flightData);
+      setFlightsData(flightData.data);
+      const totalPage = flightData.meta.pagination.totalPage;
+      const totalData = parseInt(totalPage, 10) * parseInt(pageItems, 10);
+
+      if (flightsDataAllRef.current === null || stateChanged()) {
+        flightsDataAllRef.current = totalData;
+        setFlightsDataAll(totalData);
+      }
+
+      setLoading(false);
+      if (flightData.data.length == 0) {
+        setNotFound(true);
+      } else {
+        setNotFound(false);
+      }
+    } else if (isErrorFlight) {
+      console.log("flight error");
+    } else if (isPendingFlight) {
+      setLoading(true);
     }
-  }, [flightData, isSuccessFlight]);
+  }, [
+    flightData,
+    isSuccessFlight,
+    isErrorFlight,
+    isPendingFlight,
+    stateChanged,
+  ]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const day = date.getDate(); // Mendapatkan hari (15)
-    const month = date.toLocaleString("en-US", { month: "long" }); // Mendapatkan bulan dalam bentuk teks (July)
-    const year = date.getFullYear(); // Mendapatkan tahun (2024)
+    const day = date.getUTCDate();
+    const month = date.toLocaleString("en-US", {
+      month: "long",
+      timeZone: "UTC",
+    });
+    const year = date.getUTCFullYear();
     return `${day} ${month} ${year}`;
   };
+
+  const classInputFormat = (flightClass) => {
+    if (flightClass === "FIRST") {
+      flightClass = "First Class";
+    } else if (flightClass === "PREMIUM_ECONOMY") {
+      flightClass = "Premium Economy";
+    }
+    return flightClass;
+  };
+
+  const handleFlightSelect = (flightSelect) => {
+    const fromInputSelect = `${flightSelect.departure.city}-${flightSelect.departure.code}`;
+    const toInputSelect = `${flightSelect.arrival.city}-${flightSelect.arrival.code}`;
+    const departureDateSelect = departureDateFormat(flightSelect.departureTime);
+    const classInputSelect = classInputFormat(flightSelect.class);
+    setFromInput(fromInputSelect);
+    setToInput(toInputSelect);
+    setDepartureDate(departureDateSelect);
+    setReturnDate("");
+    setClassInput(classInputSelect);
+    toast("Form updated!", {
+      icon: "✈️",
+    });
+  };
+
+  const [airportsAll, setAirportsAll] = useState("");
+  const {
+    data: airportsData,
+    isSuccess: isSuccessAirports,
+    isError: isErrorAirports,
+  } = useQuery({
+    queryKey: ["airports"],
+    queryFn: () => getAirports(),
+  });
+
+  useEffect(() => {
+    if (isSuccessAirports) {
+      setAirportsAll(airportsData);
+    } else if (isErrorAirports) {
+      console.log("Airports error occurred.");
+    }
+  }, [airportsData, isErrorAirports, isSuccessAirports]);
+
+  function formatToIDR(price) {
+    return price
+      .toLocaleString("id-ID", {
+        style: "currency",
+        currency: "IDR",
+      })
+      .replace(",00", "");
+  }
 
   return (
     <>
@@ -238,16 +342,9 @@ const Homepage = () => {
               <img className="w-100" src={kotak1} alt="" />
             </Col>
 
-            {/* Kolom tengah */}
-            <Col
-              xs={12}
-              sm={8}
-              md={8}
-              lg={6}
-              xl={6}
-              className="w-100 position-absolute top-0 start-50 translate-middle-x z-index-2"
-            >
+            <Col className="w-full position-absolute top-0 start-50 translate-middle-x z-index-2 banner-img">
               <Container
+                fluid
                 className="p-0 rounded"
                 style={{ backgroundColor: "#FFE9CA" }}
               >
@@ -257,17 +354,24 @@ const Homepage = () => {
                     md={4}
                     className="p-5 align-items-center d-none d-md-block"
                   >
-                    <h1>
-                      <i>Diskon Hari ini</i>
+                    <h1 className="banner-text">
+                      <i>Today{"`"}s Discount</i>
                     </h1>
-                    <h1 className="text-primary">85%!</h1>
+                    <h1
+                      className="banner-text"
+                      style={{
+                        color: "#7126b5",
+                      }}
+                    >
+                      85%!
+                    </h1>
                   </Col>
                   <Col xs={12} md={8}>
                     {/* Small screen */}
                     <div className="d-block d-md-none d-flex position-relative">
                       <div className="position-absolute p-2">
                         <h2>
-                          <i>Diskon Hari ini</i>{" "}
+                          <i>Today{"`"}s Discount</i>{" "}
                           <span className="text-primary">85%!</span>
                         </h2>
                       </div>
@@ -303,8 +407,10 @@ const Homepage = () => {
             <Row>
               <Col>
                 <h3>
-                  Pilih Jadwal Penerbangan spesial di{" "}
-                  <span className="text-primary">Tiketku!</span>
+                  Choose a Special Flight Schedule with{" "}
+                  <span className="" style={{ color: "#7126b5" }}>
+                    AirFly!
+                  </span>
                 </h3>
               </Col>
             </Row>
@@ -333,7 +439,7 @@ const Homepage = () => {
                         <Form.Control
                           type="text"
                           placeholder="Jakarta"
-                          className="custom-placeholder form-input"
+                          className="form-input"
                           value={fromInput}
                           onClick={() => {
                             setActiveModal("from");
@@ -374,7 +480,7 @@ const Homepage = () => {
                         <Form.Control
                           type="text"
                           placeholder="Dubai"
-                          className="custom-placeholder form-input"
+                          className="form-input"
                           value={toInput}
                           onClick={() => {
                             setActiveModal("to");
@@ -414,6 +520,10 @@ const Homepage = () => {
                                   start: "Departure",
                                   end: "Return",
                                 }}
+                                value={[
+                                  departureDate ? dayjs(departureDate) : null,
+                                  returnDate ? dayjs(returnDate) : null,
+                                ]}
                                 onChange={(e) => {
                                   setDepartureDate(
                                     dayjs(e[0]).format("YYYY-MM-DD")
@@ -432,8 +542,7 @@ const Homepage = () => {
                             <FormLabel>Departure</FormLabel>
                             <Form.Control
                               type="date"
-                              placeholder="1 Maret 2023"
-                              className="custom-placeholder form-input"
+                              className="form-input"
                               value={departureDate}
                               onChange={(e) => setDepartureDate(e.target.value)}
                             />
@@ -474,8 +583,8 @@ const Homepage = () => {
                         <FormLabel>Passengers</FormLabel>
                         <Form.Control
                           type="text"
-                          placeholder="Tambah Penumpang"
-                          className="custom-placeholder form-input"
+                          placeholder="Add Passengers"
+                          className="form-input"
                           value={
                             totalPassengers
                               ? `${adultInput > 0 ? `${adultInput} Adult` : ""}${
@@ -497,8 +606,8 @@ const Homepage = () => {
                         <FormLabel>Seat Class</FormLabel>
                         <Form.Control
                           type="text"
-                          placeholder="Pilih Class"
-                          className="custom-placeholder form-input"
+                          placeholder="Select Class"
+                          className="form-input"
                           onClick={() => setClassModalShow(true)}
                           value={classInput}
                           readOnly
@@ -507,12 +616,13 @@ const Homepage = () => {
                     </Form.Group>
                   </Col>
                 </Row>
-                {/* button */}
+
                 <Button
                   type="submit"
-                  className="btn btn-block btn-primary w-100 mt-2 mx-0 animated-button"
+                  className="btn btn-block w-100 mt-2 mx-0 animated-button"
+                  style={{ backgroundColor: "#7126b5", border: "none" }}
                 >
-                  Cari Penerbangan
+                  Search for Flights
                 </Button>
               </Form>
             </Row>
@@ -520,15 +630,17 @@ const Homepage = () => {
         </Container>
 
         {/* Memanggil from to modal */}
-        <HomepageModal
-          show={modalShow}
-          activeModal={activeModal}
-          flights={flights}
-          onHide={() => setModalShow(false)}
-          inputValue={modalInputValue}
-          setInputValue={setModalInputValue}
-          onSubmit={handleModalSubmit}
-        />
+        {isSuccessAirports && airportsAll && (
+          <HomepageModal
+            show={modalShow}
+            activeModal={activeModal}
+            flights={airportsAll}
+            onHide={() => setModalShow(false)}
+            inputValue={modalInputValue}
+            setInputValue={setModalInputValue}
+            onSubmit={handleModalSubmit}
+          />
+        )}
 
         {/* Passengers Modal */}
         <Modal
@@ -546,252 +658,30 @@ const Homepage = () => {
 
           <Modal.Body className="pt-2">
             <Container>
-              <Row className="d-flex justify-content-between align-items-center">
-                <Col xs={5} sm={6} className="d-flex">
-                  <img
-                    src={adultIcon}
-                    alt=""
-                    className="img-fluid mt-1"
-                    style={{
-                      maxWidth: "20px",
-                      maxHeight: "20px",
-                    }}
-                  />
-                  <div className="ms-2">
-                    <p className="fw-bold mb-0">Dewasa</p>
-                    <p>(12 Tahun Keatas)</p>
-                  </div>
-                </Col>
-                {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
-                <Col className="p-0 d-flex justify-content-end align-items-center">
-                  {/* Tombol Minus */}
-                  <Button
-                    className="animated-button"
-                    style={{
-                      border: "none",
-                      backgroundColor: "transparent",
-                      padding: "0",
-                    }}
-                  >
-                    <img
-                      src={minusIcon}
-                      className="img-fluid"
-                      alt=""
-                      style={{
-                        maxWidth: "40px",
-                        maxHeight: "40px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => {
-                        decrementInputPassengers("adult");
-                      }}
-                    />
-                  </Button>
-
-                  {/* Input Field */}
-                  <input
-                    type="text"
-                    style={{
-                      width: "50px",
-                      fontSize: "16px",
-                      textAlign: "center",
-                      padding: "5px",
-                      marginLeft: "10px",
-                      marginRight: "10px",
-                    }}
-                    value={adultInput}
-                    readOnly
-                  />
-
-                  {/* Tombol Plus */}
-                  <Button
-                    className="animated-button"
-                    style={{
-                      border: "none",
-                      backgroundColor: "transparent",
-                      padding: "0",
-                    }}
-                  >
-                    <img
-                      src={plusIcon}
-                      className="img-fluid"
-                      alt=""
-                      style={{
-                        maxWidth: "40px",
-                        maxHeight: "40px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => {
-                        incrementInputPassengers("adult");
-                      }}
-                    />
-                  </Button>
-                </Col>
-              </Row>
-              <Row className="d-flex justify-content-between align-items-center">
-                <Col xs={5} sm={6} className="d-flex">
-                  <img
-                    src={childIcon}
-                    alt=""
-                    className="img-fluid mt-1"
-                    style={{
-                      maxWidth: "20px",
-                      maxHeight: "20px",
-                    }}
-                  />
-                  <div className="ms-2">
-                    <p className="fw-bold mb-0">Anak</p>
-                    <p>(2 - 11 Tahun)</p>
-                  </div>
-                </Col>
-                {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
-                <Col className="p-0 d-flex justify-content-end align-items-center">
-                  {/* Tombol Minus */}
-                  <Button
-                    className="animated-button"
-                    style={{
-                      border: "none",
-                      backgroundColor: "transparent",
-                      padding: "0",
-                    }}
-                  >
-                    <img
-                      src={minusIcon}
-                      className="img-fluid"
-                      alt=""
-                      style={{
-                        maxWidth: "40px",
-                        maxHeight: "40px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => {
-                        decrementInputPassengers("child");
-                      }}
-                    />
-                  </Button>
-
-                  {/* Input Field */}
-                  <input
-                    type="text"
-                    style={{
-                      width: "50px",
-                      fontSize: "16px",
-                      textAlign: "center",
-                      padding: "5px",
-                      marginLeft: "10px",
-                      marginRight: "10px",
-                    }}
-                    value={childInput}
-                    readOnly
-                  />
-
-                  {/* Tombol Plus */}
-                  <Button
-                    className="animated-button"
-                    style={{
-                      border: "none",
-                      backgroundColor: "transparent",
-                      padding: "0",
-                    }}
-                  >
-                    <img
-                      src={plusIcon}
-                      className="img-fluid"
-                      alt=""
-                      style={{
-                        maxWidth: "40px",
-                        maxHeight: "40px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => {
-                        incrementInputPassengers("child");
-                      }}
-                    />
-                  </Button>
-                </Col>
-              </Row>
-              <Row className="d-flex justify-content-between align-items-center">
-                <Col xs={5} sm={6} className="d-flex">
-                  <img
-                    src={babyIcon}
-                    alt=""
-                    className="img-fluid mt-1"
-                    style={{
-                      maxWidth: "20px",
-                      maxHeight: "20px",
-                    }}
-                  />
-                  <div className="ms-2">
-                    <p className="fw-bold mb-0">Bayi</p>
-                    <p>(Dibawah 2 Tahun)</p>
-                  </div>
-                </Col>
-                {/* Kolom untuk Minus Icon, Input, dan Plus Icon di kanan */}
-                <Col className="p-0 d-flex justify-content-end align-items-center">
-                  {/* Tombol Minus */}
-                  <Button
-                    className="animated-button"
-                    style={{
-                      border: "none",
-                      backgroundColor: "transparent",
-                      padding: "0",
-                    }}
-                  >
-                    <img
-                      src={minusIcon}
-                      className="img-fluid"
-                      alt=""
-                      style={{
-                        maxWidth: "40px",
-                        maxHeight: "40px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => {
-                        decrementInputPassengers("baby");
-                      }}
-                    />
-                  </Button>
-
-                  {/* Input Field */}
-                  <input
-                    type="text"
-                    style={{
-                      width: "50px",
-                      fontSize: "16px",
-                      textAlign: "center",
-                      padding: "5px",
-                      marginLeft: "10px",
-                      marginRight: "10px",
-                    }}
-                    value={babyInput}
-                    readOnly
-                  />
-
-                  {/* Tombol Plus */}
-                  <Button
-                    className="animated-button"
-                    style={{
-                      border: "none",
-                      backgroundColor: "transparent",
-                      padding: "0",
-                    }}
-                  >
-                    <img
-                      src={plusIcon}
-                      className="img-fluid"
-                      alt=""
-                      style={{
-                        maxWidth: "40px",
-                        maxHeight: "40px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => {
-                        incrementInputPassengers("baby");
-                      }}
-                    />
-                  </Button>
-                </Col>
-              </Row>
+              <PassengerRow
+                icon={adultIcon}
+                label="Adult"
+                ageInfo="(12 Years and Above)"
+                inputValue={adultInput}
+                onIncrement={() => incrementInputPassengers("adult")}
+                onDecrement={() => decrementInputPassengers("adult")}
+              />
+              <PassengerRow
+                icon={childIcon}
+                label="Child"
+                ageInfo="(2 - 11 Years Old)"
+                inputValue={childInput}
+                onIncrement={() => incrementInputPassengers("child")}
+                onDecrement={() => decrementInputPassengers("child")}
+              />
+              <PassengerRow
+                icon={babyIcon}
+                label="Baby"
+                ageInfo="(Under 2 Years Old)"
+                inputValue={babyInput}
+                onIncrement={() => incrementInputPassengers("baby")}
+                onDecrement={() => decrementInputPassengers("baby")}
+              />
             </Container>
           </Modal.Body>
           <Modal.Footer>
@@ -799,8 +689,9 @@ const Homepage = () => {
               variant="primary"
               onClick={handleSavePassengers}
               className="animated-button"
+              style={{ backgroundColor: "#7126b5", border: "none" }}
             >
-              Simpan
+              Save
             </Button>
           </Modal.Footer>
         </Modal>
@@ -809,7 +700,6 @@ const Homepage = () => {
         <Modal
           show={classModalShow}
           onHide={handleClassClose}
-          size="lg"
           aria-labelledby="contained-modal-title-vcenter"
           centered
         >
@@ -827,9 +717,8 @@ const Homepage = () => {
                   handleSelectClass("economy", "economyBtn", "Economy")
                 }
               >
-                <Col xs={9} sm={10}>
+                <Col xs={9} sm={10} className="p-2">
                   <h6>Economy</h6>
-                  <p>IDR 4.950.000</p>
                 </Col>
 
                 {selectedClass === "economy" && (
@@ -852,9 +741,8 @@ const Homepage = () => {
                   )
                 }
               >
-                <Col xs={9} sm={10}>
+                <Col xs={9} sm={10} className="p-2">
                   <h6>Premium Economy</h6>
-                  <p>IDR 8.950.000</p>
                 </Col>
 
                 {selectedClass === "premiumEconomy" && (
@@ -873,9 +761,8 @@ const Homepage = () => {
                   handleSelectClass("business", "businessBtn", "Business")
                 }
               >
-                <Col xs={9} sm={10}>
+                <Col xs={9} sm={10} className="p-2">
                   <h6>Business</h6>
-                  <p>IDR 14.950.000</p>
                 </Col>
 
                 {selectedClass === "business" && (
@@ -898,9 +785,8 @@ const Homepage = () => {
                   )
                 }
               >
-                <Col xs={9} sm={10}>
+                <Col xs={9} sm={10} className="p-2">
                   <h6>First Class</h6>
-                  <p>IDR 24.950.000</p>
                 </Col>
 
                 {selectedClass === "firstClass" && (
@@ -921,14 +807,15 @@ const Homepage = () => {
               onClick={handleClassClose}
               className="animated-button"
             >
-              Tutup
+              Close
             </Button>
             <Button
               variant="primary"
               onClick={handleSaveClass}
               className="animated-button"
+              style={{ backgroundColor: "#7126b5", border: "none" }}
             >
-              Simpan
+              Save
             </Button>
           </Modal.Footer>
         </Modal>
@@ -937,11 +824,10 @@ const Homepage = () => {
       <section id="favorit">
         <Container className="mt-3">
           <Row className="mb-2">
-            <h2>Destinasi Favorit</h2>
+            <h2>Favorite Destinations</h2>
           </Row>
           <Row className="g-2 mb-2 flex-wrap">
-            {/* Tombol dengan responsivitas */}
-            {["Semua", "Asia", "Amerika", "Australia", "Eropa", "Afrika"].map(
+            {["All", "Asia", "America", "Australia", "Europe", "Africa"].map(
               (label, index) => (
                 <Col
                   key={index}
@@ -954,7 +840,9 @@ const Homepage = () => {
                   }`}
                   onClick={() => {
                     handleButtonCardClick(index);
+                    setNotFound(false);
                     setState(label);
+                    setPage(1);
                   }}
                 >
                   <FaSearch className="icon" />
@@ -963,65 +851,97 @@ const Homepage = () => {
               )
             )}
           </Row>
-          <Row className="g-3 mb-5">
-            {flightsData?.map((flight, index) => (
-              <Col key={index} xs={12} sm={6} md={4} lg={2} className="d-flex">
-                <Card className="custom-card">
-                  <div className="badge-container">
-                    <span
-                      className={`badge ${index % 2 === 0 ? "badge-limited" : "badge-discount"}`}
-                    >
-                      {index % 2 === 0 ? "Limited!" : "50% OFF"}
-                    </span>
-                  </div>
-                  <Card.Img variant="top" src={flight?.arrival.imageUrl} className="img-fluid" />
-                  <Card.Body className="custom-card-body">
-                    <Card.Title
-                      className="card-title"
-                      style={{
-                        fontSize: "14px",
-                      }}
-                    >
-                      {flight?.departure.city} -{`>`} {flight?.arrival.city}
-                    </Card.Title>
-                    <p
-                      className="text-primary mb-1"
-                      style={{
-                        fontSize: "12px",
-                      }}
-                    >
-                      {flight?.airline.name}
-                    </p>
-                    <Card.Text>
+          <Row
+            className={`g-2 mb-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 ${
+              notFound ? "justify-content-center" : ""
+            }`}
+          >
+            {loading ? (
+              <CardHomepageLoading />
+            ) : notFound ? (
+              <Col className="d-flex flex-column justify-content-center align-items-center w-50 mt-3">
+                <img src={notFoundImage} className="img-fluid w-75 mt-5" />
+                <span className="text-center fw-bold fs-6 fs-sm-5 fs-md-4">
+                  Sorry, your search was not found.
+                </span>
+              </Col>
+            ) : (
+              flightsData?.map((flight, index) => (
+                <Col key={index} className="d-flex">
+                  <Card
+                    className="custom-card"
+                    onClick={() => handleFlightSelect(flight)}
+                  >
+                    <Card.Img
+                      variant="top"
+                      src={flight?.arrival.imageUrl}
+                      className="img-fluid"
+                    />
+                    <Card.Body className="custom-card-body">
+                      <Card.Title
+                        className="card-title"
+                        style={{
+                          fontSize: "16px",
+                        }}
+                      >
+                        {flight?.departure.city} <FaArrowRight />{" "}
+                        {flight?.arrival.city}
+                      </Card.Title>
                       <p
                         className="mb-1"
                         style={{
-                          fontSize: "10px",
-                        }}
-                      >
-                        {formatDate(flight?.departureTime)}
-                      </p>
-                      <p
-                        className=""
-                        style={{
                           fontSize: "14px",
+                          color: "#7126b5",
                         }}
                       >
-                        Mulai dari{" "}
-                        <span
-                          className="text-danger"
+                        {flight?.airline.name}
+                      </p>
+                      <Card.Text>
+                        <p
+                          className="mb-1"
                           style={{
-                            fontSize: "14px",
+                            fontSize: "12px",
                           }}
                         >
-                          IDR {flight?.price}
-                        </span>
-                      </p>
-                    </Card.Text>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
+                          {formatDate(flight?.departureTime)}
+                        </p>
+                        <p
+                          className=""
+                          style={{
+                            fontSize: "16px",
+                          }}
+                        >
+                          Starts from{" "}
+                          <span
+                            className="text-danger"
+                            style={{
+                              fontSize: "16px",
+                            }}
+                          >
+                            {formatToIDR(flight?.price)}
+                          </span>
+                        </p>
+                      </Card.Text>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))
+            )}
+          </Row>
+          <Row className="d-flex w-full justify-content-right align-items-right">
+            <PaginationControl
+              page={page}
+              between={4}
+              total={flightsDataAll}
+              limit={10}
+              changePage={(page) => {
+                setPage(page);
+              }}
+              ellipsis={1}
+              style={{
+                color: "#7126b5",
+              }}
+            />
           </Row>
         </Container>
       </section>
@@ -1031,9 +951,6 @@ const Homepage = () => {
           position="top-right"
           containerStyle={{
             position: "fixed",
-            bottom: "20px",
-            left: "75%",
-            transform: "translateX(-50%)",
             zIndex: "9999",
           }}
           reverseOrder={false}

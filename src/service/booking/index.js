@@ -10,9 +10,7 @@ export const getAllBookings = async () => {
     }
   );
 
-  // get data
   const result = await response.json();
-  console.log(result);
   return result?.data;
 };
 
@@ -28,9 +26,7 @@ export const getIdBooking = async (id) => {
     }
   );
 
-  // get data
   const result = await response.json();
-  console.log(result);
   return result?.data;
 };
 
@@ -46,7 +42,6 @@ export const getCodeBooking = async (code) => {
     }
   );
 
-  // get data
   const result = await response.json();
   return result?.data;
 };
@@ -63,7 +58,6 @@ export const getGroupBooking = async () => {
     }
   );
 
-  // get data
   const result = await response.json();
   return result?.data;
 };
@@ -75,13 +69,24 @@ export const createBooking = async (request) => {
     {
       headers: {
         authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
       method: "POST",
-      body: request,
+      body: JSON.stringify(request),
     }
   );
 
-  // get data
   const result = await response.json();
+  if (result.meta?.statusCode === 401) {
+    throw new Error(result.error?.message || "Token expired, please relogin.");
+  }
+
+  if (result.meta?.statusCode === 201) {
+    const bookingId = result.data?.bookingId;
+    if (bookingId) {
+      localStorage.setItem("bookingId", bookingId);
+    }
+    return result.data;
+  }
   return result?.data;
 };

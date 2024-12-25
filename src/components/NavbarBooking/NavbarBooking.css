@@ -1,7 +1,27 @@
+.breadcrumb-item a {
+  text-decoration: none;  
+  color: #6c757d;        
+}
+
+.breadcrumb-item.active a {
+  font-weight: bold;
+  color: black;          
+}
+
+.breadcrumb-item.active a {
+  font-weight: bold;
+  color: black;          
+}
+
+/* Gaya khusus untuk item yang aktif */
+.breadcrumb-item.active a {
+  font-weight: bold;
+  color: black;          
+}
 
 .breadcrumb-item + .breadcrumb-item::before {
   content: ">";
-  color: #6c757d; 
+  color: #7126B5;
 }
 #black-overlay {
   position: fixed;
@@ -22,12 +42,13 @@
   background-color: #ff0000;
   color: #ffffff;
   text-align: center;
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
+  margin-inline: 4;
 }
 #close-button {
   background-color: transparent;

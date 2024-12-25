@@ -1,11 +1,10 @@
-body{
+body {
   overflow-x: hidden;
 }
 
 .form-section {
   position: relative;
   padding: 20px;
-  /* margin-top: -50px; */
 }
 
 .form-container {
@@ -13,7 +12,6 @@ body{
   border-radius: 8px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   max-width: 1200px;
-  /* transform: translateY(-50%); */
   margin: 0 auto;
 }
 
@@ -31,13 +29,13 @@ body{
 }
 
 @media (max-width: 576px) {
-  .form-section { 
-    margin-top: 50px; 
+  .form-section {
+    margin-top: 50px;
   }
 
   .form-container {
     margin: 0 auto;
-    transform: none; 
+    transform: none;
   }
 }
 
@@ -51,7 +49,6 @@ body{
   outline: none;
   box-shadow: none;
   border-radius: 0;
-  font-weight: 700;
   padding-left: 0;
 }
 
@@ -114,14 +111,12 @@ body{
   max-height: 50px;
 }
 
-/* Styling Card */
+
 .custom-card {
-  width: 18rem;
+  width: 16rem;
   border: 1px solid #ddd;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
   transition: transform 0.2s ease-in-out;
 }
 
@@ -129,46 +124,21 @@ body{
   transform: translateY(-5px);
 }
 
-/* Styling untuk Badge */
-.badge-container {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 2;
-}
 
-.badge {
-  display: inline-block;
-  padding: 5px 10px;
-  border-radius: 20px;
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: bold;
-}
-
-.badge-limited {
-  background-color: #aa6bff;
-}
-
-.badge-discount {
-  background-color: #ff69b4;
-}
-
-/* Styling Card Title */
 .card-title {
   font-size: 1.2rem;
   font-weight: bold;
   color: #333;
 }
 
-/* Styling Card Image */
+
 .custom-card img {
   height: 150px;
   object-fit: cover;
   border-bottom: 1px solid #ddd;
 }
 
-/* Styling Card Text */
+
 .custom-card p {
   margin: 0;
   font-size: 0.9rem;
@@ -178,19 +148,19 @@ body{
 .custom-card-body {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;  /* Untuk membuat teks terpisah dengan jarak */
-  align-items: flex-start;         /* Posisi sejajar di kiri */
-  gap: 2px; 
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2px;
 }
 
-/* Responsiveness */
+
 @media (max-width: 768px) {
   .custom-card {
     width: 100%;
   }
 }
 
-/* Styling tombol default */
+
 .responsive-button {
   background: #e2d4f0;
   display: flex;
@@ -199,56 +169,54 @@ body{
   flex-wrap: nowrap;
   text-align: center;
   cursor: pointer;
-  min-width: 120px; /* Pastikan tombol memiliki lebar minimum */
+  min-width: 120px;
   max-width: 180px;
-  transition: all 0.3s ease; /* Animasi transisi */
+  transition: all 0.3s ease;
   padding: 10px;
   border-radius: 8px;
 }
 
-/* Ukuran ikon yang konsisten */
 .responsive-button .icon {
-  font-size: 18px; /* Ukuran tetap */
+  font-size: 18px;
   margin-right: 6px;
-  width: 18px; /* Konsisten */
-  height: 18px; /* Konsisten */
-  flex-shrink: 0; /* Ikon tidak mengecil */
-  display: inline-block; /* Pastikan sebagai blok untuk mencegah distorsi */
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: inline-block;
 }
 
-/* Styling teks */
+
 .responsive-button .button-label {
   font-size: 0.9rem;
-  color: #000; /* Warna teks default */
-  white-space: nowrap; /* Hindari teks terpotong */
-  margin: 0; /* Hindari margin default */
+  color: #000;
+  white-space: nowrap;
+  margin: 0;
 }
 
-/* Hover efek */
+
 .responsive-button:hover {
   background: #7126b5;
 }
 
 .responsive-button:hover .icon,
 .responsive-button:hover .button-label {
-  color: #fff; 
+  color: #fff;
 }
 
-/* Warna tombol saat aktif (clicked) */
 .responsive-button.active {
   background: #7126b5 !important;
 }
 
 .responsive-button.active .icon,
 .responsive-button.active .button-label {
-  color: #fff !important; 
+  color: #fff !important;
 }
 
-/* Media Query untuk layar kecil */
+
 @media (max-width: 576px) {
   .responsive-button {
     padding: 8px;
-    min-width: 100px; /* Lebar minimum lebih kecil untuk layar kecil */
+    min-width: 100px;
     max-width: 150px;
   }
 
@@ -280,8 +248,6 @@ body{
   }
 }
 
-
-
 @media (max-width: 768px) {
   .responsive-button {
     padding: 12px;
@@ -289,7 +255,7 @@ body{
 
   .responsive-button .icon {
     font-size: 17px;
-     width: 15px;
+    width: 15px;
     height: 15px;
   }
 
@@ -299,17 +265,134 @@ body{
 }
 
 .animated-button {
-  transition: transform 0.2s ease, background-color 0.3s ease;
+  transition:
+    transform 0.2s ease,
+    background-color 0.3s ease;
 }
 
+.animated-button:hover {
+  transform: scale(1.0009);
+}
 
 .animated-button:active {
   transform: scale(0.9);
 }
 
-.list-item-city-modal:hover{
+.list-item-city-modal:hover {
   background-color: #f1f1f1;
   transition: background-color 0.2s ease;
 }
 
+/* Responsiveness for banner-text */
+.banner-text {
+  font-size: 1rem; /* Default size */
+}
 
+@media (min-width: 576px) {
+  .banner-text {
+    font-size: 1.5rem;
+  }
+  .banner-img {
+    max-width: 800px;
+  }
+}
+
+@media (min-width: 768px) {
+  .banner-text {
+    font-size: 2rem;
+  }
+  .banner-img {
+    max-width: 750px;
+  }
+}
+
+@media (min-width: 992px) {
+  .banner-text {
+    font-size: 2rem;
+  }
+  .banner-img {
+    max-width: 900px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .banner-text {
+    font-size: 2rem;
+  }
+  .banner-img {
+    max-width: 1100px;
+  }
+}
+
+@media (min-width: 1500px) {
+  .banner-text {
+    font-size: 2.5rem;
+  }
+  .banner-img {
+    max-width: 1300px;
+  }
+}
+
+@media (min-width: 1800px) {
+  .banner-text {
+    font-size: 2.5rem;
+  }
+  .banner-img {
+    max-width: 1400px;
+  }
+}
+
+@media (min-width: 2000px) {
+  .banner-text {
+    font-size: 2.5rem;
+  }
+  .banner-img {
+    max-width: 2000px;
+  }
+}
+
+@media (min-width: 2200px) {
+  .banner-text {
+    font-size: 4rem;
+  }
+  .banner-img {
+    max-width: 2200px;
+  }
+}
+
+@media (min-width: 3000px) {
+  .banner-text {
+    font-size: 6rem;
+  }
+  .banner-img {
+    max-width: 3000px;
+  }
+}
+
+@media (min-width: 3500px) {
+  .banner-text {
+    font-size: 6rem;
+  }
+  .banner-img {
+    max-width: 3000px;
+  }
+}
+
+@media (min-width: 3900px) {
+  .banner-text {
+    font-size: 7rem;
+  }
+  .banner-img {
+    max-width: 4000px;
+  }
+}
+
+/* Small screen text styling */
+.small-screen-text {
+  font-size: 1.5rem;
+}
+
+.pagination {
+  --bs-pagination-active-bg: #7126b5 !important;
+  --bs-link-color: #7126b5 !important;
+}

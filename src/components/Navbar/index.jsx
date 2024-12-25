@@ -1,13 +1,8 @@
-import Container from "react-bootstrap/Container";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
-import Offcanvas from "react-bootstrap/Offcanvas";
-import Image from "react-bootstrap/Image";
-import Dropdown from "react-bootstrap/Dropdown";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useCallback } from "react";
+import { Container, Offcanvas, Navbar, Nav } from "react-bootstrap";
+import { Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setToken, setUser } from "../../redux/slices/auth";
+import { setUser } from "../../redux/slices/auth";
 import { profile } from "../../service/auth";
 import { useQuery } from "@tanstack/react-query";
 import { IoIosNotificationsOutline, IoIosList } from "react-icons/io";
@@ -16,7 +11,6 @@ import { RxPerson } from "react-icons/rx";
 
 const NavigationBar = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { user, token } = useSelector((state) => state.auth);
 
   const { data, isSuccess, isError } = useQuery({
@@ -51,7 +45,13 @@ const NavigationBar = () => {
               style={{ cursor: "pointer" }}
               className="fw-bold"
             >
-              TiketKU
+              <img
+                src="/img/logo_airfly_black_inline.png"
+                width="80"
+                height="22"
+                className="d-inline-block align-center"
+                alt="Airfly logo"
+              />
             </Navbar.Brand>
 
             <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} />
@@ -62,7 +62,7 @@ const NavigationBar = () => {
             >
               <Offcanvas.Header closeButton>
                 <Offcanvas.Title id={`offcanvasNavbarLabel-expand-${expand}`}>
-                  TiketKU
+                  AirFly
                 </Offcanvas.Title>
               </Offcanvas.Header>
               <Offcanvas.Body>
@@ -90,7 +90,7 @@ const NavigationBar = () => {
                         }}
                       >
                         <LuLogIn style={{ marginRight: "10px" }} />
-                        Masuk
+                        Login
                       </Nav.Link>
                     </>
                   )}

@@ -120,7 +120,7 @@ const OTPForm = () => {
 
   const handleResendOtp = (e) => {
     e.preventDefault();
-    setTimer(5);
+    setTimer(60);
     const request = {
       email,
     };
@@ -155,10 +155,10 @@ const OTPForm = () => {
             marginRight: "20px",
           }}
         />
-        <h2 className="fw-bold text-end">Masukkan OTP</h2>
+        <h2 className="fw-bold text-end">Confirm OTP</h2>
       </div>
       <p className="text-muted m-4">
-        Ketik 6 digit kode yang dikirimkan ke <b>{maskEmail(email)}</b>
+        We have sent the authentication code to <b>{maskEmail(email)}</b>
       </p>
       <Form onSubmit={handleSubmit} className="w-100 justify-content-center">
         <Row className="justify-content-center m-4">
@@ -182,7 +182,7 @@ const OTPForm = () => {
         <Row className="justify-content-center text-center mt-4">
           {timer > 0 ? (
             <p className="text-muted mt-4">
-              Kirim Ulang OTP dalam {timer} detik
+              OTP code will be resended in {timer} seconds
             </p>
           ) : (
             <p
@@ -190,7 +190,7 @@ const OTPForm = () => {
               style={{ color: "red", fontWeight: "bold", cursor: "pointer" }}
               onClick={handleResendOtp}
             >
-              Kirim Ulang
+              Haven't received it? Resend Code
             </p>
           )}
         </Row>
@@ -209,7 +209,7 @@ const OTPForm = () => {
             onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.5")}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
           >
-            Simpan
+            Verify
           </Button>
         </Row>
       </Form>

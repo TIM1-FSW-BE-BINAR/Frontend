@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Col, Container, Form, Modal, Row } from "react-bootstrap";
 import searchIcon from "../../assets/homepage/icon/search-icon.png";
 import { SlLocationPin } from "react-icons/sl";
@@ -18,15 +18,11 @@ const HomepageModal = (props) => {
 
   useEffect(() => {
     if (show) {
-      setInputValue(""); // Reset nilai input saat modal dibuka
+      setInputValue("");
 
-      // Remove duplicates when modal is opened
       const uniqueFlights = flights.reduce(
         (acc, flight) => {
-          const key =
-            activeModal === "from"
-              ? `${flight.departure.city}-${flight.departure.code}`
-              : `${flight.arrival.city}-${flight.arrival.code}`;
+          const key = `${flight.city}-${flight.code}`;
           if (!acc.map.has(key)) {
             acc.map.set(key, true);
             acc.list.push(flight);
@@ -38,60 +34,49 @@ const HomepageModal = (props) => {
 
       setFilteredFlights(uniqueFlights);
     }
-  }, [show, flights, activeModal, setInputValue]);
+  }, [show, flights, setInputValue]);
 
- useEffect(() => {
-   if (inputValue.trim() === "") {
-     // Jika input kosong, tampilkan seluruh data unik
-     const uniqueFlights = flights.reduce(
-       (acc, flight) => {
-         const key =
-           activeModal === "from"
-             ? `${flight.departure.city}-${flight.departure.code}`
-             : `${flight.arrival.city}-${flight.arrival.code}`;
-         if (!acc.map.has(key)) {
-           acc.map.set(key, true);
-           acc.list.push(flight);
-         }
-         return acc;
-       },
-       { map: new Map(), list: [] }
-     ).list;
+  useEffect(() => {
+    if (inputValue.trim() === "") {
+      const uniqueFlights = flights.reduce(
+        (acc, flight) => {
+          const key = `${flight.city}-${flight.code}`;
+          if (!acc.map.has(key)) {
+            acc.map.set(key, true);
+            acc.list.push(flight);
+          }
+          return acc;
+        },
+        { map: new Map(), list: [] }
+      ).list;
 
-     setFilteredFlights(uniqueFlights);
-   } else {
-     const lowerCaseInput = inputValue.toLowerCase();
-     const filtered = flights.filter((flight) => {
-       const targetFields =
-         activeModal === "from"
-           ? `${flight.departure.city} ${flight.departure.code}`
-           : `${flight.arrival.city} ${flight.arrival.code}`;
-       return targetFields.toLowerCase().includes(lowerCaseInput);
-     });
+      setFilteredFlights(uniqueFlights);
+    } else {
+      const lowerCaseInput = inputValue.toLowerCase();
+      const filtered = flights.filter((flight) => {
+        const targetFields = `${flight.city} ${flight.code}`;
+        return targetFields.toLowerCase().includes(lowerCaseInput);
+      });
 
-     // Remove duplicates based on city and code for filtered results
-     const uniqueFiltered = filtered.reduce(
-       (acc, flight) => {
-         const key =
-           activeModal === "from"
-             ? `${flight.departure.city}-${flight.departure.code}`
-             : `${flight.arrival.city}-${flight.arrival.code}`;
-         if (!acc.map.has(key)) {
-           acc.map.set(key, true);
-           acc.list.push(flight);
-         }
-         return acc;
-       },
-       { map: new Map(), list: [] }
-     ).list;
+      const uniqueFiltered = filtered.reduce(
+        (acc, flight) => {
+          const key = `${flight.city}-${flight.code}`;
+          if (!acc.map.has(key)) {
+            acc.map.set(key, true);
+            acc.list.push(flight);
+          }
+          return acc;
+        },
+        { map: new Map(), list: [] }
+      ).list;
 
-     setFilteredFlights(uniqueFiltered);
-   }
- }, [inputValue, flights, activeModal]);
+      setFilteredFlights(uniqueFiltered);
+    }
+  }, [inputValue, flights]);
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-      e.preventDefault(); // Mencegah submit default
+      e.preventDefault();
     }
   };
 
@@ -129,7 +114,7 @@ const HomepageModal = (props) => {
             <div className="position-relative w-100">
               <Form.Control
                 type="search"
-                placeholder="Masukan Kota atau Negara"
+                placeholder="Select a location"
                 className="ps-5"
                 aria-label="Search"
                 style={{
@@ -161,11 +146,10 @@ const HomepageModal = (props) => {
         <Container className="p-0">
           <Row className="pt-1">
             <Col>
-              <h6 className="fw-bold">Pencarian</h6>
+              <h6 className="fw-bold">Search</h6>
             </Col>
           </Row>
 
-          {/* Scrollable List Section */}
           <div
             style={{
               maxHeight: "300px",
@@ -183,14 +167,14 @@ const HomepageModal = (props) => {
                     padding: "10px",
                   }}
                   onClick={() => {
-                    const cityId = `${flight?.departure.city}-${flight.departure.code}`;
+                    const cityId = `${flight?.city}-${flight.code}`;
                     handleCitySelect(cityId);
                   }}
                 >
                   <Col className="d-flex">
                     <SlLocationPin className="me-2" />
                     <h6>
-                      {flight?.departure.city} - {flight?.departure.code}
+                      {flight?.city} - {flight?.code}
                     </h6>
                   </Col>
                 </Row>
@@ -203,14 +187,14 @@ const HomepageModal = (props) => {
                     padding: "10px",
                   }}
                   onClick={() => {
-                    const cityId = `${flight?.arrival.city}-${flight.arrival.code}`;
+                    const cityId = `${flight?.city}-${flight.code}`;
                     handleCitySelect(cityId);
                   }}
                 >
                   <Col className="d-flex">
                     <SlLocationPin className="me-2" />
                     <h6>
-                      {flight?.arrival.city} - {flight?.arrival.code}
+                      {flight?.city} - {flight?.code}
                     </h6>
                   </Col>
                 </Row>

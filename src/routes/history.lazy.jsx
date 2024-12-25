@@ -1,13 +1,10 @@
-//import * as React from "react";
+import React from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import RiwayatLayout from "../layouts/Riwayat/RiwayatLayout";
-import ScreenRiwayat from "../components/Riwayat/ScreenRiwayat";
-import DetailPesanan from "../components/Riwayat/Detail/DetailPesananan";
-import NotFound from "../components/Riwayat/Detail/NotFound";
-import {
-  RiwayatProvider,
-  useRiwayatContext,
-} from "../components/Riwayat/RiwayatContext";
+import HistoryLayout from "../layouts/History/HistoryLayout";
+import ScreenHistory from "../components/History/ScreenHistory";
+import DetailHistory from "../components/History/Detail/DetailHistory";
+import NotFound from "../components/History/Detail/NotFound";
+import { HistoryProvider } from "../components/History/HistoryContext";
 import { getAllBookings } from "../service/booking";
 import { useState } from "react";
 import Protected from "../components/Auth/Protected";
@@ -25,8 +22,8 @@ export const Route = createLazyFileRoute("/history")({
 
 function History() {
   const { token } = useSelector((state) => state.auth);
-  const [openRiwayat, setOpenRiwayat] = useState(true);
-  const [openDetailRiwayat, setOpenDetailRiwayat] = useState(false);
+  const [openHistory, setOpenHistory] = useState(true);
+  const [openDetailHistory, setOpenDetailHistory] = useState(false);
   const [openNotFound, setOpenNotFound] = useState(false);
 
   const { data, isSuccess, isLoading } = useQuery({
@@ -35,32 +32,30 @@ function History() {
     enabled: !!token,
   });
 
-  // Effect untuk mengatur state jika tidak ada data
   useEffect(() => {
     if (isSuccess && (!data || data.length === 0)) {
-      // Jika query sukses tetapi data kosong
       setOpenNotFound(true);
-      setOpenRiwayat(false);
-      setOpenDetailRiwayat(false);
+      setOpenHistory(false);
+      setOpenDetailHistory(false);
     }
   }, [isSuccess, data]);
 
   return (
     <>
-      <RiwayatProvider>
-        <RiwayatLayout
-          openRiwayat={openRiwayat}
-          setOpenRiwayat={setOpenRiwayat}
-          openDetailRiwayat={openDetailRiwayat}
-          setOpenDetailRiwayat={setOpenDetailRiwayat}
+      <HistoryProvider>
+        <HistoryLayout
+          openHistory={openHistory}
+          setOpenHistory={setOpenHistory}
+          openDetailHistory={openDetailHistory}
+          setOpenDetailHistory={setOpenDetailHistory}
           openNotFound={openNotFound}
           setOpenNotFound={setOpenNotFound}
         >
-          {openRiwayat && <ScreenRiwayat />}
-          {openDetailRiwayat && <DetailPesanan />}
+          {openHistory && <ScreenHistory />}
+          {openDetailHistory && <DetailHistory />}
           {openNotFound && <NotFound />}
-        </RiwayatLayout>
-      </RiwayatProvider>
+        </HistoryLayout>
+      </HistoryProvider>
     </>
   );
 }

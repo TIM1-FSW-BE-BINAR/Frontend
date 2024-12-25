@@ -1,88 +1,73 @@
-import {  useNavigate, useLocation } from "@tanstack/react-router";
-import {
-  Navbar,
-  Container,
-  Col,
-  Row,
-  Breadcrumb,
-} from "react-bootstrap";
+import { useNavigate } from "@tanstack/react-router";
+import { Navbar, Container, Row, Col, Card, Stack } from "react-bootstrap";
 import { useEffect } from "react";
-import {  useSelector } from "react-redux";
-//import { setToken, setUser } from "../../redux/slices/auth";
+import { useSelector } from "react-redux";
 import { useState } from "react";
+import { Breadcrumb } from "react-bootstrap";
 import "./NavbarBooking.css";
+import PropTypes from "prop-types";
 
-const NavbarBooking = () => {
-  //const dispatch = useDispatch();
+const NavbarBooking = ({ isSaved, isPayment, isComplete }) => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { user } = useSelector((state) => state.auth);
+  const [timeLeft, setTimeLeft] = useState(() => {
+    const savedTime = localStorage.getItem("timeLeft");
+    return savedTime ? parseInt(savedTime, 10) : 0;
+  });
+const [isTimerActive, setIsTimerActive] = useState(true);
 
-  const { token } = useSelector((state) => state.auth);
+useEffect(() => {
+      let interval;
 
-  // State untuk melacak penyelesaian
-  const [isDataDiriCompleted, setIsDataDiriCompleted] = useState(false);
-  const [isBayarCompleted, setIsBayarCompleted] = useState(false);
-const [isSaved, setisSaved] = useState(false);
-  // Logika untuk menentukan apakah path aktif
-  const isActive = (path) => location.pathname === path;
+      if (isTimerActive && timeLeft > 0) {
+        interval = setInterval(() => {
+          setTimeLeft((prev) => {
+            const newTime = prev > 0 ? prev - 1 : 0;
+            localStorage.getItem("timeLeft", newTime);
+            localStorage.setItem("timeLeft", newTime); 
+            return newTime;
+          });
+        }, 1000);
+      } else if (timeLeft === 0) {
+        setIsTimerActive(false);
+      }
 
-  // Fungsi untuk memvalidasi akses dan navigasi
-  const handleNavigation = (path) => {
-    if (
-      path === "/Pemesanan" ||
-      (path === "/bayar" && isDataDiriCompleted) ||
-      (path === "/selesai" && isBayarCompleted)
-    ) {
-      navigate({ to: path });
-    }
-  };
+      return () => clearInterval(interval);
+    }, [isTimerActive, timeLeft]);
 
-  // Simulasikan penyelesaian tahap (di halaman lain, ini bisa diatur melalui props atau Redux)
-  const completeDataDiri = () => setIsDataDiriCompleted(true);
-  const completeBayar = () => setIsBayarCompleted(true);
-
-  //   Timer logic
-  const initialTime = 15 * 60;
-  const [timeLeft, setTimeLeft] = useState(initialTime);
-  const [isTimerActive, setIsTimerActive] = useState(true);
-  
-
-  useEffect(() => {
-    if (!token) {
-      setIsTimerActive(false);
-      return;
-    }
-    let interval;
-    if (isTimerActive && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
-      }, 1000);
-    } else if (timeLeft === 0) {
-      setIsTimerActive(false);
-    }
-
-    return () => clearInterval(interval);
-  }, [isTimerActive, timeLeft]);
-  // [token];
-
-  const formatTime = (seconds) => {
-    const hours = String(Math.floor(seconds / 3600)).padStart(2, "0");
-    const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
-    const secs = String(seconds % 60).padStart(2, "0");
-    return `${hours}:${minutes}:${secs}`;
-  };
-
-  // const resetTimer = () => {
-  //   setTimeLeft(initialTime);
-  //   setIsTimerActive(true);
-  //   setIsOverlayVisible(false);
-  // };
-  const resetTimer = () => {
-    navigate({to : "/"})
-  };
+    
+    const formatTime = (seconds) => {
+      const hours = String(Math.floor(seconds / 3600)).padStart(2, "0");
+      const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(
+        2,
+        "0"
+      );
+      const secs = String(seconds % 60).padStart(2, "0");
+      return `${hours}:${minutes}:${secs}`;
+    };
 
   const handleOverlayClose = () => {
     navigate({ to: "/login" });
+  };
+
+  const handleExpierdTimer = () => {
+    navigate({ to: "/" });
+  };
+
+  const getDeadline = () => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + 15);
+  
+    const formatter = new Intl.DateTimeFormat("id-ID", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "Asia/Jakarta", 
+    });
+  
+    return formatter.format(now);
   };
 
   return (
@@ -96,119 +81,156 @@ const [isSaved, setisSaved] = useState(false);
         }}
       >
         <Container>
-          <Col>
+          <Stack gap={0}>
             <Row>
               <Breadcrumb>
                 <Breadcrumb.Item
-                  active={isActive("/Booking")}
-                  onClick={() => handleNavigation("/Booking")}
-                  style={
-                    isActive("/Booking")
-                      ? {
-                          fontWeight: "bold",
-                          color: "black",
-                          textDecoration: "none",
-                          cursor: "default",
-                        }
-                      : {
-                          color: "black",
-                          textDecoration: "none",
-                          cursor: "pointer",
-                        }
-                  }
+                  active
+                  style={{
+                    fontWeight: "bold",
+                    color: isComplete ? "#7126B5" : "#7126B5",
+                  }}
                 >
-                  Isi Data Diri
+                  <span style={{ textDecoration: "none" }}>
+                    Personal Information
+                  </span>
                 </Breadcrumb.Item>
                 <Breadcrumb.Item
-                  active={isActive("/payment")}
-                  onClick={() => handleNavigation("/payment")}
-                  style={
-                    isActive("/payment")
-                      ? {
-                          fontWeight: "bold",
-                          color: "black",
-                          textDecoration: "none",
-                          cursor: "default",
-                        }
-                      : {
-                          color: isDataDiriCompleted ? "black" : "gray",
-                          textDecoration: "none",
-                          cursor: isDataDiriCompleted
-                            ? "pointer"
-                            : "not-allowed",
-                        }
-                  }
+                  active={isPayment || isComplete}
+                  style={{
+                    fontWeight: (isPayment || isComplete) ? "bold" : "normal",
+                    color: (isPayment || isComplete) ? "#7126B5" : "#6c757d",
+                  }}
                 >
-                  Bayar
+                  <span style={{ textDecoration: "none" }}>Payment</span>
                 </Breadcrumb.Item>
                 <Breadcrumb.Item
-                  active={isActive("/selesai")}
-                  onClick={() => handleNavigation("/selesai")}
-                  style={
-                    isActive("/selesai")
-                      ? {
-                          fontWeight: "bold",
-                          color: "black",
-                          textDecoration: "none",
-                          cursor: "default",
-                        }
-                      : {
-                          color: isBayarCompleted ? "black" : "gray",
-                          textDecoration: "none",
-                          cursor: isBayarCompleted ? "pointer" : "not-allowed",
-                        }
-                  }
+                  active={isComplete}
+                  style={{
+                    fontWeight: isComplete ? "bold" : "normal",
+                    color: isComplete ? "#7126B5" : "#6c757d",
+                  }}
                 >
-                  Selesai
+                  <span style={{ textDecoration: "none" }}>Complete</span>
                 </Breadcrumb.Item>
               </Breadcrumb>
             </Row>
+
             <Row>
               <div>
-                {!token ? (
-                    <div
-                      style={{
-                        textAlign: "center",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <div id="black-overlay" className="vh-100"></div>
-                      <div id="box-timer">
-                        {"Anda harus login terlebih dahulu!"}
-                        <button onClick={handleOverlayClose} id="close-button">
-                          X
-                        </button>
-                      </div>
-                    </div>
-                ) : isSaved ?  (
+                {!user ? (
+                  <>
+                    <div id="black-overlay"></div>
+                    <Row>
+                      <Col xs={12} md={12} lg={12}>
+                        <Card
+                          className="text-white text-center mx-4"
+                          style={{
+                            background: "#FF0000",
+                            borderRadius: "14px",
+                            zIndex: "3",
+                          }}
+                        >
+                          <Card.Body style={{ padding: "12px", margin: "0px" }}>
+                            {"You must log in first!"}
+                            <button
+                              onClick={handleOverlayClose}
+                              id="close-button"
+                            >
+                              X
+                            </button>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                    </Row>
+                  </>
+                ) : isComplete ? (
                   <Row>
-                    <div id="box-timer" style={{ backgroundColor: "#73CA5C" }}>
-                      <div style={{ justifyContent: "center" }}>
-                        {"Data anda berhasil tersimpan!"}
-                      </div>
-                    </div>
+                    <Col xs={12} md={12} lg={12}>
+                      <Card
+                        className="text-white text-center mx-4"
+                        style={{ background: "#73CA5C", borderRadius: "14px" }}
+                      >
+                        <Card.Body style={{ padding: "12px", margin: "0px" }}>
+                          Thank you for the transaction payment
+                        </Card.Body>
+                      </Card>
+                    </Col>
                   </Row>
-                ): (
+                ) : isPayment ? (
+                  <Row>
+                    <Col xs={12} md={12} lg={12}>
+                      <Card
+                        className="text-white text-center mx-4"
+                        style={{ background: "#FF0000", borderRadius: "14px" }}
+                      >
+                        <Card.Body style={{ padding: "12px", margin: "0px" }}>
+                          Please complete your payment before {getDeadline()}
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  </Row>
+                ) : isSaved ? (
+                  <Row>
+                    <Col xs={12} md={12} lg={12}>
+                      <Card
+                        className="text-white text-center mx-4"
+                        style={{ background: "#73CA5C", borderRadius: "14px" }}
+                      >
+                        <Card.Body style={{ padding: "12px", margin: "0px" }}>
+                          {"Your data has been successfully saved!"}
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  </Row>
+                ) : (
                   <div>
                     {timeLeft > 0 ? (
-                      <div id="box-timer">
-                        Selesaikan dalam {formatTime(timeLeft)}
-                      </div>
+                      <Row>
+                        <Col xs={12} md={12} lg={12}>
+                          <Card
+                            className="text-white text-center mx-4"
+                            style={{
+                              background: "#FF0000",
+                              borderRadius: "14px",
+                            }}
+                          >
+                            <Card.Body
+                              style={{ padding: "12px", margin: "0px" }}
+                            >
+                              Complete within {formatTime(timeLeft)}
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                      </Row>
                     ) : (
                       <>
                         <div id="black-overlay"></div>
                         <Row>
-                          <div id="box-timer">
-                            <div style={{ justifyContent: "center" }}>
-                              {
-                                "Maaf, waktu pemesanan habis, silahkan ulangi lagi."
-                              }
-                            </div>
-                            <button onClick={resetTimer} id="close-button">
-                              X
-                            </button>
-                          </div>
+                          <Col xs={12} md={12} lg={12}>
+                            <Card
+                              className="text-white text-center mx-4"
+                              style={{
+                                background: "#FF0000",
+                                borderRadius: "14px",
+                                zIndex: "3",
+                              }}
+                            >
+                              <Card.Body
+                                style={{ padding: "12px", margin: "0px" }}
+                              >
+                                {
+                                  "Sorry, the booking time has expired. Please try again."
+                                }
+                                <button
+                                  onClick={handleExpierdTimer}
+                                  id="close-button"
+                                >
+                                  X
+                                </button>
+                              </Card.Body>
+                            </Card>
+                          </Col>
                         </Row>
                       </>
                     )}
@@ -216,11 +238,17 @@ const [isSaved, setisSaved] = useState(false);
                 )}
               </div>
             </Row>
-          </Col>
+          </Stack>
         </Container>
       </Navbar>
     </>
   );
+};
+
+NavbarBooking.propTypes = {
+  isSaved: PropTypes.bool.isRequired,
+  isPayment: PropTypes.bool.isRequired,
+  isComplete: PropTypes.bool.isRequired,
 };
 
 export default NavbarBooking;

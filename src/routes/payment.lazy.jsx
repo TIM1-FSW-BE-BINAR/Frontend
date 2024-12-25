@@ -1,47 +1,27 @@
-import React, { useState } from "react";
-import "../styles/variables.scss";
+import React from "react";
+import "../components/Login/variables.scss";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import { useSelector } from "react-redux";
-import PaymentLayout from "../layouts/paymentLayout";
+import LayoutAsli from "../layouts/LayoutAsli";
 import PaymentOptions from "../components/Payment/Payment/Payment";
-import SuccessPayment from "../components/Payment/Payment/SuccessPayment";
+import Protected from "../components/Auth/Protected";
 
 export const Route = createLazyFileRoute("/payment")({
-  component: payment,
+  component: () => (
+    <Protected roles={[1]}>
+      <Payment />
+    </Protected>
+  ),
 });
 
-function payment() {
-  const { token } = useSelector((state) => state.auth);
-  const [openPayment, setOpenPayment] = useState(true);
-  const [openSuccess, setOpenSuccess] = useState(false);
-
-  // const { data, isSuccess, isLoading } = useQuery({
-  //   queryKey: ["getAllbookings"],
-  //   queryFn: getAllBookings,
-  //   enabled: !!token,
-  // });
-
-  // // Effect untuk mengatur state jika tidak ada data
-  // useEffect(() => {
-  //   if (isSuccess && (!data || data.length === 0)) {
-  //     // Jika query sukses tetapi data kosong
-  //     setOpenNotFound(true);
-  //     setOpenRiwayat(false);
-  //     setOpenDetailRiwayat(false);
-  //   }
-  // }, [isSuccess, data]);
-
+function Payment() {
   return (
-    <>
-      <PaymentLayout
-        openPayment={openPayment}
-        setOpenPayment={setOpenPayment}
-        openSuccess={openSuccess}
-        setOpenSuccess={setOpenSuccess}
-      >
-        {openPayment && <PaymentOptions />}
-        {openSuccess && <SuccessPayment />}
-      </PaymentLayout>
-    </>
+    <LayoutAsli 
+      openPayment={true} 
+      openSuccess={false}
+      isPayment={true}
+      isSaved={false}
+    >
+      <PaymentOptions />
+    </LayoutAsli>
   );
 }

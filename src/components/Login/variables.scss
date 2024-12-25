@@ -1,0 +1,65 @@
+/* hide default browser eye icon */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-clear-button,
+input[type="password"]::-webkit-inner-spin-button,
+input[type="password"]::-webkit-outer-spin-button,
+input[type="password"]::-webkit-reveal-button {
+  display: none;
+}
+
+/* hide default browser input up and down button */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input:focus.is-invalid {
+  border-color: #dc3545 !important; /* Merah */
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25); /* Bayangan merah */
+}
+
+input:focus {
+  border-color: #dc3545; /* Warna merah */
+}
+
+/* Styling untuk input error */
+.error-input {
+  border-color: #dc3545 !important;
+  background-image: none !important;
+}
+
+.error-input:focus {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+}
+
+/* Styling untuk feedback error */
+.invalid-feedback {
+  display: block;
+  color: #dc3545;
+  margin-top: 0.25rem;
+  font-size: 0.875em;
+}
+
+/* Override Bootstrap's default invalid feedback display */
+.form-control.is-invalid ~ .invalid-feedback {
+  display: block !important;
+}
+
+.form-control:focus {
+  border-color: #7126b5 !important;
+  box-shadow: 0 0 0 0.25rem rgba(113, 38, 181, 0.25) !important;
+}
+
+.form-control.is-invalid:focus {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+}

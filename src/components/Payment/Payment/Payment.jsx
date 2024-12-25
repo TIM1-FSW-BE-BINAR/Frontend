@@ -1,21 +1,29 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { useSelector } from "react-redux";
+import { useNavigate, Link } from "@tanstack/react-router";
 import toast, { Toaster } from "react-hot-toast";
-import { Container, Row, Col, Card, Spinner } from "react-bootstrap";
+import { Container, Row, Col, Card, Spinner, Button } from "react-bootstrap";
 import DetailPesanan from "./DetailPesanan";
 
 const PaymentOptions = () => {
   const [snapLoaded, setSnapLoaded] = useState(false);
+  const [snapToken, setSnapToken] = useState("");
+  const [bookingId, setBookingId] = useState("");
+  const [amount, setAmount] = useState("");
   const [paymentInitiated, setPaymentInitiated] = useState(false);
   const navigate = useNavigate();
-  const transaction_payment = "66e4fa55-fdac-4ef9-91b5-733b97d1b862";
-  //   const { transaction_payment } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    // if (!transaction_payment) {
-    //         navigate("/");
-    //        }
+    const queryParams = new URLSearchParams(location.search);
+    setSnapToken(queryParams.get("snapToken") || "");
+    setAmount(queryParams.get("amount") || "");
+
+    const storedBookingId = localStorage.getItem("bookingId");
+    if (storedBookingId) {
+      setBookingId(storedBookingId);
+    }
+  }, []);
+
+  useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
     script.setAttribute("data-client-key", "SB-Mid-client-sWHHfn6Rjgzxjvrc");
@@ -39,12 +47,17 @@ const PaymentOptions = () => {
 
   useEffect(() => {
     const handlePay = () => {
-      if (snapLoaded && window.snap) {
-        window.snap.embed(transaction_payment, {
+      if (snapLoaded && window.snap && snapToken) {
+        window.snap.embed(snapToken, {
           embedId: "snap-container",
           onSuccess: function () {
-            toast.success("Payment Success!");
-            navigate("/payment-success");
+            toast.success("Payment Success!", {
+              duration: 4000,
+            });
+            const timer = setTimeout(() => {
+              navigate({ to: "/complete" });
+            }, 3000);
+            return () => clearTimeout(timer);
           },
           onPending: function () {
             toast("Waiting for your payment", { icon: "⏳" });
@@ -61,28 +74,37 @@ const PaymentOptions = () => {
       }
     };
 
-    if (snapLoaded && !paymentInitiated) {
+    if (snapLoaded && !paymentInitiated && snapToken) {
       handlePay();
       setPaymentInitiated(true);
     }
-  }, [snapLoaded, paymentInitiated]);
+  }, [snapLoaded, snapToken, paymentInitiated]);
 
   return (
     <Container className="py-4">
       <Row className="justify-content-center">
         <Col lg={7}>
-          <Card className="shadow-sm">
-            <Card.Body>
+          <Card
+            className="shadow-sm mb-4"
+            style={{
+              maxWidth: "100%", 
+              height: "auto", 
+              maxHeight: "90%", 
+              overflow: "hidden", 
+            }}
+          >
+            <Card.Body style={{ overflow: "auto" }}>
+              {" "}
               <Card.Title className="fw-bold text-start mb-4">
-                Isi Data Pembayaran
+                Complete Payment
               </Card.Title>
               <div
                 id="snap-container"
                 className="rounded w-100"
-                style={{ height: "70vh" }}
-                xs={12}
-                md={12}
-                lg={12}
+                style={{
+                  minHeight: "50px", 
+                  maxHeight: "100%", 
+                }}
               >
                 {!snapLoaded && (
                   <div className="text-center mt-4">
@@ -93,6 +115,17 @@ const PaymentOptions = () => {
               </div>
             </Card.Body>
           </Card>
+          <Button
+            type="submit"
+            className="btn btn-block w-100 mt-2 mx-0 animated-button"
+            style={{ backgroundColor: "#7126b5", border: "none" }}
+            as="a"
+            href="https://simulator.sandbox.midtrans.com/v2/qris/index"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Midtrans Sandbox Simulator
+          </Button>
         </Col>
         <Col lg={5}>
           <Card className="shadow-sm ">
@@ -100,13 +133,13 @@ const PaymentOptions = () => {
               <Card.Title className="text-secondary text-center">
                 Ticket Details
               </Card.Title>
-              {/* Tambahkan detail tiket di sini */}
-              <DetailPesanan />
+              {/* detail tiket */}
+              <DetailPesanan bookingId={bookingId} amount={amount} />
             </Card.Body>
           </Card>
         </Col>
       </Row>
-      <Toaster position="bottom-right" reverseOrder={false} />
+      <Toaster position="top-right" reverseOrder={false} />
     </Container>
   );
 };

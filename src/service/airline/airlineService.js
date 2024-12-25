@@ -7,7 +7,7 @@ export const getAirlines = async (filters = {}) => {
     }
   });
 
-  let url = `${import.meta.env.VITE_API_URL}/airline?${params.toString()}`;
+  let url = `${import.meta.env.VITE_API_URL}/api/v1/airline?${params.toString()}`;
 
   const response = await fetch(url, {
     method: "GET",
@@ -21,11 +21,4 @@ export const getAirlines = async (filters = {}) => {
   return result?.data;
 };
 
-// Daftar Params untuk data Airlines
-//   page,
-//   limit,
-// Contoh Cara pemanggilan : 
-// const airline = await getAirlines({
-//   page: 1,
-//   limit: 10,
-//})
+
