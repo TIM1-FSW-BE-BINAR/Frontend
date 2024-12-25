@@ -222,7 +222,7 @@ const SearchFlight = ({
         setNotFound(false);
       }
     } else if (isError) {
-      console.log("fetch search nya error");
+      toast.error("Something went wrong");
     } else if (isPending) {
       setLoading(true);
     }
