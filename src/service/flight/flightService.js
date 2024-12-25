@@ -13,7 +13,6 @@ export const getFlights = async (filters = {}) => {
     method: "GET",
   });
 
-  // get data
   const result = await response.json();
   if (!result) {
     throw new Error(result?.error?.message);
@@ -28,7 +27,6 @@ export const getFlightId = async (id) => {
     method: "GET",
   });
 
-  // get data
   const result = await response.json();
   return result;
 };
