@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useRef } from "react";
 import {
   Button,
   Card,
@@ -38,9 +38,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import { getFlights } from "../../service/flight/flightService";
 import { useNavigate } from "@tanstack/react-router";
-
-// Context
-import { HomepageContext } from "../../context/HomepageContext";
+import { getAirports } from "../../service/airport/airportService";
 
 const ScreenHomepage = () => {
   return <Homepage />;
@@ -75,15 +73,15 @@ const Homepage = () => {
   const [totalPassengers, setTotalPassengers] = useState(1);
   const [classInput, setClassInput] = useState("Economy");
 
-   const [today, setToday] = useState("");
-   useEffect(() => {
-     const now = new Date();
-     const utcDate = now.toISOString();
-     setToday(utcDate);
-   }, []);
+  const [today, setToday] = useState("");
+  useEffect(() => {
+    const now = new Date();
+    const utcDate = now.toISOString();
+    setToday(utcDate);
+  }, []);
 
-   useEffect(() => {
-     if(localStorage.getItem("lastFrom")){
+  useEffect(() => {
+    if (localStorage.getItem("lastFrom")) {
       setFromInput(localStorage.getItem("lastFrom"));
       setToInput(localStorage.getItem("lastTo"));
       setDepartureDate(localStorage.getItem("lastDeparture"));
@@ -92,8 +90,8 @@ const Homepage = () => {
       setChildInput(parseInt(localStorage.getItem("lastChild")));
       setBabyInput(parseInt(localStorage.getItem("lastBaby")));
       setClassInput(localStorage.getItem("lastClass"));
-     }
-   }, []);
+    }
+  }, []);
 
   // Pagination
   const [page, setPage] = useState(1);
@@ -214,6 +212,18 @@ const Homepage = () => {
   const [notFound, setNotFound] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const [flightsDataAll, setFlightsDataAll] = useState([]);
+  const flightsDataAllRef = useRef(null);
+  const pageItems = 10;
+
+  // Fungsi untuk memeriksa apakah state berubah
+  const stateChanged = () => {
+    return (
+      flightsDataAllRef.current !== null &&
+      flightsDataAllRef.current.state !== state
+    );
+  };
+
   const {
     data: flightData,
     isSuccess: isSuccessFlight,
@@ -233,9 +243,17 @@ const Homepage = () => {
 
   useEffect(() => {
     if (isSuccessFlight) {
-      setFlightsData(flightData);
+      setFlightsData(flightData.data);
+      const totalPage = flightData.meta.pagination.totalPage;
+      const totalData = parseInt(totalPage, 10) * parseInt(pageItems, 10);
+
+      if (flightsDataAllRef.current === null || stateChanged()) {
+        flightsDataAllRef.current = totalData;
+        setFlightsDataAll(totalData);
+      }
+
       setLoading(false);
-      if (flightData.length == 0) {
+      if (flightData.data.length == 0) {
         setNotFound(true);
       } else {
         setNotFound(false);
@@ -245,24 +263,13 @@ const Homepage = () => {
     } else if (isPendingFlight) {
       setLoading(true);
     }
-  }, [flightData, isSuccessFlight, isErrorFlight, isPendingFlight]);
-
-  const [flightsDataAll, setFlightsDataALl] = useState([]);
-  const { data: flightDataAll, isSuccess: isSuccessFlightDataAll } = useQuery({
-    queryKey: ["all-flights", state],
-    queryFn: () =>
-      getFlights({
-        ...(state !== "All" && { state: state }),
-        startDeparture: today,
-      }),
-    enabled: !!today,
-  });
-
-  useEffect(() => {
-    if (isSuccessFlightDataAll) {
-      setFlightsDataALl(flightDataAll);
-    }
-  }, [flightDataAll, isSuccessFlightDataAll]);
+  }, [
+    flightData,
+    isSuccessFlight,
+    isErrorFlight,
+    isPendingFlight,
+    stateChanged,
+  ]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -274,7 +281,7 @@ const Homepage = () => {
     const year = date.getUTCFullYear();
     return `${day} ${month} ${year}`;
   };
-  
+
   const classInputFormat = (flightClass) => {
     if (flightClass === "FIRST") {
       flightClass = "First Class";
@@ -298,6 +305,33 @@ const Homepage = () => {
       icon: "✈️",
     });
   };
+
+  const [airportsAll, setAirportsAll] = useState("");
+  const {
+    data: airportsData,
+    isSuccess: isSuccessAirports,
+    isError: isErrorAirports,
+  } = useQuery({
+    queryKey: ["airports"],
+    queryFn: () => getAirports(),
+  });
+
+  useEffect(() => {
+    if (isSuccessAirports) {
+      setAirportsAll(airportsData);
+    } else if (isErrorAirports) {
+      console.log("Airports error occurred.");
+    }
+  }, [airportsData, isErrorAirports, isSuccessAirports]);
+
+  function formatToIDR(price) {
+    return price
+      .toLocaleString("id-ID", {
+        style: "currency",
+        currency: "IDR",
+      })
+      .replace(",00", "");
+  }
 
   return (
     <>
@@ -596,15 +630,17 @@ const Homepage = () => {
         </Container>
 
         {/* Memanggil from to modal */}
-        <HomepageModal
-          show={modalShow}
-          activeModal={activeModal}
-          flights={flightsDataAll}
-          onHide={() => setModalShow(false)}
-          inputValue={modalInputValue}
-          setInputValue={setModalInputValue}
-          onSubmit={handleModalSubmit}
-        />
+        {isSuccessAirports && airportsAll && (
+          <HomepageModal
+            show={modalShow}
+            activeModal={activeModal}
+            flights={airportsAll}
+            onHide={() => setModalShow(false)}
+            inputValue={modalInputValue}
+            setInputValue={setModalInputValue}
+            onSubmit={handleModalSubmit}
+          />
+        )}
 
         {/* Passengers Modal */}
         <Modal
@@ -653,7 +689,7 @@ const Homepage = () => {
               variant="primary"
               onClick={handleSavePassengers}
               className="animated-button"
-              style={{ backgroundColor: "#7126b5" }}
+              style={{ backgroundColor: "#7126b5", border: "none" }}
             >
               Save
             </Button>
@@ -777,7 +813,7 @@ const Homepage = () => {
               variant="primary"
               onClick={handleSaveClass}
               className="animated-button"
-              style={{ backgroundColor: "#7126b5" }}
+              style={{ backgroundColor: "#7126b5", border: "none" }}
             >
               Save
             </Button>
@@ -791,7 +827,7 @@ const Homepage = () => {
             <h2>Favorite Destinations</h2>
           </Row>
           <Row className="g-2 mb-2 flex-wrap">
-            {["All", "Asia", "Amerika", "Australia", "Eropa", "Afrika"].map(
+            {["All", "Asia", "America", "Australia", "Europe", "Africa"].map(
               (label, index) => (
                 <Col
                   key={index}
@@ -882,7 +918,7 @@ const Homepage = () => {
                               fontSize: "16px",
                             }}
                           >
-                            IDR {flight?.price}
+                            {formatToIDR(flight?.price)}
                           </span>
                         </p>
                       </Card.Text>
@@ -896,15 +932,15 @@ const Homepage = () => {
             <PaginationControl
               page={page}
               between={4}
-              total={flightsDataAll.length}
+              total={flightsDataAll}
               limit={10}
               changePage={(page) => {
                 setPage(page);
               }}
               ellipsis={1}
-              style={{ 
-                color: "#7126b5"
-               }}
+              style={{
+                color: "#7126b5",
+              }}
             />
           </Row>
         </Container>

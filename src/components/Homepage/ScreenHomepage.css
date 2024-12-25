@@ -111,7 +111,7 @@ body {
   max-height: 50px;
 }
 
-/* Styling Card */
+
 .custom-card {
   width: 16rem;
   border: 1px solid #ddd;
@@ -124,21 +124,21 @@ body {
   transform: translateY(-5px);
 }
 
-/* Styling Card Title */
+
 .card-title {
   font-size: 1.2rem;
   font-weight: bold;
   color: #333;
 }
 
-/* Styling Card Image */
+
 .custom-card img {
   height: 150px;
   object-fit: cover;
   border-bottom: 1px solid #ddd;
 }
 
-/* Styling Card Text */
+
 .custom-card p {
   margin: 0;
   font-size: 0.9rem;
@@ -153,14 +153,14 @@ body {
   gap: 2px;
 }
 
-/* Responsiveness */
+
 @media (max-width: 768px) {
   .custom-card {
     width: 100%;
   }
 }
 
-/* Styling tombol default */
+
 .responsive-button {
   background: #e2d4f0;
   display: flex;
@@ -185,7 +185,7 @@ body {
   display: inline-block;
 }
 
-/* Styling teks */
+
 .responsive-button .button-label {
   font-size: 0.9rem;
   color: #000;
@@ -193,7 +193,7 @@ body {
   margin: 0;
 }
 
-/* Hover efek */
+
 .responsive-button:hover {
   background: #7126b5;
 }
@@ -212,7 +212,7 @@ body {
   color: #fff !important;
 }
 
-/* Media Query untuk layar kecil */
+
 @media (max-width: 576px) {
   .responsive-button {
     padding: 8px;

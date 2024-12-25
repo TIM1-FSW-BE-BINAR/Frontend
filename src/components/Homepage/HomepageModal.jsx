@@ -22,10 +22,7 @@ const HomepageModal = (props) => {
 
       const uniqueFlights = flights.reduce(
         (acc, flight) => {
-          const key =
-            activeModal === "from"
-              ? `${flight.departure.city}-${flight.departure.code}`
-              : `${flight.arrival.city}-${flight.arrival.code}`;
+          const key = `${flight.city}-${flight.code}`;
           if (!acc.map.has(key)) {
             acc.map.set(key, true);
             acc.list.push(flight);
@@ -37,16 +34,13 @@ const HomepageModal = (props) => {
 
       setFilteredFlights(uniqueFlights);
     }
-  }, [show, flights, activeModal, setInputValue]);
+  }, [show, flights, setInputValue]);
 
   useEffect(() => {
     if (inputValue.trim() === "") {
       const uniqueFlights = flights.reduce(
         (acc, flight) => {
-          const key =
-            activeModal === "from"
-              ? `${flight.departure.city}-${flight.departure.code}`
-              : `${flight.arrival.city}-${flight.arrival.code}`;
+          const key = `${flight.city}-${flight.code}`;
           if (!acc.map.has(key)) {
             acc.map.set(key, true);
             acc.list.push(flight);
@@ -60,19 +54,13 @@ const HomepageModal = (props) => {
     } else {
       const lowerCaseInput = inputValue.toLowerCase();
       const filtered = flights.filter((flight) => {
-        const targetFields =
-          activeModal === "from"
-            ? `${flight.departure.city} ${flight.departure.code}`
-            : `${flight.arrival.city} ${flight.arrival.code}`;
+        const targetFields = `${flight.city} ${flight.code}`;
         return targetFields.toLowerCase().includes(lowerCaseInput);
       });
 
       const uniqueFiltered = filtered.reduce(
         (acc, flight) => {
-          const key =
-            activeModal === "from"
-              ? `${flight.departure.city}-${flight.departure.code}`
-              : `${flight.arrival.city}-${flight.arrival.code}`;
+          const key = `${flight.city}-${flight.code}`;
           if (!acc.map.has(key)) {
             acc.map.set(key, true);
             acc.list.push(flight);
@@ -84,7 +72,7 @@ const HomepageModal = (props) => {
 
       setFilteredFlights(uniqueFiltered);
     }
-  }, [inputValue, flights, activeModal]);
+  }, [inputValue, flights]);
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -179,14 +167,14 @@ const HomepageModal = (props) => {
                     padding: "10px",
                   }}
                   onClick={() => {
-                    const cityId = `${flight?.departure.city}-${flight.departure.code}`;
+                    const cityId = `${flight?.city}-${flight.code}`;
                     handleCitySelect(cityId);
                   }}
                 >
                   <Col className="d-flex">
                     <SlLocationPin className="me-2" />
                     <h6>
-                      {flight?.departure.city} - {flight?.departure.code}
+                      {flight?.city} - {flight?.code}
                     </h6>
                   </Col>
                 </Row>
@@ -199,14 +187,14 @@ const HomepageModal = (props) => {
                     padding: "10px",
                   }}
                   onClick={() => {
-                    const cityId = `${flight?.arrival.city}-${flight.arrival.code}`;
+                    const cityId = `${flight?.city}-${flight.code}`;
                     handleCitySelect(cityId);
                   }}
                 >
                   <Col className="d-flex">
                     <SlLocationPin className="me-2" />
                     <h6>
-                      {flight?.arrival.city} - {flight?.arrival.code}
+                      {flight?.city} - {flight?.code}
                     </h6>
                   </Col>
                 </Row>

@@ -45,7 +45,7 @@ function Search() {
     }
   }, [classInput]);
 
-  const { data, isSuccess, isError } = useQuery({
+  const { data, isSuccess, } = useQuery({
     queryKey: ["airports"],
     queryFn: () => getAirports(),
   });
@@ -55,10 +55,8 @@ function Search() {
       setAirports(data);
       setDepartureAirportId(null);
       setReturnAirportId(null);
-    } else if (isError) {
-      console.log("Airports error occurred.");
     }
-  }, [data, isError, isSuccess]);
+  }, [data, isSuccess]);
 
   useEffect(() => {
     if (departureAirportCode) {

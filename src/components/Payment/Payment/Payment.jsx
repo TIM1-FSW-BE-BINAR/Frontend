@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, Link } from "@tanstack/react-router";
 import toast, { Toaster } from "react-hot-toast";
-import { Container, Row, Col, Card, Spinner } from "react-bootstrap";
+import { Container, Row, Col, Card, Spinner, Button } from "react-bootstrap";
 import DetailPesanan from "./DetailPesanan";
 
 const PaymentOptions = () => {
@@ -51,7 +51,13 @@ const PaymentOptions = () => {
         window.snap.embed(snapToken, {
           embedId: "snap-container",
           onSuccess: function () {
-            toast.success("Payment Success!");
+            toast.success("Payment Success!", {
+              duration: 4000,
+            });
+            const timer = setTimeout(() => {
+              navigate({ to: "/complete" });
+            }, 3000);
+            return () => clearTimeout(timer);
           },
           onPending: function () {
             toast("Waiting for your payment", { icon: "⏳" });
@@ -78,18 +84,27 @@ const PaymentOptions = () => {
     <Container className="py-4">
       <Row className="justify-content-center">
         <Col lg={7}>
-          <Card className="shadow-sm mb-4">
-            <Card.Body>
+          <Card
+            className="shadow-sm mb-4"
+            style={{
+              maxWidth: "100%", 
+              height: "auto", 
+              maxHeight: "90%", 
+              overflow: "hidden", 
+            }}
+          >
+            <Card.Body style={{ overflow: "auto" }}>
+              {" "}
               <Card.Title className="fw-bold text-start mb-4">
                 Complete Payment
               </Card.Title>
               <div
                 id="snap-container"
                 className="rounded w-100"
-                style={{ height: "100%", maxHeight: "70vh" }}
-                xs={12}
-                md={12}
-                lg={12}
+                style={{
+                  minHeight: "50px", 
+                  maxHeight: "100%", 
+                }}
               >
                 {!snapLoaded && (
                   <div className="text-center mt-4">
@@ -100,6 +115,17 @@ const PaymentOptions = () => {
               </div>
             </Card.Body>
           </Card>
+          <Button
+            type="submit"
+            className="btn btn-block w-100 mt-2 mx-0 animated-button"
+            style={{ backgroundColor: "#7126b5", border: "none" }}
+            as="a"
+            href="https://simulator.sandbox.midtrans.com/v2/qris/index"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Midtrans Sandbox Simulator
+          </Button>
         </Col>
         <Col lg={5}>
           <Card className="shadow-sm ">
