@@ -1,10 +1,10 @@
-import { Button, Form } from "react-bootstrap";
+import { Button, Form, Spinner } from "react-bootstrap";
 import { useState } from "react";
 import { IoArrowBack } from "react-icons/io5";
 import { sendEmail, verifyEmail } from "../../../service/auth";
 import { useMutation } from "@tanstack/react-query";
 import toast, { Toaster } from "react-hot-toast";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import ResetPasswordForm from "./resetPasswordForm";
 import { useSpring, animated } from "@react-spring/web";
 
@@ -16,7 +16,7 @@ const ForgetPasswordForm = ({ onBack }) => {
   const [isEmailSubmitted, setIsEmailSubmitted] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
 
-  const { mutate: sendEmailMutation } = useMutation({
+  const { mutate: sendEmailMutation, isPending: emailPending } = useMutation({
     mutationFn: (request) => {
       return sendEmail(request);
     },
@@ -63,8 +63,7 @@ const ForgetPasswordForm = ({ onBack }) => {
     },
   });
 
-  // Mutation untuk verifikasi OTP
-  const { mutate: verifyEmailMutation } = useMutation({
+  const { mutate: verifyEmailMutation, isPending: otpPending } = useMutation({
     mutationFn: (request) => {
       return verifyEmail(request);
     },
@@ -163,7 +162,7 @@ const ForgetPasswordForm = ({ onBack }) => {
                 borderRadius: "15px",
                 padding: "1em",
               }}
-              disabled={isEmailSubmitted}
+              disabled={isEmailSubmitted || emailPending}
             />
             <Form.Text muted>
               Enter your registered email to reset password
@@ -197,7 +196,9 @@ const ForgetPasswordForm = ({ onBack }) => {
             className="w-100 mt-3 mb-3"
             disabled={
               (!forgotEmail && !isEmailSubmitted) ||
-              (isEmailSubmitted && !otpCode)
+              (isEmailSubmitted && !otpCode) ||
+              emailPending ||
+              otpPending
             }
             style={{
               backgroundColor: "#7126B5",
@@ -222,7 +223,13 @@ const ForgetPasswordForm = ({ onBack }) => {
                 : (e.currentTarget.style.opacity = "1")
             }
           >
-            {isEmailSubmitted ? "Verify OTP" : "Send Email"}
+            {emailPending || otpPending ? (
+              <Spinner animation="border" size="sm" /> 
+            ) : isEmailSubmitted ? (
+              "Verify OTP"
+            ) : (
+              "Send Email"
+            )}
           </Button>
         </Form>
       </animated.div>

@@ -1,14 +1,12 @@
 import { useState, useRef } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Button, Form, Spinner } from "react-bootstrap";
 import { IoEyeOutline, IoEyeOffOutline, IoArrowBack } from "react-icons/io5";
 import { useMutation } from "@tanstack/react-query";
 import { resetPassword } from "../../../service/auth";
-import { useNavigate } from "@tanstack/react-router";
 import toast from "react-hot-toast";
 import { useSpring, animated } from "@react-spring/web";
 
 const ResetPasswordForm = ({ email, otp, onBack }) => {
-  const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [type, setType] = useState("password");
@@ -18,7 +16,7 @@ const ResetPasswordForm = ({ email, otp, onBack }) => {
   const passwordRef = useRef(null);
   const confirmPasswordRef = useRef(null);
 
-  const { mutate: resetPasswordMutation } = useMutation({
+  const { mutate: resetPasswordMutation, isPending } = useMutation({
     mutationFn: (request) => resetPassword(request),
     onSuccess: (result) => {
       if (result?.meta?.statusCode === 200) {
@@ -183,8 +181,9 @@ const ResetPasswordForm = ({ email, otp, onBack }) => {
               border: "none",
               transition: "opacity 0.3s ease",
             }}
-          >
-            Save
+            disabled={isPending}
+            >
+              {isPending ? <Spinner animation="border" size="sm" /> : "Save"}
           </Button>
         </Form>
       </div>
