@@ -64,14 +64,8 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
         snapCreate({
           bookingId: bookingId,
         });
-      } else {
-        console.error("No bookingId in response:", response);
       }
       setIsPayment(true);
-    },
-    onError: (error) => {
-      console.error("Booking error:", error);
-      toast.error(`Error: ${error.message}`);
     },
   });
 
@@ -143,40 +137,33 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
   };
 
   const handlePayment = async () => {
-    try {
-      if (!isSaved) {
-        toast.error("You must enter form first!");
-        return;
-      }
-
-      if (!dataBooking) {
-        throw new Error("Booking data not found. Please fill the form first.");
-      }
-
-      const updatedBookingDetail = dataBooking.bookingDetail.map((detail) => {
-        const basePrice = detail.price;
-        const discountedPrice = Math.round(
-          basePrice - (basePrice * totalDiscount) / 100
-        );
-
-        return {
-          ...detail,
-          price: discountedPrice,
-        };
-      });
-
-      const updatedDataBooking = {
-        ...dataBooking,
-        bookingDetail: updatedBookingDetail,
-      };
-
-      booking(updatedDataBooking);
-    } catch (error) {
-      console.error("Payment error:", error);
-      if (error.message.includes("Token expired")) {
-        navigate({ to: "/login" });
-      }
+    if (!isSaved) {
+      toast.error("You must enter form first!");
+      return;
     }
+
+    if (!dataBooking) {
+      throw new Error("Booking data not found. Please fill the form first.");
+    }
+
+    const updatedBookingDetail = dataBooking.bookingDetail.map((detail) => {
+      const basePrice = detail.price;
+      const discountedPrice = Math.round(
+        basePrice - (basePrice * totalDiscount) / 100
+      );
+
+      return {
+        ...detail,
+        price: discountedPrice,
+      };
+    });
+
+    const updatedDataBooking = {
+      ...dataBooking,
+      bookingDetail: updatedBookingDetail,
+    };
+
+    booking(updatedDataBooking);
   };
 
   const priceDeparture = Math.round(

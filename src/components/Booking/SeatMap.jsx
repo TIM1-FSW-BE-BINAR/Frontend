@@ -41,13 +41,9 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
 
   useEffect(() => {
     const fetchSeats = async () => {
-      try {
-        const params = { flightId };
-        const data = await getAllSeats(params);
-        setSeats(data?.data || []);
-      } catch (error) {
-        console.error("Error fetching seat data:", error.message, error.stack);
-      }
+      const params = { flightId };
+      const data = await getAllSeats(params);
+      setSeats(data?.data || []);
     };
 
     fetchSeats();
@@ -89,7 +85,22 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
   };
 
   if (isLoading) return <SeatLoading />;
-  
+
+  const formatClassName = (classType) => {
+    switch (classType) {
+      case "ECONOMY":
+        return "Economy";
+      case "PREMIUM_ECONOMY":
+        return "Premium Economy";
+      case "BUSINESS":
+        return "Business";
+      case "FIRST":
+        return "First Class";
+      default:
+        return "Unknown";
+    }
+  };
+
   return (
     <>
       <Toaster position="top-right" />
@@ -103,7 +114,7 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
           zIndex: "1",
         }}
       >
-        {flight?.data?.class || "Unknown"} -{" "}
+        {formatClassName(flight?.data?.class) || "Unknown"} -{" "}
         {seats.filter((s) => s.status === "AVAILABLE").length} Seats Available
       </div>
       <br />
@@ -115,10 +126,12 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
                 return <div key={seatIndex} style={{ width: "35px" }}></div>;
               }
 
-              const seat = seats.find((seat) => seat.seatNumber === seatNumber) || {
-                  seatNumber,
-                  status: "UNAVAILABLE",
-                };
+              const seat = seats.find(
+                (seat) => seat.seatNumber === seatNumber
+              ) || {
+                seatNumber,
+                status: "UNAVAILABLE",
+              };
               const isSelected = selectedSeats.some(
                 (selectedSeat) => selectedSeat.id === seat?.id
               );
@@ -179,7 +192,9 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
                 <div
                   key={seatIndex}
                   className={`seat ${
-                    seat?.status === "LOCKED" || seat?.status === "UNAVAILABLE" ? "booked" : ""
+                    seat?.status === "LOCKED" || seat?.status === "UNAVAILABLE"
+                      ? "booked"
+                      : ""
                   } ${isSelected ? "selected" : ""}`}
                   onClick={() => seat && handleSeatClick(seat)}
                   style={{

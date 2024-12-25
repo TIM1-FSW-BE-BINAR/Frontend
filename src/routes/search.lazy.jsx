@@ -28,6 +28,9 @@ function Search() {
   const departureAirportCode = fromInput?.split("-")[1];
   const returnAirportCode = toInput?.split("-")[1];
 
+  const infoDepartureCityName = fromInput?.split("-")[0];
+  const infoReturnCityName = toInput?.split("-")[0];
+
   const [airports, setAirports] = useState([]);
   const [departureAirportId, setDepartureAirportId] = useState(null);
   const [returnAirportId, setReturnAirportId] = useState(null);
@@ -85,6 +88,9 @@ function Search() {
           key="return"
           fromInput={toInput?.replace(/\+/g, " ")}
           toInput={fromInput?.replace(/\+/g, " ")}
+          infoDepartureCityName={infoDepartureCityName}
+          infoReturnCityName={infoReturnCityName}
+          infoReturnDate={returnDate}
           departureDate={departureDate}
           returnDate={returnDate}
           passengers={totalPassengers}
@@ -104,6 +110,9 @@ function Search() {
           key="departure"
           fromInput={fromInput?.replace(/\+/g, " ")}
           toInput={toInput?.replace(/\+/g, " ")}
+          infoDepartureCityName={infoDepartureCityName}
+          infoReturnCityName={infoReturnCityName}
+          infoReturnDate={returnDate}
           departureDate={departureDate}
           returnDate={returnDate}
           passengers={totalPassengers}
