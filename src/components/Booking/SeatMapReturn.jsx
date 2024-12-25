@@ -47,17 +47,9 @@ const SeatMapReturn = ({
 
   useEffect(() => {
     const fetchReturnSeats = async () => {
-      try {
-        const params = { flightId: returnFlightId };
-        const data = await getAllSeats(params);
-        setReturnSeats(data?.data || []);
-      } catch (error) {
-        console.error(
-          "Error fetching return seat data:",
-          error.message,
-          error.stack
-        );
-      }
+      const params = { flightId: returnFlightId };
+      const data = await getAllSeats(params);
+      setReturnSeats(data?.data || []);
     };
     if (returnFlightId) {
       fetchReturnSeats();
@@ -105,6 +97,21 @@ const SeatMapReturn = ({
 
   if (isLoading) return <SeatLoading />;
 
+  const formatClassName = (classType) => {
+    switch (classType) {
+      case "ECONOMY":
+        return "Economy";
+      case "PREMIUM_ECONOMY":
+        return "Premium Economy";
+      case "BUSINESS":
+        return "Business";
+      case "FIRST":
+        return "First Class";
+      default:
+        return "Unknown";
+    }
+  };
+
   return (
     <>
       <Toaster position="top-right" />
@@ -118,7 +125,7 @@ const SeatMapReturn = ({
           zIndex: "1",
         }}
       >
-        {returnFlight?.data?.class || "Unknown"} -{" "}
+        {formatClassName(returnFlight?.data?.class) || "Unknown"} -{" "}
         {returnSeats.filter((s) => s.status === "AVAILABLE").length} Seats
         Available
       </div>
@@ -134,9 +141,9 @@ const SeatMapReturn = ({
               const seat = returnSeats.find(
                 (seat) => seat.seatNumber === seatNumber
               ) || {
-                  seatNumber,
-                  status: "UNAVAILABLE",
-                };
+                seatNumber,
+                status: "UNAVAILABLE",
+              };
               const isSelected = selectedSeatsReturn.some(
                 (selectedSeat) => selectedSeat.id === seat?.id
               );

@@ -1,7 +1,7 @@
 import React from "react";
 import "../components/Login/variables.scss";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import LayoutAsli from "../layouts/LayoutAsli";
+import CheckoutLayout from "../layouts/CheckoutLayout";
 import PaymentOptions from "../components/Payment/Payment/Payment";
 import Protected from "../components/Auth/Protected";
 
@@ -15,13 +15,13 @@ export const Route = createLazyFileRoute("/payment")({
 
 function Payment() {
   return (
-    <LayoutAsli 
+    <CheckoutLayout 
       openPayment={true} 
       openSuccess={false}
       isPayment={true}
       isSaved={false}
     >
       <PaymentOptions />
-    </LayoutAsli>
+    </CheckoutLayout>
   );
 }
