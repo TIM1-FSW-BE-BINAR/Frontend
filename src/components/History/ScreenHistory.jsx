@@ -155,7 +155,6 @@ const ScreenHistory = () => {
       setGroupedBookings(Object.entries(grouped));
       setShowDetailPrompt(false);
 
-      // Simpan filteredData ke localStorage
       localStorage.setItem("filteredData", JSON.stringify(filteredData));
     } else {
       setGroupedBookings([]);

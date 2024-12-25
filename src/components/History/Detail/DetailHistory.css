@@ -21,7 +21,7 @@
 }
 
 .custom-toast {
-  display: none; /* Sembunyikan toast default */
+  display: none;
 }
 
 .cancel-toast {
