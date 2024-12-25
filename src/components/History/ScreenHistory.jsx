@@ -21,7 +21,7 @@ import "./ScreenHistory.css";
 import arrowRight from "../../assets/arrow-right.png";
 import notFound from "../../assets/homepage/not-found.png";
 
-import ScreenRiwayatLoading from "./Loading/ScreenHistoryLoading";
+import ScreenHistoryLoading from "./Loading/ScreenHistoryLoading";
 
 const ScreenHistory = () => {
   const { token } = useSelector((state) => state.auth);
@@ -39,7 +39,11 @@ const ScreenHistory = () => {
   );
   const [showDetailPrompt, setShowDetailPrompt] = useState(true);
   const [matchedPayments, setMatchedPayments] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
+  const [filteredData, setFilteredData] = useState(() => {
+    const savedFilteredData = localStorage.getItem("filteredData");
+    return savedFilteredData ? JSON.parse(savedFilteredData) : [];
+  });
+
   const [activeFilter, setActiveFilter] = useState(() => {
     const savedFilter = localStorage.getItem("activeFilter");
     return savedFilter ? savedFilter : "all";
@@ -63,7 +67,14 @@ const ScreenHistory = () => {
     localStorage.setItem("isDetailVisible", isDetailVisible);
     localStorage.setItem("activeFilter", activeFilter);
     localStorage.setItem("groupedBookings", JSON.stringify(groupedBookings));
-  }, [selectedId, isDetailVisible, activeFilter, groupedBookings]);
+    localStorage.setItem("filteredData", JSON.stringify(filteredData));
+  }, [
+    selectedId,
+    isDetailVisible,
+    activeFilter,
+    groupedBookings,
+    filteredData,
+  ]);
 
   const { data, isSuccess, isLoading } = useQuery({
     queryKey: ["getAllbookings"],
@@ -143,6 +154,9 @@ const ScreenHistory = () => {
 
       setGroupedBookings(Object.entries(grouped));
       setShowDetailPrompt(false);
+
+      // Simpan filteredData ke localStorage
+      localStorage.setItem("filteredData", JSON.stringify(filteredData));
     } else {
       setGroupedBookings([]);
       setShowDetailPrompt(false);
@@ -241,6 +255,8 @@ const ScreenHistory = () => {
 
   const handleFilterClick = (filter) => {
     setActiveFilter(filter);
+    setIsDetailVisible(false);
+    setSelectedId(null);
     localStorage.setItem("activeFilter", filter);
   };
 
@@ -311,7 +327,7 @@ const ScreenHistory = () => {
           }}
         >
           {isLoading ? (
-            <ScreenRiwayatLoading />
+            <ScreenHistoryLoading />
           ) : isSuccess &&
             Array.isArray(groupedBookings) &&
             groupedBookings.length > 0 ? (

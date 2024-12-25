@@ -14,11 +14,14 @@ import {
   cancelPayment,
   getAllPaymentPagination,
 } from "../../../service/payment";
-import DetailPesananLoading from "../Loading/DetailHistoryLoading";
+import DetailHistoryLoading from "../Loading/DetailHistoryLoading";
 import { useNavigate } from "@tanstack/react-router";
 import { createSnap } from "../../../service/payment/snap";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas-pro";
+import { ClassNames } from "@emotion/react";
+import { ToastContainer } from "react-toastify";
+import { useNotificationCenter } from "react-toastify/addons/use-notification-center";
 
 const DetailHistory = ({ id, onBack }) => {
   const { token } = useSelector((state) => state.auth);
@@ -49,6 +52,7 @@ const DetailHistory = ({ id, onBack }) => {
         toast.success(
           "Ticket printed successfully! Please wait a second for auto refresh",
           {
+            id: "general",
             style: {
               padding: "16px",
               background: "#73CA5C",
@@ -66,6 +70,7 @@ const DetailHistory = ({ id, onBack }) => {
         }, 1500);
       } else {
         toast.error("Flight ticket data not found or payment not yet paid", {
+          id: "general",
           style: {
             padding: "16px",
             background: "#FF0000",
@@ -81,6 +86,7 @@ const DetailHistory = ({ id, onBack }) => {
     },
     onError: (err) => {
       toast.error("Failed to print ticket. Please try again.", {
+        id: "general",
         style: {
           padding: "16px",
           background: "#FF0000",
@@ -110,6 +116,7 @@ const DetailHistory = ({ id, onBack }) => {
       toast.success(
         "Payment canceled successfully! Please wait a second for auto refresh",
         {
+          id: "general",
           style: {
             padding: "16px",
             background: "#73CA5C",
@@ -128,6 +135,7 @@ const DetailHistory = ({ id, onBack }) => {
     },
     onError: (err) => {
       toast.error("Failed to cancel payment. Please try again.", {
+        id: "general",
         style: {
           padding: "16px",
           background: "#FF0000",
@@ -153,7 +161,9 @@ const DetailHistory = ({ id, onBack }) => {
           to: `/payment?snapToken=${snapToken}&amount=${amount}`,
         });
       } else {
-        toast.error("Payment data is incomplete or missing.");
+        toast.error("Payment data is incomplete or missing.", {
+          id: "general",
+        });
       }
     }
   };
@@ -221,23 +231,27 @@ const DetailHistory = ({ id, onBack }) => {
           </div>
         ),
         {
+          id: "cancel",
           duration: Infinity,
-          position: "top-center",
         }
       );
     } else {
-      toast.error("Payment ID is missing. Cannot cancel payment.");
+      toast.error("Payment ID is missing. Cannot cancel payment.", {
+        id: "general",
+      });
     }
   };
 
   const handleOverlayClick = () => {
+    toast.dismiss("cancel");
     setOverlayVisible(false);
-    toast.dismiss();
   };
 
   const handlePrintTicket = () => {
     if (!booking?.id) {
-      toast.error("Booking ID is missing. Cannot print ticket.");
+      toast.error("Booking ID is missing. Cannot print ticket.", {
+        id: "general",
+      });
       return;
     }
 
@@ -248,7 +262,9 @@ const DetailHistory = ({ id, onBack }) => {
     const cardElement = document.querySelector(".card-detail-history");
 
     if (!cardElement) {
-      toast.error("Card element not found. Cannot generate PDF.");
+      toast.error("Card element not found. Cannot generate PDF.", {
+        id: "general",
+      });
       return;
     }
 
@@ -337,6 +353,7 @@ const DetailHistory = ({ id, onBack }) => {
       pdf.save("TicketDetail.pdf");
 
       toast.success("Ticket downloaded as PDF successfully!", {
+        id: "general",
         style: {
           padding: "16px",
           background: "#73CA5C",
@@ -350,6 +367,7 @@ const DetailHistory = ({ id, onBack }) => {
     } catch (error) {
       console.error("Error generating PDF:", error);
       toast.error("Failed to download ticket as PDF. Please try again.", {
+        id: "general",
         style: {
           padding: "16px",
           background: "#FF0000",
@@ -375,6 +393,7 @@ const DetailHistory = ({ id, onBack }) => {
     document.body.removeChild(link);
 
     toast.success("QR Code downloaded successfully!", {
+      id: "general",
       style: {
         padding: "16px",
         background: "#73CA5C",
@@ -387,7 +406,7 @@ const DetailHistory = ({ id, onBack }) => {
     });
   };
 
-  if (isLoading) return <DetailPesananLoading />;
+  if (isLoading) return <DetailHistoryLoading />;
   if (isError || !booking)
     return <p>Error fetching details: {error?.message || "Unknown error"}</p>;
 
@@ -424,7 +443,7 @@ const DetailHistory = ({ id, onBack }) => {
             <div className="d-flex justify-content-between align-items-center mb-3 custom-status">
               <h6 className="fw-bold custom-h6">Booking Detail</h6>
               <span
-                className="px-3 py-1 text-white"
+                className="px-3 py-1 text-white custom-status-span"
                 style={{
                   backgroundColor:
                     matchedPayment?.status === "pending"
@@ -575,14 +594,20 @@ const DetailHistory = ({ id, onBack }) => {
                       <Col xs={8}>
                         <p className="m-0">{`${data.count} ${type}`}</p>
                       </Col>
-                      <Col xs={4} className="text-end">
-                        <p className="m-0">{`IDR ${data.totalPrice.toLocaleString("id-ID")}`}</p>
+                      <Col xs={4} className="text-start">
+                        <p
+                          className="me-2 mb-0 custom-p-detail"
+                          style={{ width: "8rem" }}
+                        >{`IDR ${data.totalPrice.toLocaleString("id-ID")}`}</p>
                       </Col>
                       <Col xs={8}>
-                        <p className="m-0">Tax</p>
+                        <p className="m-0">TAX</p>
                       </Col>
-                      <Col xs={4} className="text-end">
-                        <p className="m-0">
+                      <Col xs={4} className="text-start ">
+                        <p
+                          className="me-2 mb-0 custom-p-detail"
+                          style={{ width: "8rem" }}
+                        >
                           {`IDR ${(booking?.totalPrice + booking?.totalPrice * 0.03 - booking?.totalPrice).toLocaleString("id-ID")}`}
                         </p>
                       </Col>
@@ -712,7 +737,14 @@ const DetailHistory = ({ id, onBack }) => {
           </div>
         </Card.Body>
       </Card>
-      <Toaster position="top-right" reverseOrder={false} />
+      <Toaster
+        containerStyle={{
+          left: "2.5rem",
+          zIndex: "9999",
+        }}
+        position="top-right"
+        reverseOrder={false}
+      />
     </>
   );
 };

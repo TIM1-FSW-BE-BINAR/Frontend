@@ -3,17 +3,6 @@
   overflow-y: auto;
 }
 
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  cursor: pointer;
-}
-
 .customized-style::-webkit-scrollbar {
   width: 8px;
 }
@@ -27,11 +16,25 @@
   background: #f5f5f5;
 }
 
+.toast-container {
+  z-index: 1100 !important;
+}
+
+.custom-toast {
+  display: none; /* Sembunyikan toast default */
+}
+
 .cancel-toast {
   padding: 16px;
   background-color: #fff;
-
+  position: fixed;
+  top: 50vh;
+  left: -50vw !important;
+  width: 20rem;
+  transform: translate(-50%, -50%);
   z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
 }
 
 .cancel-toast p {
@@ -45,10 +48,36 @@
   font-size: 14px;
 }
 
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  cursor: pointer;
+}
+
 @media (max-width: 426px) {
   .card-detail-history {
     width: 90vw !important;
     font-size: 12px !important;
+  }
+
+  .cancel-toast {
+    width: 15rem;
+    left: 10 !important;
+  }
+
+  .custom-p-detail {
+    width: 10rem !important;
+    margin-left: -1.1rem !important;
+  }
+
+  .custom-status-span {
+    font-size: 10px !important;
+    margin-bottom: 10px !important;
   }
 
   .custom-h6 {
@@ -75,18 +104,19 @@
   }
 
   .custom-btn1 {
-    height: 2rem !important;
+    height: 2.5rem !important;
     font-size: 12px !important;
+    width: 11rem !important;
   }
   .custom-btn2 {
-    height: 2rem !important;
+    height: 2.5rem !important;
     font-size: 12px !important;
-    width: 8rem !important;
+    width: 11rem !important;
   }
   .custom-btn3 {
-    height: 2rem !important;
+    height: 2.5rem !important;
     font-size: 12px !important;
-    width: 8rem !important;
+    width: 11rem !important;
   }
 
   .qr-ticket {
