@@ -4,7 +4,7 @@ import NavbarBooking from "../components/NavbarBooking";
 import Footer from "../components/Footer/index";
 import PropTypes from "prop-types";
 
-export default function LayoutAsli({
+export default function CheckoutLayout({
   openPayment = false,
   openSuccess = false,
   isSaved = false,
@@ -26,7 +26,7 @@ export default function LayoutAsli({
   );
 }
 
-LayoutAsli.propTypes = {
+CheckoutLayout.propTypes = {
   children: PropTypes.node.isRequired,
   openPayment: PropTypes.bool,
   openSuccess: PropTypes.bool,

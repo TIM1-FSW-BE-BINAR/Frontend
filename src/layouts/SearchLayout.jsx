@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import "../components/Search/SearchFlight.css";
-import { Accordion, Button, Col, Container, Modal, Row } from "react-bootstrap";
+import { Accordion, Button, Col, Container, Modal, Row, Card } from "react-bootstrap";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaArrowRight } from "react-icons/fa";
 import { FiBox } from "react-icons/fi";
 import { FiHeart } from "react-icons/fi";
 import { FiDollarSign } from "react-icons/fi";
 import { LuArrowUpDown } from "react-icons/lu";
+import flightIcon from "../assets/homepage/icon/flight-takeoff-icon.png";
 import selectedIcon from "../assets/homepage/icon/selected-icon.png";
 import longArrowRight from "../assets/homepage/icon/long-arrow-right-icon.png";
 import baggageDelay from "../assets/homepage/icon/baggage-delay-icon.png";
@@ -28,10 +29,15 @@ import { useQuery } from "@tanstack/react-query";
 import { getFlights, getFlightId } from "../service/flight/flightService";
 import toast, { Toaster } from "react-hot-toast";
 import { useSelector } from "react-redux";
+import InformationBox from "../components/Search/InformationBox";
 
 const SearchFlight = ({
   fromInput,
   toInput,
+  infoDepartureCityName,
+  infoReturnCityName,
+  infoDepartureDate,
+  infoReturnDate,
   departureDate,
   returnDate,
   passengers,
@@ -82,15 +88,14 @@ const SearchFlight = ({
   const [dateBtnActive, setDateBtnActive] = useState(null);
   const dateObj = new Date(date);
   const [currentWeek, setCurrentWeek] = useState(dateObj);
-  const [weekDates, setWeekDates] = useState([]); 
-  const [dateActive, setDateActive] = useState(date); 
+  const [weekDates, setWeekDates] = useState([]);
+  const [dateActive, setDateActive] = useState(date);
 
   const calculateWeekDates = (baseDate) => {
     const startDate = startOfWeek(baseDate, { weekStartsOn: 1 });
     return Array.from({ length: 7 }, (_, i) => addDays(startDate, i));
   };
 
-  // update tanggal saat minggu berubah
   useEffect(() => {
     const week = calculateWeekDates(currentWeek);
 
@@ -107,27 +112,27 @@ const SearchFlight = ({
     }
   }, [currentWeek, dateObj, dateBtnActive]);
 
- const handleNextWeek = () => {
-   const maxDate = addWeeks(new Date(dateActive), 1);
-   const lastDayOfCurrentWeek = endOfWeek(currentWeek, { weekStartsOn: 1 });
+  const handleNextWeek = () => {
+    const maxDate = addWeeks(new Date(dateActive), 1);
+    const lastDayOfCurrentWeek = endOfWeek(currentWeek, { weekStartsOn: 1 });
 
-   if (lastDayOfCurrentWeek < maxDate) {
-     setCurrentWeek((prevDate) => addWeeks(prevDate, 1));
-   } else {
-     toast.error("Cannot go further than one week ahead!");
-   }
- };
+    if (lastDayOfCurrentWeek < maxDate) {
+      setCurrentWeek((prevDate) => addWeeks(prevDate, 1));
+    } else {
+      toast.error("Cannot go further than one week ahead!");
+    }
+  };
 
- const handlePreviousWeek = () => {
-   const minDate = subWeeks(new Date(dateActive), 1);
-   const firstDayOfCurrentWeek = startOfWeek(currentWeek, { weekStartsOn: 1 });
+  const handlePreviousWeek = () => {
+    const minDate = subWeeks(new Date(dateActive), 1);
+    const firstDayOfCurrentWeek = startOfWeek(currentWeek, { weekStartsOn: 1 });
 
-   if (firstDayOfCurrentWeek > minDate) {
-     setCurrentWeek((prevDate) => subWeeks(prevDate, 1));
-   } else {
-     toast.error("Cannot go further than one week back!");
-   }
- };
+    if (firstDayOfCurrentWeek > minDate) {
+      setCurrentWeek((prevDate) => subWeeks(prevDate, 1));
+    } else {
+      toast.error("Cannot go further than one week back!");
+    }
+  };
 
   const handleDateBtnActive = (index, date) => {
     if (returnPage) {
@@ -240,7 +245,6 @@ const SearchFlight = ({
   const handleBookingPage = async (flight) => {
     const flightDataById = await getFlightId(flight?.id);
     if (flightDataById.error?.message) {
-      // tiket nya habis
       setTicketSoldOut(true);
     } else {
       if (returnPage) {
@@ -324,6 +328,8 @@ const SearchFlight = ({
     localStorage.setItem("timeLeft", initialTime);
     setIsTimerActive(true);
   };
+
+  const activeFlight = flightsData[0];
 
   return (
     <>
@@ -418,125 +424,21 @@ const SearchFlight = ({
         <Row className="mt-4">
           <Col
             xs={12}
-            lg={3}
+            lg={4}
             xl={2}
-            className="border p-3 rounded shadow mb-5"
-            style={{
-              background: "#FFFFFF",
-              borderRadius: "12px",
-              height: "230px",
-            }}
+            style={{ maxHeight: "28vh", padding: "0px" }}
           >
-            <h4
-              style={{
-                fontSize: "18px",
-                fontWeight: "bold",
-                color: "#000000",
-              }}
-            >
-              Filter
-            </h4>
-            <div
-              className="d-flex justify-content-between align-items-center pt-2 mb-3"
-              style={{
-                borderBottom: "1px solid #D0D0D0",
-                paddingBottom: "8px",
-              }}
-            >
-              <div className="d-flex align-items-center">
-                <FiBox
-                  style={{
-                    width: "24px",
-                    height: "24px",
-                    color: "#8A8A8A",
-                  }}
-                />
-                <h5
-                  className="ms-2 mb-0"
-                  style={{
-                    fontSize: "16px",
-                    fontWeight: "normal",
-                    color: "#000000",
-                  }}
-                >
-                  Transit
-                </h5>
-              </div>
-              <FaArrowRight
-                style={{
-                  color: "#8A8A8A",
-                  fontSize: "16px",
-                }}
+              <InformationBox
+                infoDepartureCityName={infoDepartureCityName}
+                infoReturnCityName={infoReturnCityName}
+                infoReturnDate={infoReturnDate}
+                departureFlight={flightSelect}
+                activeFlight={activeFlight}
+                formatDate={formatDate}
+                formatTime={formatTime}
               />
-            </div>
-
-            <div
-              className="d-flex justify-content-between align-items-center pt-2 mb-3"
-              style={{
-                borderBottom: "1px solid #D0D0D0",
-                paddingBottom: "8px",
-              }}
-            >
-              <div className="d-flex align-items-center">
-                <FiHeart
-                  style={{
-                    width: "24px",
-                    height: "24px",
-                    color: "#8A8A8A",
-                  }}
-                />
-                <h5
-                  className="ms-2 mb-0"
-                  style={{
-                    fontSize: "16px",
-                    fontWeight: "normal",
-                    color: "#000000",
-                  }}
-                >
-                  Fasilitas
-                </h5>
-              </div>
-              <FaArrowRight
-                style={{
-                  color: "#8A8A8A",
-                  fontSize: "16px",
-                }}
-              />
-            </div>
-
-            <div
-              className="d-flex justify-content-between align-items-center pt-2 mb-3"
-              style={{
-                paddingBottom: "8px",
-              }}
-            >
-              <div className="d-flex align-items-center">
-                <FiDollarSign
-                  style={{
-                    width: "24px",
-                    height: "24px",
-                    color: "#8A8A8A",
-                  }}
-                />
-                <h5
-                  className="ms-2 mb-0"
-                  style={{
-                    fontSize: "16px",
-                    fontWeight: "normal",
-                    color: "#000000",
-                  }}
-                >
-                  Harga
-                </h5>
-              </div>
-              <FaArrowRight
-                style={{
-                  color: "#8A8A8A",
-                  fontSize: "16px",
-                }}
-              />
-            </div>
           </Col>
+
           <Col>
             {loading ? (
               <div className="d-flex justify-content-center align-items-center">

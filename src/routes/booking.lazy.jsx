@@ -1,7 +1,7 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import BookingForm from "../components/Booking/BookingForm";
 import Protected from "../components/Auth/Protected";
-import LayoutAsli from "../layouts/LayoutAsli";
+import CheckoutLayout from "../layouts/CheckoutLayout";
 import { useState } from "react";
 
 export const Route = createLazyFileRoute("/booking")({
@@ -17,7 +17,7 @@ function Booking() {
   const [isPayment, setIsPayment] = useState(false);
 
   return (
-    <LayoutAsli 
+    <CheckoutLayout
       openPayment={false}
       openSuccess={false}
       isSaved={isSaved}
@@ -29,6 +29,6 @@ function Booking() {
         setIsPayment={setIsPayment}
         isPayment={isPayment}
       />
-    </LayoutAsli>
+    </CheckoutLayout>
   );
 }
