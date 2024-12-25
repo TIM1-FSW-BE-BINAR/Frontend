@@ -1,4 +1,4 @@
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import {
   Button,
   Card,
@@ -213,7 +213,8 @@ const Homepage = () => {
   const [loading, setLoading] = useState(false);
 
   const [flightsDataAll, setFlightsDataAll] = useState([]);
-  const flightsDataAllRef = useRef(null); // Menyimpan nilai fetch pertama
+  const flightsDataAllRef = useRef(null); 
+  const pageItems = 10;
 
   // Fungsi untuk memeriksa apakah state berubah
   const stateChanged = () => {
@@ -244,10 +245,8 @@ const Homepage = () => {
     if (isSuccessFlight) {
       setFlightsData(flightData.data);
       const totalPage = flightData.meta.pagination.totalPage;
-      const pageItems = flightData.meta.pagination.pageItems;
       const totalData = parseInt(totalPage, 10) * parseInt(pageItems, 10);
 
-      // Set flightsDataAll jika belum pernah di-set atau jika state berubah
       if (flightsDataAllRef.current === null || stateChanged()) {
         flightsDataAllRef.current = totalData;
         setFlightsDataAll(totalData);
