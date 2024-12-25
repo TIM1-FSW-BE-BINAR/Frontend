@@ -1,13 +1,14 @@
 import React, { useRef, useState } from "react";
 import "../../Login/variables.scss";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useDispatch, useSelector } from "react-redux";
-import { Container, Row, Col, Button, Form, Image } from "react-bootstrap";
+import { useDispatch} from "react-redux";
+import {  Button, Form, Spinner } from "react-bootstrap";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { useMutation } from "@tanstack/react-query";
-import { register } from "../../../service/auth";
+import { register, googleLogin } from "../../../service/auth";
+import { useGoogleLogin } from "@react-oauth/google";
+import { FcGoogle } from "react-icons/fc";
 import { useSpring, animated } from "@react-spring/web";
-
 import { setToken } from "../../../redux/slices/auth";
 import toast, { Toaster } from "react-hot-toast";
 import PhoneInput from "react-phone-number-input";
@@ -44,7 +45,7 @@ const RegisterForm = () => {
   const passwordRef = useRef(null);
   const confirmPasswordRef = useRef(null);
 
-  const { mutate: registerUser } = useMutation({
+  const { mutate: registerUser, isPending } = useMutation({
     mutationFn: (request) => {
       return register(request);
     },
@@ -157,6 +158,26 @@ const RegisterForm = () => {
     registerUser(request);
   };
 
+  const { mutate: googleLoginUser } = useMutation({
+    mutationFn: (accessToken) => googleLogin(accessToken),
+    onSuccess: (result) => {
+      dispatch(setToken(result?.data?.token));
+      navigate({ to: "/" });
+    },
+    onError: (err) => {
+      toast.error(err.message || "Google login failed");
+    },
+  });
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      googleLoginUser(tokenResponse.access_token);
+    },
+    onError: (err) => {
+      toast.error("Google login error");
+    },
+  });
+
   const handleEyeToggle = (field) => {
     if (field === "password") {
       if (type === "password") {
@@ -176,6 +197,7 @@ const RegisterForm = () => {
       }
     }
   };
+
   const formAnimation = useSpring({
     from: { opacity: 0, transform: "translateY(50px)" },
     to: { opacity: 1, transform: "translateY(0px)" },
@@ -232,7 +254,6 @@ const RegisterForm = () => {
               {errors.lastName}
             </Form.Control.Feedback>
           </Form.Group>
-
           {/* Email */}
           <Form.Group className="mb-3" controlId="validationCustom03">
             <Form.Label>Email</Form.Label>
@@ -253,7 +274,6 @@ const RegisterForm = () => {
               {errors.email}
             </Form.Control.Feedback>
           </Form.Group>
-
           {/* Nomor Telepon */}
           <Form.Group className="mb-3" controlId="validationCustom04">
             <Form.Label>Phone Number</Form.Label>
@@ -299,7 +319,6 @@ const RegisterForm = () => {
               {errors.phone}
             </Form.Control.Feedback>
           </Form.Group>
-
           {/* Buat Password */}
           <Form.Group className="mb-3" controlId="validationCustom05">
             <Form.Label>Create Password</Form.Label>
@@ -336,10 +355,9 @@ const RegisterForm = () => {
               </Form.Control.Feedback>
             </div>
           </Form.Group>
-
           {/* Konfirmasi Password */}
           <Form.Group className="mb-3">
-            <Form.Label>Confrim Password</Form.Label>
+            <Form.Label>Confirm Password</Form.Label>
             <div style={{ position: "relative" }}>
               <Form.Control
                 ref={confirmPasswordRef}
@@ -372,11 +390,10 @@ const RegisterForm = () => {
               </Form.Control.Feedback>
             </div>
           </Form.Group>
-
           <Button
             variant="primary"
             type="submit"
-            className="w-100 mb-3"
+            className="w-100 mt-3 animated-button"
             style={{
               backgroundColor: "#7126B5",
               border: "none",
@@ -384,8 +401,27 @@ const RegisterForm = () => {
             }}
             onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.5")}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+            disabled={isPending}
           >
-            Daftar
+            {isPending ? <Spinner animation="border" size="sm" /> : "Sign Up"}
+          </Button>
+
+          <h6 className="text-muted text-center mt-2"> or sign up with </h6>
+
+          <Button
+            variant=""
+            type="submit"
+            className="w-100 mb-3 text-light d-flex align-items-center justify-content-center animated-button"
+            onClick={handleGoogleLogin}
+            style={{
+              backgroundColor: "#000000",
+              transition: "opacity 0.3s ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+          >
+            <FcGoogle style={{ marginRight: "8px", fontSize: "20px" }} />
+            Google
           </Button>
         </Form>
         <div
