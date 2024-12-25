@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useDispatch, useSelector } from "react-redux";
-import { Container, Row, Col, Button, Form, Image } from "react-bootstrap";
+import { useDispatch } from "react-redux";
+import { Button, Form, Spinner } from "react-bootstrap";
 import { IoEyeOutline, IoEyeOffOutline, IoArrowBack } from "react-icons/io5";
 import { FcGoogle } from "react-icons/fc";
 import ForgetPasswordForm from "./forgetPasswordForm";
@@ -28,7 +28,7 @@ const loginForm = () => {
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
 
-  const { mutate: loginUser } = useMutation({
+  const { mutate: loginUser, isPending } = useMutation({
     mutationFn: (request) => {
       return login(request);
     },
@@ -219,7 +219,7 @@ const loginForm = () => {
                 variant="primary"
                 type="submit"
                 className="w-100 "
-                disabled={disabled}
+                disabled={disabled && isPending}
                 style={{
                   backgroundColor: "#7126B5",
                   border: "none",
@@ -232,11 +232,13 @@ const loginForm = () => {
                 onMouseLeave={(e) =>
                   !disabled && (e.currentTarget.style.opacity = "1")
                 }
-              >
-                Login
+                >
+                  {isPending ? <Spinner animation="border" size="sm" /> : "Login"}                
               </Button>
             </Form>
+
             <h6 className="text-muted text-center mt-2"> or continue with </h6>
+
             <Button
               variant=""
               type="submit"

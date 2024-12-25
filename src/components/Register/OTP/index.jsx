@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
+import { Container, Row, Spinner, Button, Form } from "react-bootstrap";
 import { useNavigate, useLocation } from "@tanstack/react-router";
 import OtpInput from "react-otp-input";
 import { IoArrowBack } from "react-icons/io5";
@@ -25,7 +25,7 @@ const OTPForm = () => {
     return () => clearInterval(countdown);
   }, [timer]);
 
-  const { mutate: verifyRegister } = useMutation({
+  const { mutate: verifyRegister, isPending } = useMutation({
     mutationFn: (request) => {
       return verifyEmail(request);
     },
@@ -186,7 +186,7 @@ const OTPForm = () => {
             </p>
           ) : (
             <p
-              className="mt-4"
+              className="mt-4 animated-button"
               style={{ color: "red", fontWeight: "bold", cursor: "pointer" }}
               onClick={handleResendOtp}
             >
@@ -198,7 +198,7 @@ const OTPForm = () => {
           <Button
             variant="primary"
             type="submit"
-            className="w-50 mb-4 mt-4"
+            className="w-50 mb-4 mt-4 animated-button"
             style={{
               backgroundColor: "#7126B5",
               border: "none",
@@ -208,8 +208,9 @@ const OTPForm = () => {
             }}
             onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.5")}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+            disabled={isPending}
           >
-            Verify
+            {isPending ? <Spinner animation="border" size="sm" /> : "Verify"}            
           </Button>
         </Row>
       </Form>
