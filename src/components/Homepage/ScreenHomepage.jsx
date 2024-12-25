@@ -259,7 +259,7 @@ const Homepage = () => {
         setNotFound(false);
       }
     } else if (isErrorFlight) {
-      console.log("flight error");
+      toast.error("Something went wrong");
     } else if (isPendingFlight) {
       setLoading(true);
     }
@@ -320,7 +320,7 @@ const Homepage = () => {
     if (isSuccessAirports) {
       setAirportsAll(airportsData);
     } else if (isErrorAirports) {
-      console.log("Airports error occurred.");
+      toast.error("Something went wrong");
     }
   }, [airportsData, isErrorAirports, isSuccessAirports]);
 
