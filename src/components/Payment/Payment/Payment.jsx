@@ -84,18 +84,27 @@ const PaymentOptions = () => {
     <Container className="py-4">
       <Row className="justify-content-center">
         <Col lg={7}>
-          <Card className="shadow-sm mb-4">
-            <Card.Body>
+          <Card
+            className="shadow-sm mb-4"
+            style={{
+              maxWidth: "100%", 
+              height: "auto", 
+              maxHeight: "90%", 
+              overflow: "hidden", 
+            }}
+          >
+            <Card.Body style={{ overflow: "auto" }}>
+              {" "}
               <Card.Title className="fw-bold text-start mb-4">
                 Complete Payment
               </Card.Title>
               <div
                 id="snap-container"
                 className="rounded w-100"
-                style={{ height: "100%", maxHeight: "70vh" }}
-                xs={12}
-                md={12}
-                lg={12}
+                style={{
+                  minHeight: "50px", 
+                  maxHeight: "100%", 
+                }}
               >
                 {!snapLoaded && (
                   <div className="text-center mt-4">
