@@ -41,6 +41,7 @@ const DetailPesanan = ({ bookingId, amount }) => {
     if (!flight) {
       return null;
     }
+
     return (
       <Card.Body>
         <h5 className="fw-bold">{title}</h5>
@@ -198,14 +199,15 @@ const DetailPesanan = ({ bookingId, amount }) => {
           <div className="d-flex justify-content-between fw-bold">
             <div>
               <h5 className="fw-bold">Total Price:</h5>
-              <small
-                style={{ fontSize: "12px", color: "gray" }}
-              >
+              <small style={{ fontSize: "12px", color: "gray" }}>
                 Tax included
               </small>
             </div>
             <h4 className="fw-bold" style={{ color: "#7126B5" }}>
-              IDR {amount || "N/A"}
+              IDR{" "}
+              {amount && !isNaN(parseFloat(amount))
+                ? parseFloat(amount).toLocaleString("id-ID")
+                : "N/A"}
             </h4>
           </div>
         </Card.Body>
