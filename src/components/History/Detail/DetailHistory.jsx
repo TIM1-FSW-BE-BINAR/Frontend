@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, Button, Row, Col, Image, Accordion } from "react-bootstrap";
-import { getIdBooking } from "../../../service/booking";
+import { getIdBooking, getCodeBooking } from "../../../service/booking";
 import { tickets } from "../../../service/ticket";
 import { useSelector } from "react-redux";
 import { VscChromeClose } from "react-icons/vsc";
@@ -23,7 +23,7 @@ import { ClassNames } from "@emotion/react";
 import { ToastContainer } from "react-toastify";
 import { useNotificationCenter } from "react-toastify/addons/use-notification-center";
 
-const DetailHistory = ({ id, onBack }) => {
+const DetailHistory = ({ id, code, onBack }) => {
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const [booking, setBookingDetail] = useState(null);
@@ -37,6 +37,17 @@ const DetailHistory = ({ id, onBack }) => {
     queryFn: () => getIdBooking(id),
     enabled: !!id && !!token,
   });
+
+  console.log("booing id: ", data);
+
+  const { data: codeData } = useQuery({
+    queryKey: ["getCodeBooking", booking?.code],
+    queryFn: () => getBookingBooking(booking?.code),
+    enabled: !!booking?.code && !!token,
+  });
+
+  console.log("booking by code: ", codeData);
+  console.log("matched payment: ", matchedPayment);
 
   const { data: paymentData } = useQuery({
     queryKey: ["payment"],
@@ -269,8 +280,6 @@ const DetailHistory = ({ id, onBack }) => {
     }
 
     try {
-      cardElement.scrollTop = 0;
-
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       const buttons = document.querySelectorAll(".custom-btn2, .custom-btn3");
@@ -416,11 +425,11 @@ const DetailHistory = ({ id, onBack }) => {
         className="shadow-sm rounded border-1 mt-5 card-detail-history customized-style"
         style={{
           width: "27rem",
-          height: "65rem",
+          height: "110rem",
           position: "sticky",
           top: "20px",
           background: "#FFFFFF",
-          overflowY: "auto",
+          // overflowY: "auto",
         }}
       >
         <Button
@@ -431,13 +440,17 @@ const DetailHistory = ({ id, onBack }) => {
         >
           <VscChromeClose size={25} style={{ color: "black" }} />
         </Button>
+
         <Card.Body
-          style={{
-            maxHeight: "100%",
-            overflowY: "auto",
-          }}
+          style={
+            {
+              // maxHeight: "100%",
+              // overflowY: "auto",
+            }
+          }
+          className="card-body2"
         >
-          <div style={{ height: "80rem" }}>
+          <div style={{}}>
             {" "}
             {/* Status Pesanan */}
             <div className="d-flex justify-content-between align-items-center mb-3 custom-status">
@@ -477,112 +490,254 @@ const DetailHistory = ({ id, onBack }) => {
                 {booking?.code || "N/A"}
               </span>
             </div>
-            {/* Keberangkatan */}
-            <div className="mb-3 d-flex align-items-start justify-content-between">
-              <div>
-                <p className="m-0 fw-bold">
-                  {booking?.flight?.departureTime
-                    ? format(new Date(booking.flight.departureTime), "HH:mm", {
-                        locale: enUS,
-                      })
-                    : "N/A"}
-                </p>
-                <p className="m-0">
-                  {booking?.flight?.departureTime
-                    ? format(
-                        new Date(booking.flight.departureTime),
-                        "dd MMMM yyyy",
-                        {
-                          locale: enUS,
-                        }
-                      )
-                    : "N/A"}
-                </p>
-                <p className="m-0">
-                  {booking?.flight?.departure?.name || "Departure Airport N/A"}
-                </p>
-              </div>
-              <span className="fw-bold" style={{ color: "#A06ECE" }}>
-                Departure
-              </span>
-            </div>
-            <hr />
-            <div className="mb-3 d-flex align-items-center">
-              {/* Logo Maskapai */}
-              <img
-                className="me-4"
-                src={
-                  booking?.flight?.airline?.imageUrl ||
-                  "imageUrl Airline not available"
-                }
-                alt={
-                  booking?.flight?.airline?.imageId ||
-                  "imageId Airline not available"
-                }
-                style={{ width: "40px", height: "40px" }}
-              />
-
-              <div>
-                {/* Detail Maskapai */}
-                <h6 className="fw-bolder m-0 custom-flight">
-                  {booking?.flight?.airline?.name || "Airline not available"} -{" "}
-                  {booking.flight?.class
-                    ? booking.flight.class.replace(/_/g, " ")
-                    : "Class not available"}
-                </h6>
-                <p className="m-0 fw-bold">
-                  {booking?.flight?.flightNumber || "Flight Number N/A"}
-                </p>
-                {/* Informasi Penumpang */}
-                <div className="mt-4">
-                  <h6 className="fw-bolder mb-0 custom-flight-info">
-                    Information:
-                  </h6>
-                  {booking?.bookingDetail?.map((detail, index) => (
-                    <div key={detail.id}>
-                      <p
-                        className="m-0"
-                        style={{ color: "#4B1979", fontWeight: "500" }}
-                      >
-                        {`Penumpang ${index + 1}: ${detail.passenger?.name} ${detail.passenger?.familyName} `}
-                      </p>
-                      <p className="m-0">{`ID: ${detail.passenger?.identityNumber || "N/A"}`}</p>
-                    </div>
-                  ))}
+            {/* Card untuk Flight */}
+            <Card className="mb-3 shadow-sm border-1 custom-card-arr">
+              <Card.Body>
+                <h6 className="fw-bold">Flight</h6>
+                <div className="mb-3 d-flex align-items-start justify-content-between">
+                  <div>
+                    <p className="m-0 fw-bold">
+                      {booking?.flight?.departureTime
+                        ? format(
+                            new Date(booking.flight.departureTime),
+                            "HH:mm",
+                            {
+                              locale: enUS,
+                            }
+                          )
+                        : "N/A"}
+                    </p>
+                    <p className="m-0">
+                      {booking?.flight?.departureTime
+                        ? format(
+                            new Date(booking.flight.departureTime),
+                            "dd MMMM yyyy",
+                            {
+                              locale: enUS,
+                            }
+                          )
+                        : "N/A"}
+                    </p>
+                    <p className="m-0">
+                      {booking?.flight?.departure?.name ||
+                        "Departure Airport N/A"}
+                    </p>
+                  </div>
+                  <span className="fw-bold" style={{ color: "#A06ECE" }}>
+                    Departure
+                  </span>
                 </div>
-              </div>
-            </div>
-            <hr />
-            {/* Kedatangan */}
-            <div className="mb-3 d-flex align-items-start justify-content-between">
-              <div>
-                <p className="m-0 fw-bold">
-                  {booking?.flight?.arrivalTime
-                    ? format(new Date(booking.flight.arrivalTime), "HH:mm", {
-                        locale: enUS,
-                      })
-                    : "N/A"}
-                </p>
-                <p className="m-0">
-                  {booking?.flight?.arrivalTime
-                    ? format(
-                        new Date(booking.flight.arrivalTime),
-                        "dd MMMM yyyy",
-                        {
-                          locale: enUS,
-                        }
-                      )
-                    : "N/A"}
-                </p>
-                <p className="m-0">
-                  {booking?.flight?.arrival?.name || "Arrival Airport N/A"}
-                </p>
-              </div>
+                <hr />
+                <div className="mb-3 d-flex align-items-center">
+                  {/* Logo Maskapai */}
+                  <img
+                    className="me-4"
+                    src={
+                      booking?.flight?.airline?.imageUrl ||
+                      "imageUrl Airline not available"
+                    }
+                    alt={
+                      booking?.flight?.airline?.imageId ||
+                      "imageId Airline not available"
+                    }
+                    style={{ width: "40px", height: "40px" }}
+                  />
 
-              <span className="fw-bold" style={{ color: "#A06ECE" }}>
-                Arrival
-              </span>
-            </div>
+                  <div>
+                    {/* Detail Maskapai */}
+                    <h6 className="fw-bolder m-0 custom-flight">
+                      {booking?.flight?.airline?.name ||
+                        "Airline not available"}{" "}
+                      -{" "}
+                      {booking.flight?.class
+                        ? booking.flight.class.replace(/_/g, " ")
+                        : "Class not available"}
+                    </h6>
+                    <p className="m-0 fw-bold">
+                      {booking?.flight?.flightNumber || "Flight Number N/A"}
+                    </p>
+                    {/* Informasi Penumpang */}
+                    <div className="mt-4">
+                      <h6 className="fw-bolder mb-0 custom-flight-info">
+                        Information:
+                      </h6>
+                      {booking?.bookingDetail?.map((detail, index) => (
+                        <div key={detail.id}>
+                          <p
+                            className="m-0"
+                            style={{ color: "#4B1979", fontWeight: "500" }}
+                          >
+                            {`Penumpang ${index + 1}: ${detail.passenger?.name} ${detail.passenger?.familyName} `}
+                          </p>
+                          <p className="m-0">{`ID: ${detail.passenger?.identityNumber || "N/A"}`}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <hr />
+                {/* Kedatangan */}
+                <div className="mb-3 d-flex align-items-start justify-content-between">
+                  <div>
+                    <p className="m-0 fw-bold">
+                      {booking?.flight?.arrivalTime
+                        ? format(
+                            new Date(booking.flight.arrivalTime),
+                            "HH:mm",
+                            {
+                              locale: enUS,
+                            }
+                          )
+                        : "N/A"}
+                    </p>
+                    <p className="m-0">
+                      {booking?.flight?.arrivalTime
+                        ? format(
+                            new Date(booking.flight.arrivalTime),
+                            "dd MMMM yyyy",
+                            {
+                              locale: enUS,
+                            }
+                          )
+                        : "N/A"}
+                    </p>
+                    <p className="m-0">
+                      {booking?.flight?.arrival?.name || "Arrival Airport N/A"}
+                    </p>
+                  </div>
+
+                  <span className="fw-bold" style={{ color: "#A06ECE" }}>
+                    Arrival
+                  </span>
+                </div>
+              </Card.Body>
+            </Card>
+            {/* Card untuk Return Flight (Jika Ada) */}
+            {booking?.returnFlight && (
+              <Card className="mb-3 shadow-sm border-1">
+                <Card.Body>
+                  <h6 className="fw-bold">Return Flight</h6>
+                  <div className="mb-3 d-flex align-items-start justify-content-between">
+                    <div>
+                      <p className="m-0 fw-bold">
+                        {booking?.returnFlight?.departureTime
+                          ? format(
+                              new Date(booking.returnFlight.departureTime),
+                              "HH:mm",
+                              {
+                                locale: enUS,
+                              }
+                            )
+                          : "N/A"}
+                      </p>
+                      <p className="m-0">
+                        {booking?.returnFlight?.departureTime
+                          ? format(
+                              new Date(booking.returnFlight.departureTime),
+                              "dd MMMM yyyy",
+                              {
+                                locale: enUS,
+                              }
+                            )
+                          : "N/A"}
+                      </p>
+                      <p className="m-0">
+                        {booking?.returnFlight?.departure?.name ||
+                          "Departure Airport N/A"}
+                      </p>
+                    </div>
+                    <span className="fw-bold" style={{ color: "#A06ECE" }}>
+                      Departure
+                    </span>
+                  </div>
+                  <hr />
+                  <div className="mb-3 d-flex align-items-center">
+                    {/* Logo Maskapai */}
+                    <img
+                      className="me-4"
+                      src={
+                        booking?.returnFlight?.airline?.imageUrl ||
+                        "imageUrl Airline not available"
+                      }
+                      alt={
+                        booking?.returnFlight?.airline?.imageId ||
+                        "imageId Airline not available"
+                      }
+                      style={{ width: "40px", height: "40px" }}
+                    />
+
+                    <div>
+                      {/* Detail Maskapai */}
+                      <h6 className="fw-bolder m-0 custom-flight">
+                        {booking?.returnFlight?.airline?.name ||
+                          "Airline not available"}{" "}
+                        -{" "}
+                        {booking.returnFlight?.class
+                          ? booking.returnFlight.class.replace(/_/g, " ")
+                          : "Class not available"}
+                      </h6>
+                      <p className="m-0 fw-bold">
+                        {booking?.returnFlight?.flightNumber ||
+                          "Flight Number N/A"}
+                      </p>
+                      {/* Informasi Penumpang */}
+                      <div className="mt-4">
+                        <h6 className="fw-bolder mb-0 custom-flight-info">
+                          Information:
+                        </h6>
+                        {booking?.bookingDetail?.map((detail, index) => (
+                          <div key={detail.id}>
+                            <p
+                              className="m-0"
+                              style={{ color: "#4B1979", fontWeight: "500" }}
+                            >
+                              {`Penumpang ${index + 1}: ${detail.passenger?.name} ${detail.passenger?.familyName} `}
+                            </p>
+                            <p className="m-0">{`ID: ${detail.passenger?.identityNumber || "N/A"}`}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <hr />
+                  {/* Kedatangan */}
+                  <div className="mb-3 d-flex align-items-start justify-content-between">
+                    <div>
+                      <p className="m-0 fw-bold">
+                        {booking?.returnFlight?.arrivalTime
+                          ? format(
+                              new Date(booking.returnFlight.arrivalTime),
+                              "HH:mm",
+                              {
+                                locale: enUS,
+                              }
+                            )
+                          : "N/A"}
+                      </p>
+                      <p className="m-0">
+                        {booking?.returnFlight?.arrivalTime
+                          ? format(
+                              new Date(booking.returnFlight.arrivalTime),
+                              "dd MMMM yyyy",
+                              {
+                                locale: enUS,
+                              }
+                            )
+                          : "N/A"}
+                      </p>
+                      <p className="m-0">
+                        {booking?.returnFlight?.arrival?.name ||
+                          "Arrival Airport N/A"}
+                      </p>
+                    </div>
+
+                    <span className="fw-bold" style={{ color: "#A06ECE" }}>
+                      Arrival
+                    </span>
+                  </div>
+                </Card.Body>
+              </Card>
+            )}
             <hr />
             {/* Rincian Harga */}
             <div className="mb-3">
@@ -675,9 +830,6 @@ const DetailHistory = ({ id, onBack }) => {
                     : ""}
               </Button>
             </div>
-            {isOverlayVisible && (
-              <div className="overlay" onClick={handleOverlayClick}></div>
-            )}
             {/* Tombol Cancel Payment */}
             {matchedPayment?.status === "pending" && (
               <div className="mt-2 text-center">
@@ -698,45 +850,51 @@ const DetailHistory = ({ id, onBack }) => {
             {/* tombol download */}
             {booking?.bookingDetail[0]?.qrCodeImage && (
               <div className="mt-3 text-center">
-                <Button
-                  variant="none"
-                  className="mb-3 me-2 rounded-pill custom-btn2"
-                  style={{
-                    backgroundColor: "#FFFFFF",
-                    color: "#4B1979",
-                    borderColor: "#4B1979",
-                    height: "3rem",
-                    width: "10rem",
-                  }}
-                  onClick={handleDownloadQRCode}
-                >
-                  Download QR
-                </Button>
-                <Button
-                  variant="none"
-                  className="mb-3 text-white rounded-pill custom-btn3"
-                  style={{
-                    backgroundColor: "#4B1979",
-                    height: "3rem",
-                    width: "10rem",
-                  }}
-                  onClick={handleDownloadTicket}
-                >
-                  Print Ticket
-                </Button>
-
                 <h6 className="custom-h6-qr">Scan QR Ticket:</h6>
-                <Image
-                  src={booking?.bookingDetail[0]?.qrCodeImage}
-                  alt="QR Code"
-                  className="img-fluid qr-ticket"
-                  style={{ maxWidth: "200px" }}
-                />
+                <div>
+                  <Image
+                    src={booking?.bookingDetail[0]?.qrCodeImage}
+                    alt="QR Code"
+                    className="img-fluid qr-ticket mb-3"
+                    style={{ maxWidth: "200px" }}
+                  />
+                </div>
+                <div className="d-flex justify-content-center gap-2">
+                  <Button
+                    variant="none"
+                    className="mb-3 me-2 rounded-pill custom-btn2"
+                    style={{
+                      backgroundColor: "#FFFFFF",
+                      color: "#4B1979",
+                      borderColor: "#4B1979",
+                      height: "3rem",
+                      width: "10rem",
+                    }}
+                    onClick={handleDownloadQRCode}
+                  >
+                    Download QR
+                  </Button>
+                  <Button
+                    variant="none"
+                    className="mb-3 text-white rounded-pill custom-btn3"
+                    style={{
+                      backgroundColor: "#4B1979",
+                      height: "3rem",
+                      width: "10rem",
+                    }}
+                    onClick={handleDownloadTicket}
+                  >
+                    Print Ticket
+                  </Button>
+                </div>
               </div>
             )}
           </div>
         </Card.Body>
       </Card>
+      {isOverlayVisible && (
+        <div className="overlay" onClick={handleOverlayClick}></div>
+      )}
       <Toaster
         containerStyle={{
           left: "2.5rem",
