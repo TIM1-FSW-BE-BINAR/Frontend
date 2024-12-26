@@ -38,16 +38,11 @@ const DetailHistory = ({ id, code, onBack }) => {
     enabled: !!id && !!token,
   });
 
-  console.log("booing id: ", data);
-
   const { data: codeData } = useQuery({
     queryKey: ["getCodeBooking", booking?.code],
     queryFn: () => getBookingBooking(booking?.code),
     enabled: !!booking?.code && !!token,
   });
-
-  console.log("booking by code: ", codeData);
-  console.log("matched payment: ", matchedPayment);
 
   const { data: paymentData } = useQuery({
     queryKey: ["payment"],
@@ -280,6 +275,10 @@ const DetailHistory = ({ id, code, onBack }) => {
     }
 
     try {
+      const originalHeight = cardElement.style.height;
+
+      cardElement.style.height = "200rem";
+
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       const buttons = document.querySelectorAll(".custom-btn2, .custom-btn3");
@@ -291,6 +290,7 @@ const DetailHistory = ({ id, code, onBack }) => {
         scale: 2,
       });
 
+      cardElement.style.height = originalHeight;
       buttons.forEach((button) => (button.style.display = ""));
 
       const imgData = canvas.toDataURL("image/png");
@@ -425,11 +425,11 @@ const DetailHistory = ({ id, code, onBack }) => {
         className="shadow-sm rounded border-1 mt-5 card-detail-history customized-style"
         style={{
           width: "27rem",
-          height: "110rem",
+          height: "43rem",
           position: "sticky",
           top: "20px",
           background: "#FFFFFF",
-          // overflowY: "auto",
+          overflowY: "auto",
         }}
       >
         <Button
@@ -442,12 +442,10 @@ const DetailHistory = ({ id, code, onBack }) => {
         </Button>
 
         <Card.Body
-          style={
-            {
-              // maxHeight: "100%",
-              // overflowY: "auto",
-            }
-          }
+          style={{
+            maxHeight: "100%",
+            overflowY: "auto",
+          }}
           className="card-body2"
         >
           <div style={{}}>
