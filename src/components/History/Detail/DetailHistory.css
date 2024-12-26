@@ -1,5 +1,5 @@
 .card-detail-history {
-  max-height: 65rem;
+  max-height: 100rem;
   overflow-y: auto;
 }
 
@@ -124,12 +124,27 @@
   }
 }
 
-@media (min-width: 427px) and (max-width: 768px) {
-  .custom-card.customized-style {
-    width: 35vw !important;
-    position: relative !important;
-    left: -2rem !important;
+@media (min-width: 427px) and (max-width: 769px) {
+  .card-detail-history {
+    width: 20rem !important;
+    /* position: relative !important; */
+    margin-left: -2rem !important;
     font-size: 13px !important;
+  }
+
+  .custom-status-span {
+    margin-bottom: 10px !important;
+    font-size: 10px !important;
+  }
+
+  .custom-card-arr {
+    width: 30vw !important;
+  }
+
+  .custom-flight,
+  .custom-flight-info,
+  .custom-payment {
+    font-size: 12px !important;
   }
 
   .custom-h6 {
@@ -147,8 +162,29 @@
   }
 
   .print-button,
-  .cancel-button {
+  .cancel-button,
+  .customh6-qr {
     font-size: 13px !important;
+  }
+
+  .custom-btn1 {
+    height: 2.5rem !important;
+    font-size: 12px !important;
+    width: 11rem !important;
+  }
+  .custom-btn2 {
+    height: 2.5rem !important;
+    font-size: 12px !important;
+    width: 11rem !important;
+  }
+  .custom-btn3 {
+    height: 2.5rem !important;
+    font-size: 12px !important;
+    width: 11rem !important;
+  }
+
+  .qr-ticket {
+    height: 10rem !important;
   }
 }
 
