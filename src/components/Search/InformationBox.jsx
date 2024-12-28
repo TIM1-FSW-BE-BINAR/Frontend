@@ -90,7 +90,7 @@ const InformationBox = ({
                       color: "#000000",
                     }}
                   >
-                   {!flight || !departureFlight
+                    {!flight || !departureFlight
                       ? activeFlight?.departureTime &&
                         !isNaN(new Date(activeFlight.departureTime))
                         ? formatDate(activeFlight?.departureTime)
@@ -150,7 +150,7 @@ const InformationBox = ({
                         color: "#000000",
                       }}
                     >
-                     {!flight || !departureFlight
+                      {!flight || !departureFlight
                         ? infoReturnDate && !isNaN(new Date(infoReturnDate))
                           ? formatDate(infoReturnDate)
                           : "Not Available"
