@@ -1,17 +1,10 @@
-
 import "font-awesome/css/font-awesome.min.css";
-import { FaPlane } from "react-icons/fa"; 
+import { FaPlane } from "react-icons/fa";
 import { FaArrowRight } from "react-icons/fa";
 import PropTypes from "prop-types";
 import { getFlightId } from "../../service/flight/flightService";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Col,
-  Row,
-} from "react-bootstrap";
+import { Card, CardBody, CardHeader, Col, Row } from "react-bootstrap";
 
 const InformationBox = ({
   infoDepartureCityName,
@@ -21,7 +14,6 @@ const InformationBox = ({
   departureFlight,
   formatDate,
 }) => {
-
   const { data: flight } = useQuery({
     queryKey: ["flight", departureFlight],
     queryFn: () => getFlightId(departureFlight),
