@@ -47,9 +47,17 @@ const SeatMapReturn = ({
 
   useEffect(() => {
     const fetchReturnSeats = async () => {
-      const params = { flightId: returnFlightId };
-      const data = await getAllSeats(params);
-      setReturnSeats(data?.data || []);
+      try {
+        const params = { flightId: returnFlightId };
+        const data = await getAllSeats(params);
+        setReturnSeats(data?.data || []);
+      } catch (error) {
+        console.error(
+          "Error fetching return seat data:",
+          error.message,
+          error.stack
+        );
+      }
     };
     if (returnFlightId) {
       fetchReturnSeats();

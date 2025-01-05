@@ -87,10 +87,10 @@ const PaymentOptions = () => {
           <Card
             className="shadow-sm mb-4"
             style={{
-              maxWidth: "100%", 
-              height: "auto", 
-              maxHeight: "90%", 
-              overflow: "hidden", 
+              maxWidth: "100%",
+              height: "auto",
+              maxHeight: "90%",
+              overflow: "hidden",
             }}
           >
             <Card.Body style={{ overflow: "auto" }}>
@@ -102,8 +102,8 @@ const PaymentOptions = () => {
                 id="snap-container"
                 className="rounded w-100"
                 style={{
-                  minHeight: "50px", 
-                  maxHeight: "100%", 
+                  minHeight: "50px",
+                  maxHeight: "100%",
                 }}
               >
                 {!snapLoaded && (

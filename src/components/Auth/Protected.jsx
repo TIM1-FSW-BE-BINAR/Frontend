@@ -6,7 +6,6 @@ const Protected = ({ children, roles }) => {
 
   const { token, users } = useSelector((state) => state.auth);
 
-  // if token not found It will redirect it to login
   if (!token) {
     navigate({ to: "/login" });
     return;
