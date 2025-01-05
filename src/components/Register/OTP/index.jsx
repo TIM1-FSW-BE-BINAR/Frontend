@@ -219,26 +219,3 @@ const OTPForm = () => {
 };
 
 export default OTPForm;
-
-{
-  /* <Row className="justify-content-center mb-3">
-          {otp.map((value, index) => (
-            <Col key={index} xs="auto">
-              <Form.Control
-                type="text"
-                maxLength="1"
-                value={value}
-                onChange={(e) => handleChange(e.target, index)}
-                onFocus={(e) => e.target.select()}
-                className="text-center"
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  fontSize: "24px",
-                  fontWeight: "bold",
-                }}
-              />
-            </Col>
-          ))}
-        </Row> */
-}

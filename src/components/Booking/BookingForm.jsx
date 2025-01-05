@@ -45,14 +45,15 @@ function BookingForm({ setIsSaved, isSaved, setIsPayment, isPayment }) {
     searchParams.get("returnFlightId") || "0",
     10
   );
-  const totalPassengers = Math.max(
-    0,
-    parseInt(searchParams.get("totalPassengers") || "0", 10)
-  );
+  // const totalPassengers = Math.max(
+  //   0,
+  //   parseInt(searchParams.get("totalPassengers") || "0", 10)
+  // );
   const adultInput = parseInt(searchParams.get("adultInput") || "0", 10);
   const childInput = parseInt(searchParams.get("childInput") || "0", 10);
   const babyInput = parseInt(searchParams.get("babyInput") || "0", 10);
   const totalSeat = adultInput + childInput;
+  const totalPassengers = adultInput + childInput + babyInput;
   const passengers = Array.from(
     { length: totalPassengers > 0 ? totalPassengers : 0 },
     (_, index) => {

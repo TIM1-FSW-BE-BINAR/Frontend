@@ -67,7 +67,6 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
       } else {
         console.error("No bookingId in response:", response);
       }
-      setIsPayment(true);
     },
     onError: (error) => {
       console.error("Booking error:", error);
@@ -310,11 +309,11 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
                         fontSize: "16px",
                       }}
                     >
-                      IDR
-                      {returnFlight?.data?.price * adultInput &&
-                      !isNaN(parseFloat(returnFlight?.data?.price * adultInput))
+                      IDR{" "}
+                      {flight?.data?.price * adultInput &&
+                      !isNaN(parseFloat(flight?.data?.price * adultInput))
                         ? parseFloat(
-                            returnFlight?.data?.price * adultInput
+                            flight?.data?.price * adultInput
                           ).toLocaleString("id-ID")
                         : "0"}
                     </span>
@@ -332,11 +331,11 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
                         fontSize: "16px",
                       }}
                     >
-                      IDR
-                      {returnFlight?.data?.price * childInput &&
-                      !isNaN(parseFloat(returnFlight?.data?.price * childInput))
+                      IDR{" "}
+                      {flight?.data?.price * childInput &&
+                      !isNaN(parseFloat(flight?.data?.price * childInput))
                         ? parseFloat(
-                            returnFlight?.data?.price * childInput
+                            flight?.data?.price * childInput
                           ).toLocaleString("id-ID")
                         : "0"}
                     </span>
@@ -369,7 +368,7 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
                       fontSize: "16px",
                     }}
                   >
-                    IDR
+                    IDR{" "}
                     {taxDeparture && !isNaN(parseFloat(taxDeparture))
                       ? parseFloat(taxDeparture).toLocaleString("id-ID")
                       : "0"}
@@ -386,7 +385,7 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
                       fontSize: "16px",
                     }}
                   >
-                    IDR
+                    IDR{" "}
                     {discountDeparture && !isNaN(parseFloat(discountDeparture))
                       ? parseFloat(discountDeparture).toLocaleString("id-ID")
                       : "0"}
