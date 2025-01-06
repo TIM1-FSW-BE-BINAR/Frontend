@@ -72,6 +72,10 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
       console.error("Booking error:", error);
       toast.error(`Error: ${error.message}`);
     },
+    onError: (error) => {
+      console.error("Booking error:", error);
+      toast.error(`Error: ${error.message}`);
+    },
   });
 
   const { data: flight, isLoading } = useQuery({
@@ -487,15 +491,7 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
                             fontSize: "16px",
                           }}
                         >
-                          IDR
-                          {returnFlight?.data?.price * adultInput &&
-                          !isNaN(
-                            parseFloat(returnFlight?.data?.price * adultInput)
-                          )
-                            ? parseFloat(
-                                returnFlight?.data?.price * adultInput
-                              ).toLocaleString("id-ID")
-                            : "0"}
+                          IDR {returnFlight?.data?.price * adultInput || 0}
                         </span>
                       </div>
                     )}
@@ -511,15 +507,7 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
                             fontSize: "16px",
                           }}
                         >
-                          IDR
-                          {returnFlight?.data?.price * childInput &&
-                          !isNaN(
-                            parseFloat(returnFlight?.data?.price * childInput)
-                          )
-                            ? parseFloat(
-                                returnFlight?.data?.price * childInput
-                              ).toLocaleString("id-ID")
-                            : "0"}
+                          IDR {returnFlight?.data?.price * childInput || 0}
                         </span>
                       </div>
                     )}
@@ -550,10 +538,7 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
                           fontSize: "16px",
                         }}
                       >
-                        IDR
-                        {taxReturn && !isNaN(parseFloat(taxReturn))
-                          ? parseFloat(taxReturn).toLocaleString("id-ID")
-                          : "0"}
+                        IDR {taxReturn}
                       </span>
                     </div>
 
@@ -567,10 +552,7 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
                           fontSize: "16px",
                         }}
                       >
-                        IDR
-                        {discountReturn && !isNaN(parseFloat(discountReturn))
-                          ? parseFloat(discountReturn).toLocaleString("id-ID")
-                          : "0"}
+                        IDR {discountReturn}
                       </span>
                     </div>
                   </div>
@@ -632,14 +614,7 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
                     <span>
                       discount : {discount.value} %
                       <br />
-                      minimum order : IDR{" "}
-                      {discount.minPurchase &&
-                      !isNaN(parseFloat(discount.minPurchase))
-                        ? parseFloat(discount.minPurchase).toLocaleString(
-                            "id-ID"
-                          )
-                        : "0"}{" "}
-                      <br />
+                      minimum order : IDR {discount.minPurchase} <br />
                       expired at : {
                         parseDateAndTime(discount.endDate).date
                       }{" "}
@@ -686,10 +661,7 @@ const TicketDetails = ({ isSaved, setIsPayment, dataBooking }) => {
               fontSize: "20px",
             }}
           >
-            IDR{" "}
-            {Total && !isNaN(parseFloat(Total))
-              ? parseFloat(Total).toLocaleString("id-ID")
-              : "N/A"}
+            IDR {Total}
           </span>
         </div>
 
