@@ -168,21 +168,6 @@ const DetailPesanan = ({ bookingId, amount }) => {
       "Return Ticket"
     );
 
-  // const departureTotal = groupedPassengers(booking.bookingDetail);
-  // const returnTotal = groupedPassengers(booking.returnBookingDetail);
-
-  // const totalPrice =
-  //   (departureTotal &&
-  //     Object.values(departureTotal).reduce(
-  //       (sum, data) => sum + data.totalPrice,
-  //       0
-  //     )) +
-  //   (returnTotal &&
-  //     Object.values(returnTotal).reduce(
-  //       (sum, data) => sum + data.totalPrice,
-  //       0
-  //     ));
-
   return (
     <>
       {/* Booking Code */}

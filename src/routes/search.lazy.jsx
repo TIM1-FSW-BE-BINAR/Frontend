@@ -45,7 +45,7 @@ function Search() {
     }
   }, [classInput]);
 
-  const { data, isSuccess, } = useQuery({
+  const { data, isSuccess } = useQuery({
     queryKey: ["airports"],
     queryFn: () => getAirports(),
   });

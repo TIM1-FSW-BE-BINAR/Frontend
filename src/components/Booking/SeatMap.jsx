@@ -41,9 +41,13 @@ const SeatMap = ({ selectedSeats, setSelectedSeats, totalSeat, isSaved }) => {
 
   useEffect(() => {
     const fetchSeats = async () => {
-      const params = { flightId };
-      const data = await getAllSeats(params);
-      setSeats(data?.data || []);
+      try {
+        const params = { flightId };
+        const data = await getAllSeats(params);
+        setSeats(data?.data || []);
+      } catch (error) {
+        console.error("Error fetching seat data:", error.message, error.stack);
+      }
     };
 
     fetchSeats();

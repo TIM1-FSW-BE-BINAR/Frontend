@@ -1,12 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-// Default (initial) state
 const initialState = {
   user: null,
   token: localStorage.getItem("token") || null,
 };
 
-// Slice action and reducer
 export const authSlice = createSlice({
   initialState,
   name: "auth",
@@ -16,7 +14,7 @@ export const authSlice = createSlice({
     },
     setToken: (state, action) => {
       if (action.payload) {
-        const createdAt = new Date().getTime(); // Waktu saat token disimpan
+        const createdAt = new Date().getTime(); 
         localStorage.setItem("token", action.payload);
         localStorage.setItem("token_created_at", createdAt.toString());
       } else {
@@ -33,19 +31,12 @@ export const isTokenExpired = () => {
   if (!createdAt) return true;
 
   const now = new Date().getTime();
-  const twentyFourHours = 24 * 60 * 60 * 1000; // 24 jam dalam milidetik
+  const twentyFourHours = 24 * 60 * 60 * 1000; 
 
   return now - parseInt(createdAt, 10) > twentyFourHours;
 };
 
-// Export the action
 export const { setToken, setUser } = authSlice.actions;
 
-// Export the state/reducers
 export default authSlice.reducer;
 
-/* 
-    Analogy in useState code
-*/
-// const [user, setUser] = useState(null);
-// const [token, setToken] = useState(localStorage.getItem("token") || null);

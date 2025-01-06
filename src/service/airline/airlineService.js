@@ -13,7 +13,6 @@ export const getAirlines = async (filters = {}) => {
     method: "GET",
   });
 
-  // get data
   const result = await response.json();
   if (!result) {
     throw new Error(result?.message);
